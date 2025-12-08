@@ -75,8 +75,7 @@ export default function Detail() {
         <h2 className="text-2xl font-bold">Episodes</h2>
         <Link
           href={`/admin/episode/add?id=${data?.id}`}
-          className="rounded-[40px] button-bg py-1 sm:py-2 px-3 sm:px-5 cursor-pointer text-sm sm:text-base md:text-md inline-block"
-        >
+          className="rounded-[40px] button-bg py-1 sm:py-2 px-3 sm:px-5 cursor-pointer text-sm sm:text-base md:text-md inline-block" >
           Add New Episode
         </Link>
         </div>

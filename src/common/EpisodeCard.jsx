@@ -72,13 +72,13 @@ export default function EpisodeCard({
     }}
 >
   {/* Image */}
-  <div className="relative w-full md:w-[400px] aspect-video rounded-2xl overflow-hidden flex-shrink-0">
+  <div className="relative w-full md:min-h-[260px] h-full md:w-[400px] aspect-video rounded-2xl overflow-hidden flex-shrink-0">
     <Image
       src={episode?.thumbnail || ""}
       alt={episode?.title}
       layout="fill"
       objectFit="cover"
-      className="rounded-2xl"
+      className="rounded-2xl  object-cover h-full"
     />
     {/* Hover Play Icon */}
     <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
