@@ -1,8 +1,10 @@
 import React from 'react'
 import podcastImage from "../assets/e-guidebanner.png"
 import Image from 'next/image'
+import { useAudioPlayer } from '@/context/AudioPlayerContext';
 
 export default function PodcastDetails({ podcast }) {
+    const { playTrack } = useAudioPlayer();
     // console.log("podcast", podcast);
     return (
         <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
@@ -24,7 +26,12 @@ export default function PodcastDetails({ podcast }) {
                 <p className="text-[16px] text-[#727272] font-[400] leading-snug mt-2">
                     {podcast?.description}
                 </p>
-                <button className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 cursor-pointer">
+                <button className="mt-4 px-4 py-2 bg-theme rounded cursor-pointer" 
+                onClick={()=>{
+                    console.log("podcast episodes", podcast?.episodes);
+                    playTrack(podcast?.episodes[0]);
+                }}
+                >
                     ▶ Latest Episode
                 </button>
             </div>

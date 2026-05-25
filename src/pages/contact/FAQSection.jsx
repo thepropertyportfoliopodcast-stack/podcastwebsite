@@ -38,16 +38,16 @@ export default function FAQSection() {
   };
 
   return (
-    <>
-      <h2 className="text-center text-4xl md:text-5xl font-bold uppercase my-12">
+    <div className="mt-[30px] mb-[30px] md:mt-[50px] lg:mb-[40px] lg:mt-[60px] lg:mb-[50px]">
+      <h2 className="text-[25px] md:text-[35px] xl:text-[40px] font-work font-[800] leading-[1.15] uppercase text-center mb-[25px]">
         <span className="text-theme">Frequently </span> Asked Questions
       </h2>
-      <div className="space-y-4 bg-[#2C2C2C]">
+      <div className=" p-[15px] md:p-[30px] lg:p-[40px] bg-[#0F0F0F] border border-[#FFFFFF66] rounded-[10px] md:rounded-[15px]">
         {faqs &&
           faqs?.map((faq, index) => (
-            <div key={index} onClick={() => toggleIndex(index)} className={`rounded-lg ${index === 0 ? "border-t pt-3" : ""} border-b border-white/20 cursor-pointer`}>
-              <div className="w-full flex justify-between items-center text-left px-6 py-3">
-              <span className="text-base md:text-lg leading-[20px] md:leading-[24px] font-[500] text-white">
+            <div key={index} onClick={() => toggleIndex(index)} className={` ${index === 0 ? "border-t" : ""}  border-b border-[#FFFFFF14] cursor-pointer`}>
+              <div className="w-full flex justify-between items-center text-left  py-6">
+              <span className="text-[16px] md:text-[20px] lg:text-[25px] leading-[22px] md:leading-[24px] font-[600] text-white">
                 {faq?.question}
               </span>
               {activeIndex === index ? (
@@ -57,7 +57,7 @@ export default function FAQSection() {
               )}
             </div>
               {activeIndex === index && (
-                <div className="flex gap-2 px-6 pb-4 text-sm md:text-base leading-[20px] md:leading-[22px] text-white/50 max-w-4xl">
+                <div className="flex gap-2 px-2 md:px-6 pb-4 text-[14px] md:text-[18px] lg:text-[20px] font-[600] leading-[20px] md:leading-[22px] text-white max-w-4xl">
                     <HiOutlineArrowTurnDownRight size={24} className="min-w-fit text-purple-200"/>
                   {faq?.answer}
                 </div>
@@ -65,6 +65,6 @@ export default function FAQSection() {
             </div>
           ))}
       </div>
-    </>
+    </div>
   );
 }

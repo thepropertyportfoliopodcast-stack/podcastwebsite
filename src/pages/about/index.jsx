@@ -1,5 +1,6 @@
 import Heading from "@/common/Heading";
 import Layout from "@/layout/Layout";
+import Image from "next/image";
 import React from "react";
 import {
   HiOutlineMicrophone,
@@ -72,15 +73,25 @@ const Index = () => {
 
   return (
     <Layout>
-      <div className="text-white pt-[118px] lg:pt-[128px]">
-        <NewVoice />
+      <div className=" pt-[118px] lg:pt-[128px] pb-[40px] md:pb-[60px] lg:pb-[0px]">
+          <NewVoice />
           <MeetYourHost />
       </div>
-      <div className="relative overflow-hidden mt-10">
-        <div className="absolute w-[20vw] max-w-[500px] aspect-square -left-[5%] top-1/10 blurcircle rounded-r-full" />
-        <div className="absolute w-[20vw] max-w-[500px] aspect-square -right-[5%] bottom-1/10 blurcircle rounded-l-full" />
-        <div className="container xl:max-w-[1440px] mx-auto px-4 ">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+
+
+
+
+
+      <div className="relative overflow-hidden mt-2  md:mt-10 ">
+            <div className="absolute z-0 xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square left-[0] top-[-100px]  1111blurcircle rounded-r-full z-1">
+              <Image src={"/lightpinkleft.png"} layout="fill" objectFit="cover" className="object-cover w-full" />
+            </div>
+
+             
+
+        <div className="px-4 max-w-[1310px] m-auto">
+          <div className="flex gap-[15px] flex-wrap md:flex-nowrap">
             <Vision />
             <Mission />
           </div>

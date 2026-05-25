@@ -10,49 +10,62 @@ export default function VideoPlayer() {
   const videoRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  useEffect(() => {
-    if (videoRef.current) {
-      const player = new Plyr(videoRef.current, {
-        controls: [
-          "play",
-          "progress",
-          "current-time",
-          "mute",
-          "volume",
-          "fullscreen",
-        ],
-      });
+  // console.log("selectedEpisode",selectedEpisode);
 
-      // Handle fullscreen events
-      player.on("enterfullscreen", () => setIsFullscreen(true));
-      player.on("exitfullscreen", () => setIsFullscreen(false));
-    }
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const player = new Plyr(videoRef.current, {
+      controls: [
+        "play",
+        "progress",
+        "current-time",
+        "mute",
+        "volume",
+        "fullscreen",
+      ],
+    });
+
+    player.on("enterfullscreen", () => setIsFullscreen(true));
+    player.on("exitfullscreen", () => setIsFullscreen(false));
+
+    return () => {
+      player.pause();
+      player.destroy();
+    };
   }, [selectedEpisode?.link]);
 
   return (
     <div className="fixed inset-0 z-[99] bg-black flex justify-center p-4">
       <div className="relative w-full max-w-[90vw]">
-        <div className="flex justify-between items-center">
-          <div className="p-6 text-left font-semibold text-lg text-white">
+        <div
+          className="absolute z-10 w-full flex justify-between items-center
+                  bg-black/60 backdrop-blur-md"
+        >
+          <div className="p-4 text-left font-medium text-base text-gray-100 truncate">
             {selectedEpisode?.title}
           </div>
+
           <button
-            className="text-white text-xl cursor-pointer z-50"
+            className="text-gray-300 hover:text-white p-4 transition-colors cursor-pointer"
             onClick={() => {
+              videoRef.current?.pause();
               setSelectedEpisode(null);
               setCurrentTrack(null);
             }}
           >
-            <IoMdClose size={22} />
+            <IoMdClose size={20} />
           </button>
         </div>
+
         <video
+          poster={selectedEpisode?.thumbnail}
           ref={videoRef}
           src={selectedEpisode?.link}
           playsInline
           controls
           autoPlay
-          className={`w-auto h-full rounded-lg ${
+          className={`w-full h-full rounded-lg ${
             isFullscreen ? "" : "max-h-[90vh]"
           }`}
         />

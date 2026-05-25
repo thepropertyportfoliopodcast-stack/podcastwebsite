@@ -3,17 +3,26 @@ import MiniPlayer from "./MiniPlayer";
 import FullPlayer from "./FullPlayer";
 import VideoPlayer from "./VideoPlayer";
 import AudioPlyr from "./AudioPlyr";
+import { useEffect } from "react";
 
 function isVideo(url) {
   return /\.(mp4|webm|ogg|mov)(\?.*)?$/.test(url);
 }
 
 export default function Player() {
-  const { isMinimized, selectedEpisode } = useAudioPlayer();
+  const { isMinimized, selectedEpisode, pauseTrack } = useAudioPlayer();
 
   if (!selectedEpisode) return null;
 
   const isVideoFile = isVideo(selectedEpisode.link);
+
+  useEffect(() => {
+  if (!selectedEpisode) return;
+
+  const isVideo = /\.(mp4|webm|ogg|mov)/.test(selectedEpisode.link);
+  if (isVideo) pauseTrack();
+}, [selectedEpisode]);
+
 
   if (isVideoFile) return <VideoPlayer />;
 

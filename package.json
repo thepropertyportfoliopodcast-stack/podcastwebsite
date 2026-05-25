@@ -20,8 +20,10 @@
     "react-h5-audio-player": "^3.10.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
+    "react-player": "^3.4.0",
     "react-quill-new": "^3.6.0",
-    "swiper": "^11.2.10"
+    "swiper": "^11.2.10",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

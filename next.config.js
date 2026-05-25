@@ -20,6 +20,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'abhinav-bucket.s3.ap-south-1.amazonaws.com',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
         hostname: 'f004.backblazeb2.com',
         pathname: '**',
       },

@@ -18,8 +18,8 @@ class Listing extends Component {
     return Api.get("/podcast/get")
   }
 
-  async EpisodeGetAll(search="") {
-    return Api.get(`/file/getAll?search=${search}`)
+  async EpisodeGetAll(search = "", topic = "", page = 1, limit = 10) {
+    return Api.get(`/file/getAll?search=${search}&topic=${topic}&page=${page}&limit=${limit}`);
   }
 
   async HomeEpisode() {
@@ -87,16 +87,16 @@ class Listing extends Component {
   }
 
   async AddSubscriber(data){
-    return Api.post("/subscriber/add" , data)
+    return Api.post("/subscriber/add" , data);
   }
-async enquiryGet() {
-    return Api.get("/contact/get")
+async enquiryGet(page, limit) {
+    return Api.get(`contact/get?page=${page}&limit=${limit}`);
   }
-   async GetSubscriber(){
-    return Api.get("/subscriber/get" , )
+   async GetSubscriber(page, limit){
+    return Api.get(`/subscriber/get?page=${page}&limit=${limit}`);
   }
   async AddContact(data){
-    return  Api.post("/contact/add" ,data)
+    return  Api.post("/contact/add",data)
   }
   render() {
     return (

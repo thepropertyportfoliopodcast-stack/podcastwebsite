@@ -10,6 +10,7 @@ import AddEpisode from "./AddEpisode";
 import PodcastDetails from "@/common/PodcastDetails";
 import Link from "next/link";
 import Loader from "@/common/Loader";
+import toast from "react-hot-toast";
 
 export default function Detail() {
   const router = useRouter();
@@ -37,6 +38,18 @@ export default function Detail() {
       fetchDetails(slug);
     }
   }, [slug]);
+
+  const videoRss = `https://api.thepropertyportfolio.com.au/rss/video/podcasts/${data?.uuid}`;
+  const audioRss = `https://api.thepropertyportfolio.com.au/rss/audio/podcasts/${data?.uuid}`;
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success("Copied to clipboard")
+    } catch {
+      toast.error("Copy failed")
+    }
+  }
   // console.log("data", data);
 
   return (
@@ -70,18 +83,68 @@ export default function Detail() {
       {loading ? <Loader/> : 
       <>
       <PodcastDetails podcast={data}/>
+        {/* 🔗 RSS Feed Links */}
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold text-white mb-3">
+            RSS feed links
+          </h3>
+
+          {/* Video RSS */}
+          {/* <div className="mb-3">
+            <p className="text-sm text-gray-400 mb-1">
+              Video RSS Link
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={videoRss}
+                className="flex-1 bg-[#1c1c1c] text-gray-300 text-sm px-3 py-2 rounded border border-gray-700"
+              />
+              <button
+                onClick={() => copyToClipboard(videoRss)}
+                className="px-3 py-2 bg-[#2a2a2a] text-white rounded hover:bg-[#3a3a3a] cursor-pointer"
+              >
+                Copy
+              </button>
+            </div>
+          </div> */}
+
+          {/* Audio RSS */}
+          <div className="mb-3">
+            <p className="text-sm text-gray-400 mb-1">
+              Audio RSS Link
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={audioRss}
+                className="flex-1 bg-[#1c1c1c] text-gray-300 text-sm px-3 py-2 rounded border border-gray-700"
+              />
+              <button
+                onClick={() => copyToClipboard(audioRss)}
+                className="px-3 py-2 bg-[#2a2a2a] text-white rounded hover:bg-[#3a3a3a] cursor-pointer"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+
       <div className="mt-8">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-3">
         <h2 className="text-2xl font-bold">Episodes</h2>
         <Link
           href={`/admin/episode/add?id=${data?.id}`}
-          className="rounded-[40px] button-bg py-1 sm:py-2 px-3 sm:px-5 cursor-pointer text-sm sm:text-base md:text-md inline-block" >
+          className="rounded-[40px] bg-theme py-1 sm:py-2 px-3 sm:px-5 cursor-pointer text-sm sm:text-base md:text-md inline-block"
+        >
           Add New Episode
         </Link>
         </div>
          <div className="space-y-8 mt-6">
           {data && data?.episodes && data?.episodes?.map((item,index)=>(
-            <EpisodeCard episode={item} key={index} setIsEpisodePopupOpen={setIsEpisodePopupOpen} setSelectedEpisode={setSelectedEpisode} fetchDetails={fetchDetails} isAdmin={true} slug={slug}/>
+            <EpisodeCard episode={item} key={index} setIsEpisodePopupOpen={setIsEpisodePopupOpen} setSelectedEpisode={setSelectedEpisode} fetchDetails={fetchDetails} isAdmin={true} slug={slug} data={data}/>
           ))}
          </div>
       </div>

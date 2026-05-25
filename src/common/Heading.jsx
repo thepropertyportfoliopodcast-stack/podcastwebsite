@@ -3,11 +3,11 @@ import React from 'react'
 export default function Heading({ title, content, subtitle, className }) {
     return (
         <div className={`${className}`}>
-            <h2 className="text-[30px] sm:text-[41px] lg:text-[52px] font-[700] mb-2 uppercase">
+            <h2 className="text-[25px] md:text-[35px] xl:text-[40px] font-work font-[800] leading-[1.15] uppercase mb-[15px]">
                 <span className="text-white">{title}</span>
                 <span className="text-theme"> {subtitle}</span>
             </h2>
-            <p className="text-[18px] sm:text-[20px] md:text-[18px] mb-8 text-[#FFFFFFCC]">
+            <p className="font-[600] text-[18px] md:text-[20px]  mb-[40px] text-white">
                 {content}
             </p>
         </div>

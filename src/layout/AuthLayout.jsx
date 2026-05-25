@@ -81,7 +81,7 @@ export default function AuthLayout({ children }) {
                   </p>
                 </div>
               </div>
-              <button className="hidden md:flex" onClick={handleLogout}>
+              <button className="hidden md:flex cursor-pointer" onClick={handleLogout}>
                 <TbLogout color="#fff" className="me-2" size={"2rem"} />
               </button>
 

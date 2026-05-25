@@ -16,35 +16,131 @@ export default function Edit() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    topic: "",
     thumbnail: null,
     video: null,
+    audio: null,
+    audioUrl: "",
     details: null,
+    timestamps: null,
     mimefield: "",
     duration: 0,
     durationInSec: 0,
     size: 0,
+    isSpotify: false,
+    spotifyLink: "",
+    isApple: false,
+    appleLink: "",
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null); 
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const [uploadingVideo, setUploadingVideo] = useState(false);
 
+  // Audio States
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [audioUploadProgress, setAudioUploadProgress] = useState(0);
+  const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
+
+  const validateImageDimensions = (file, requiredWidth, requiredHeight) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+
+        if (img.width === requiredWidth && img.height === requiredHeight) {
+          resolve(true);
+        } else {
+          reject(
+            `Thumbnail must be exactly ${requiredWidth} × ${requiredHeight}px. 
+            Selected image is ${img.width} × ${img.height}px.`
+          );
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject("Invalid image file");
+      };
+
+      img.src = objectUrl;
+    });
+  };
+
   const handleQuillChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleChange = async(e) => {
-    const { name, value, files } = e.target;
+    const { name, value, files, type, checked } = e.target;
 
-    if (name === "thumbnail" && files?.[0]) {
-      const file = files[0];
-      if (!file.type.startsWith("image/")) {
-        toast.error("Only image files allowed");
+     if (type === "checkbox") {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: checked,
+          ...(name === "isSpotify" && !checked ? { spotifyLink: "" } : {}),
+          ...(name === "isApple" && !checked ? { appleLink: "" } : {}),
+        }));
         return;
       }
-      setFormData((prev) => ({ ...prev, thumbnail: file }));
-      setThumbnailPreview(URL.createObjectURL(file));
-      } else if (name === "video" && files?.[0]) {
+
+      if (name === "thumbnail" && files?.[0]) {
+        const file = files[0];
+        if (!file.type.startsWith("image/")) {
+          toast.error("Only image files allowed");
+          return;
+        }
+        try {
+          await validateImageDimensions(file, 3000, 3000);
+          setFormData((prev) => ({ ...prev, thumbnail: file }));
+          setThumbnailPreview(URL.createObjectURL(file));
+        } catch (err) {
+          toast.error(err);
+          e.target.value = ""; // reset file input
+          setFormData((prev) => ({ ...prev, thumbnail: null }));
+          setThumbnailPreview(null);
+        }
+        return;
+      }
+      else if (name === "audio" && files?.[0]) {
+        const file = files[0];
+
+        if (!file.type.startsWith("audio/")) {
+          toast.error("Only audio files allowed");
+          return;
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          audio: file,
+        }));
+
+        setUploadingAudio(true);
+        setAudioUploadProgress(0);
+        toast.loading("Uploading audio...");
+
+        try {
+          const url = await uploadLargeFile(file);
+          setUploadedAudioUrl(url);
+
+          setFormData((prev) => ({
+            ...prev,
+            audioUrl: url,
+          }));
+
+          toast.dismiss();
+          toast.success("Audio uploaded!");
+        } catch (err) {
+          toast.dismiss();
+          toast.error("Audio upload failed!");
+          console.error(err);
+        } finally {
+          setUploadingAudio(false);
+        }
+      } 
+      else if (name === "video" && files?.[0]) {
     const file = files[0];
 
     if (!file.type.startsWith("video/") && !file.type.startsWith("audio/")) {
@@ -101,14 +197,21 @@ export default function Edit() {
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
+
+    if (!file || !file.type.startsWith("image/")) {
+      toast.error("Only image files are allowed");
+      return;
+    }
+
+    try {
+      await validateImageDimensions(file, 3000, 3000);
       setFormData((prev) => ({ ...prev, thumbnail: file }));
       setThumbnailPreview(URL.createObjectURL(file));
-    } else {
-      toast.error("Only image files are allowed");
+    } catch (err) {
+      toast.error(err);
     }
   };
 
@@ -257,15 +360,25 @@ export default function Edit() {
       const main = new Listing();
       const payload = new FormData();
       payload.append("title", formData.title);
+      payload.append("topic", formData.topic);
       payload.append("description", formData.description);
       payload.append("podcastId", id);
       payload.append("detail", formData?.details);
+      payload.append("timestamps", formData.timestamps);
       if (formData.thumbnail instanceof File) { 
         payload.append("thumbnail", formData.thumbnail);
       }
-      // if (formData.video instanceof File) {
-      //   payload.append("video", formData.video);
-      // }
+      if (formData.isSpotify && formData.spotifyLink) {
+        payload.append("spotifyLink", formData.spotifyLink);
+      }
+
+      if (formData.isApple && formData.appleLink) {
+        payload.append("appleLink", formData.appleLink);
+      }
+
+      if (formData.audioUrl) {
+        payload.append("audio", formData.audioUrl);
+      }
       payload.append("link", uploadedFileUrl);
       payload.append("mimefield", formData.mimeType || "");
       payload.append("duration", formData.duration || 0);
@@ -278,6 +391,7 @@ export default function Edit() {
         setFormData({
           title: "",
           description: "",
+          topic: "",
           thumbnail: null,
           video: null,
         });
@@ -303,14 +417,21 @@ export default function Edit() {
       // Updating the fields as required
       setFormData({
       title: response?.data?.data?.title || "",
+      topic: response?.data?.data?.topic || "",
       description: response?.data?.data?.description || "",
       thumbnail: response?.data?.data?.thumbnail || null,
       video: response?.data?.data?.link || null,
+      audioUrl: response?.data?.data?.audio || "",
       details: response?.data?.data?.detail || null,
+      timestamps: response?.data?.data?.timestamps || null,
       mimefield: response?.data?.data?.mimefield || "",
       duration: response?.data?.data?.duration || 0,
       durationInSec: response?.data?.data?.durationInSec || 0,
       size: response?.data?.data?.size || 0,
+      isSpotify: !!response?.data?.data?.spotifyLink,
+      spotifyLink: response?.data?.data?.spotifyLink || "",
+      isApple: !!response?.data?.data?.appleLink,
+      appleLink: response?.data?.data?.appleLink || "",
     });
 
     if (response?.data?.data?.thumbnail) {
@@ -330,7 +451,7 @@ export default function Edit() {
     }
   }, [id]);
 
-  console.log("data", data);
+  // console.log("formData", formData);
 
   return (
     <AuthLayout>
@@ -365,11 +486,28 @@ export default function Edit() {
           />
         </div>
 
+        {/* Topic */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">
+            Topic <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="topic"
+            className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
+            value={formData.topic}
+            onChange={handleChange}
+          />
+        </div>
+
         {/* Thumbnail */}
         <div className="space-y-1">
           <label className="block text-sm font-medium">
             Thumbnail <span className="text-red-500">*</span>
           </label>
+          <p className="text-xs text-gray-400">
+            Required size: 3000 × 3000 px
+          </p>
           <div
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -406,7 +544,7 @@ export default function Edit() {
             name="video"
              accept="video/*,audio/*"
             onChange={handleChange}
-            className="w-full text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
+            className="w-full h-fit text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
           />
           {uploadingVideo && (
             <div>
@@ -419,14 +557,56 @@ export default function Edit() {
             <div className="text-green-400 text-sm mt-1">File uploaded ✔</div>
           )}
           {typeof formData.video === "string" && (
-            <video controls className="mt-2 w-full rounded-lg">
+            <video controls className="mt-2 w-full max-h-96 rounded-lg">
               <source src={data?.link} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           )}
         </div>
 
-        {/* Video */}
+        {/* Audio */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">
+            Audio
+          </label>
+
+          <input
+            type="file"
+            name="audio"
+            accept="audio/*"
+            onChange={handleChange}
+            className="w-full text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
+          />
+
+          {uploadingAudio && (
+            <div>
+              <label>Uploading Audio...</label>
+              <progress value={audioUploadProgress} max="100"></progress>
+              <span>{audioUploadProgress}%</span>
+            </div>
+          )}
+
+          {uploadedAudioUrl && (
+            <div className="text-green-400 text-sm mt-1">
+              Audio uploaded ✔
+            </div>
+          )}
+
+          {uploadedAudioUrl && (
+            <audio controls className="mt-2 w-full">
+              <source src={uploadedAudioUrl} />
+              Your browser does not support the audio tag.
+            </audio>
+          )}
+          {typeof formData.audioUrl === "string" && (
+            <audio controls className="mt-2 w-full">
+              <source src={formData.audioUrl} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          )}
+        </div>
+
+        {/* Details */}
         <div className="space-y-1">
           <label className="block text-sm font-medium">
             Details
@@ -437,6 +617,72 @@ export default function Edit() {
             handleBioChange={(val) => handleQuillChange('details', val)}
           />
         </div>
+        
+        {/* Timestamps */}
+        <div className="space-y-1 mt-[65px]">
+          <label className="block text-sm font-medium">
+            Timestamps
+          </label>
+          <ReactQuillEditor
+            label="timestamps"
+            desc={formData?.timestamps}
+            handleBioChange={(val) => handleQuillChange('timestamps', val)}
+          />
+        </div>
+
+        {/* Platform Availability */}
+        <div className="space-y-4 mt-[65px]">
+          <label className="block text-sm font-medium">
+            Available On
+          </label>
+
+          {/* Spotify */}
+          <div className="flex items-center gap-4">
+            <input
+              type="checkbox"
+              name="isSpotify"
+              checked={formData.isSpotify}
+              onChange={handleChange}
+              className="w-4 h-4"
+            />
+            <span>Available on Spotify</span>
+
+            {formData.isSpotify && (
+              <input
+                type="url"
+                name="spotifyLink"
+                placeholder="Enter Spotify link"
+                value={formData.spotifyLink}
+                onChange={handleChange}
+                className="flex-1 p-2 rounded-lg bg-[#1c1c1c] border border-gray-700 text-white"
+              />
+            )}
+          </div>
+
+          {/* Apple Music */}
+          <div className="flex items-center gap-4">
+            <input
+              type="checkbox"
+              name="isApple"
+              checked={formData.isApple}
+              onChange={handleChange}
+              className="w-4 h-4"
+            />
+            <span>Available on Apple Music</span>
+
+            {formData.isApple && (
+              <input
+                type="url"
+                name="appleLink"
+                placeholder="Enter Apple Music link"
+                value={formData.appleLink}
+                onChange={handleChange}
+                className="flex-1 p-2 rounded-lg bg-[#1c1c1c] border border-gray-700 text-white"
+              />
+            )}
+          </div>
+        </div>
+
 
         {/* Submit */}
         <div className="pt-2 mt-16">

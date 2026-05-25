@@ -16,9 +16,13 @@ export default function Add() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    topic: "",
     thumbnail: null,
     video: null,
+    audio: null,
+    audioUrl: "",
     details: null,
+    timestamps: null,
     mimefield: "",
     duration: 0,
     durationInSec: 0,
@@ -28,6 +32,38 @@ export default function Add() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+
+  // Audio States
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [audioUploadProgress, setAudioUploadProgress] = useState(0);
+  const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
+
+  const validateImageDimensions = (file, requiredWidth, requiredHeight) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+
+        if (img.width === requiredWidth && img.height === requiredHeight) {
+          resolve(true);
+        } else {
+          reject(
+            `Thumbnail must be exactly ${requiredWidth} × ${requiredHeight}px. 
+            Selected image is ${img.width} × ${img.height}px.`
+          );
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject("Invalid image file");
+      };
+
+      img.src = objectUrl;
+    });
+  };
 
   const handleQuillChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -42,9 +78,18 @@ export default function Add() {
         toast.error("Only image files allowed");
         return;
       }
-      setFormData((prev) => ({ ...prev, thumbnail: file }));
-      setThumbnailPreview(URL.createObjectURL(file));
-      } else if (name === "video" && files?.[0]) {
+      try {
+        await validateImageDimensions(file, 3000, 3000);
+        setFormData((prev) => ({ ...prev, thumbnail: file }));
+        setThumbnailPreview(URL.createObjectURL(file));
+      } catch (err) {
+        toast.error(err);
+        e.target.value = ""; // reset file input
+        setFormData((prev) => ({ ...prev, thumbnail: null }));
+        setThumbnailPreview(null);
+      }
+      return;
+    } else if (name === "video" && files?.[0]) {
     const file = files[0];
 
     if (!file.type.startsWith("video/") && !file.type.startsWith("audio/")) {
@@ -75,7 +120,7 @@ export default function Add() {
       setUploadingVideo(true);
       toast.loading("Uploading file...");
       try {
-        const url = await uploadLargeFile(file);
+        const url = await uploadLargeFile(file, "video");
         setUploadedFileUrl(url);
 
         setFormData((prev) => ({
@@ -96,19 +141,62 @@ export default function Add() {
 
     tempVideo.src = URL.createObjectURL(file);
        }
+       else if (name === "audio" && files?.[0]) {
+        const file = files[0];
+
+        if (!file.type.startsWith("audio/")) {
+          toast.error("Only audio files allowed");
+          return;
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          audio: file,
+        }));
+
+        setUploadingAudio(true);
+        setAudioUploadProgress(0);
+        toast.loading("Uploading audio...");
+
+        try {
+          const url = await uploadLargeFile(file, "audio");
+          setUploadedAudioUrl(url);
+
+          setFormData((prev) => ({
+            ...prev,
+            audioUrl: url,
+          }));
+
+          toast.dismiss();
+          toast.success("Audio uploaded!");
+        } catch (err) {
+          toast.dismiss();
+          toast.error("Audio upload failed!");
+          console.error(err);
+        } finally {
+          setUploadingAudio(false);
+        }
+      }
       else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
+
+    if (!file || !file.type.startsWith("image/")) {
+      toast.error("Only image files are allowed");
+      return;
+    }
+
+    try {
+      await validateImageDimensions(file, 3000, 3000);
       setFormData((prev) => ({ ...prev, thumbnail: file }));
       setThumbnailPreview(URL.createObjectURL(file));
-    } else {
-      toast.error("Only image files are allowed");
+    } catch (err) {
+      toast.error(err);
     }
   };
 
@@ -236,7 +324,7 @@ export default function Add() {
       }
   };
 
-  const uploadLargeFile = async (file) => {
+  const uploadLargeFile = async (file, type="video") => {
       const fileSize = file.size;
       const MIN_CHUNK_SIZE = 10 * 1024 * 1024;
       const MAX_CHUNKS = 100;
@@ -253,8 +341,13 @@ export default function Add() {
       const totalFileBytes = file.size;
       // --- END NEW ---
 
-      setUploadingVideo(true);
-      setUploadProgress(0);
+      if(type === "audio"){
+        setUploadingAudio(true);
+        setAudioUploadProgress(0);
+      }else{
+        setUploadingVideo(true);
+        setUploadProgress(0);
+      }
 
       try {
           const initRes = await Api.post(`/upload/init`, { fileName: file.name, mimeType: file.type });
@@ -281,7 +374,11 @@ export default function Add() {
 
                   // Calculate the single, overall percentage
                   const percent = Math.round((totalBytesTransferred / totalFileBytes) * 100);
-                  setUploadProgress(percent);
+                  if(type === "audio"){
+                    setAudioUploadProgress(percent);
+                  }else{
+                    setUploadProgress(percent);
+                  }
               };
 
               chunkTasks.push(
@@ -315,17 +412,29 @@ export default function Add() {
           const completeRes = await Api.post(`/upload/complete`, { uploadId, key, parts: allUploadedParts });
 
           // ... success handling remains the same ...
-          setUploadProgress(100);
+          if(type === "audio"){
+            setAudioUploadProgress(100);
+          }else{
+            setUploadProgress(100);
+          }
           toast.success("Upload completed!");
           return completeRes.data.fileUrl;
 
       } catch (error) {
           // ... failure handling remains the same ...
           toast.error(error.message.includes("chunk") ? error.message : "Upload failed, please try again.");
-          setUploadProgress(0);
+          if(type === "audio"){
+            setAudioUploadProgress(0);
+          }else{
+            setUploadProgress(0);
+          }
           return null;
       } finally {
+        if(type === "audio"){
+          setUploadingAudio(false);
+        }else{
           setUploadingVideo(false);
+        }
       }
   };
 
@@ -340,14 +449,19 @@ export default function Add() {
       const payload = new FormData();
       payload.append("title", formData.title);
       payload.append("description", formData.description);
+      payload.append("topic", formData.topic);
       payload.append("podcastId", id);
       payload.append("detail", formData.details);
+      payload.append("timestamps", formData.timestamps);
 
       // Video now handled via chunk upload
       if (!uploadedFileUrl) {
         toast.error("Please upload the video first!");
         setLoading(false);
         return;
+      }
+      if (formData.audioUrl) {
+        payload.append("audio", formData.audioUrl);
       }
 
       payload.append("link", uploadedFileUrl);
@@ -368,6 +482,7 @@ export default function Add() {
         setFormData({
           title: "",
           description: "",
+          topic: "",
           details: "",
           thumbnail: null,
           videoUrl: "",
@@ -423,11 +538,28 @@ export default function Add() {
           />
         </div>
 
+        {/* Topic */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">
+            Topic <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="topic"
+            className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
+            value={formData.topic}
+            onChange={handleChange}
+          />
+        </div>
+
         {/* Thumbnail */}
         <div className="space-y-1">
           <label className="block text-sm font-medium">
             Thumbnail <span className="text-red-500">*</span>
           </label>
+          <p className="text-xs text-gray-400">
+            Required size: 3000 × 3000 px
+          </p>
           <div
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -478,7 +610,43 @@ export default function Add() {
           )}
         </div>
 
-        {/* Video */}
+        {/* Audio */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">
+            Audio
+          </label>
+
+          <input
+            type="file"
+            name="audio"
+            accept="audio/*"
+            onChange={handleChange}
+            className="w-full text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
+          />
+
+          {uploadingAudio && (
+            <div>
+              <label>Uploading Audio...</label>
+              <progress value={audioUploadProgress} max="100"></progress>
+              <span>{audioUploadProgress}%</span>
+            </div>
+          )}
+
+          {uploadedAudioUrl && (
+            <div className="text-green-400 text-sm mt-1">
+              Audio uploaded ✔
+            </div>
+          )}
+
+          {uploadedAudioUrl && (
+            <audio controls className="mt-2 w-full">
+              <source src={uploadedAudioUrl} />
+              Your browser does not support the audio tag.
+            </audio>
+          )}
+        </div>
+
+        {/* Details */}
         <div className="space-y-1">
           <label className="block text-sm font-medium">
             Details
@@ -487,6 +655,18 @@ export default function Add() {
             label="details"
             desc={formData?.details}
             handleBioChange={(val) => handleQuillChange('details', val)}
+          />
+        </div>
+
+         {/* Timestamps */}
+        <div className="space-y-1 mt-[65px]">
+          <label className="block text-sm font-medium">
+            Timestamps
+          </label>
+          <ReactQuillEditor
+            label="timestamps"
+            desc={formData?.timestamps}
+            handleBioChange={(val) => handleQuillChange('timestamps', val)}
           />
         </div>
 

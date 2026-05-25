@@ -68,17 +68,17 @@ export default function Sidebar({ toggle, handleLogout }) {
             </Link>
           </li>
 
-          <li>
+          {/* <li>
             <Link
               className={`hover:opacity-[0.7] hover:text-white focus:!text-white bg-dark text-gray-200 mb-2 py-[13px] px-[13px] ${pathname === "/admin/guide" ? "bg-theme" : ""} border border-gray-700 rounded-2xl  flex items-center`}
               href={"/admin/guide"}
             >
               <BsFileEarmarkPdf className="me-2" size={"1.4rem"} /> Guides
             </Link>
-          </li>
+          </li> */}
 
           <li>
-            <button className="hover:opacity-[0.7] hover:text-white focus:!text-white text-gray-200 w-full mb-2 py-[13px] px-[13px] border border-gray-700 rounded-2xl bg-dark flex items-center" onClick={handleLogout}>
+            <button className="hover:opacity-[0.7] hover:text-white focus:!text-white text-gray-200 w-full mb-2 py-[13px] px-[13px] border border-gray-700 rounded-2xl bg-dark flex items-center cursor-pointer" onClick={handleLogout}>
               <MdOutlineLogout className="me-2" size={"1.4rem"} /> Logout
             </button>
           </li>

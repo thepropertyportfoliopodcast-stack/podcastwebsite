@@ -4,33 +4,49 @@ import Link from "next/link";
 
 export default function NewVoice() {
   return (
-    <section className="relative bg-[#1C1B1B] py-8 sm:py-20">
-      <div className="absolute w-[20vw] max-w-[500px] aspect-square -left-[5%] top-1/10 blurcircle rounded-r-full" />
-      <div className="absolute w-[20vw] max-w-[500px] aspect-square -right-[5%] bottom-1/10 blurcircle rounded-l-full" />
-      <div className="mx-auto container xl:max-w-[1440px] px-4 flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-12">
+    <section className="relative pt-[10px] md:pt-[20px] lg:pt-[50px]">
+      <div className="mx-auto container xl:max-w-[1310px] px-4 flex flex-col lg:flex-row items-center justify-between gap-[10px] md:gap-[25px]">
         {/* Left Content */}
-        <div className="text-white max-w-xl text-center lg:text-left relative z-[2]">
-          <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight">
-            Australia’s{" "}
-            <span className="text-theme"> New Voice in Educating Smart </span>
-            Property Investors.
+        <div className="text-white w-full max-w-[100%] lg:max-w-[50%] text-center lg:text-left relative z-[2]">
+          <h1 className="text-[25px] md:text-[35px] xl:text-[40px] font-work font-[800] leading-[1.15] uppercase">
+           Build Your <span className="text-theme"> Financial  Freedom </span> Alongside Australia’s Leading Voices.
+              
+            
           </h1>
-          <p className="mt-6 text-gray-300 text-base sm:text-lg leading-loose">
-            We're dedicated to transforming complex property investment concepts
-            into strategic frameworks that help intelligent investors to build
-            enduring wealth through property. Born from the strategic
-            collaboration between PropWealth and Nfinity Financials, two
-            industry-leading firms, we curate decades of combined expertise in
-            smart investment strategies, mortgage solutions, and robust
-            portfolio building to deliver refined, actionable insights that
-            empower astute investors.
+          <p className="mt-6 text-white text-base  font-outfit text-justify font-[600] text-[15px] md:text-[16px] xl:text-[18px] text-justify">
+          We engage with investors who have experienced the pitfalls, rejoiced in the successes, and discovered what truly succeeds in Australian property. We engage in real conversations about firsthand deals, real numbers, and meaningful decisions. We analyse the strategies that distinguish portfolio builders from those who merely dream of property ownership. Built for investors who value practical insights over noise, we translate complex investment thinking into real frameworks that smart investors like you can actually use.
+
           </p>
-          <ul className="mt-4 text-gray-300 text-base sm:text-lg list-disc list-inside space-y-1">
-            <li>23+ Years Combined Experience</li>
-            <li>Strategic Portfolio Building Focus</li>
-            <li>Data-Driven Investment Insights</li>
-            <li>Commitment to Your Success</li>
-          </ul>
+          <div className="flex items-center justify-center flex-wrap md:flex-nowrap lg:justify-start gap-[10px] mt-[25px] mb-[25px] md:mb-[0]">
+            <div className="relative w-[135px] sm:w-[150px] h-[115px] edubg ">
+              <div className=" absolute top-0 bottom-0 left-0 right-0 w-[98%] h-[98%] m-auto bg-[#0F0F0F] rounded-[10px]"></div>
+              <div className="relative w-full h-full text-[14px] font-[600] text-center z-1 flex items-center justify-center ">
+                23+ <br /> Years Combined Experience
+              </div>
+            </div>
+
+             <div className="relative  w-[135px] sm:w-[150px] h-[115px] edubg ">
+              <div className=" absolute top-0 bottom-0 left-0 right-0 w-[98%] h-[98%] m-auto bg-[#0F0F0F] rounded-[10px]"></div>
+              <div className="relative w-full h-full text-[14px] font-[600] text-center z-1 flex items-center justify-center ">
+                Every Real Estate Basics Explained
+              </div>
+            </div>
+
+             <div className="relative  w-[135px] sm:w-[150px] h-[115px] edubg ">
+              <div className=" absolute top-0 bottom-0 left-0 right-0 w-[98%] h-[98%] m-auto bg-[#0F0F0F] rounded-[10px]"></div>
+              <div className="relative w-full h-full text-[14px] font-[600] text-center z-1 flex items-center justify-center ">
+               Real-Time Market Intelligence for Smart Decisions
+              </div>
+            </div>
+
+             <div className="relative  w-[135px] sm:w-[150px] h-[115px] edubg ">
+              <div className=" absolute top-0 bottom-0 left-0 right-0 w-[98%] h-[98%] m-auto bg-[#0F0F0F] rounded-[10px]"></div>
+              <div className="relative w-full h-full text-[14px] font-[600] text-center z-1 flex items-center justify-center ">
+               Sharing Unfiltered Conversations of Industry Leaders
+              </div>
+            </div>
+          </div>
+         
 
           {/* <div className="mt-6 border-l-4 border-white pl-4 text-gray-200 flex items-start justify-center lg:justify-start gap-2 text-left">
                 <MdOutlineHeadphones size={22} className="mt-1 flex-shrink-0" />
@@ -47,13 +63,13 @@ export default function NewVoice() {
         </div>
 
         {/* Right Image */}
-        <div className="flex-shrink-0 w-full max-w-sm sm:max-w-md lg:max-w-lg relative z-[2]">
+        <div className=" w-full max-w-[100%] lg:max-w-[50%]  relative z-[2]">
           <Image
-            src="/investor.png"
+            src="/aboutimg.jpg"
             alt="Podcast Recording"
             width={700}
-            height={500}
-            className="rounded-xl object-cover w-full h-auto"
+            height={800}
+            className="rounded-xl object-cover w-full"
           />
         </div>
       </div>

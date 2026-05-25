@@ -83,7 +83,7 @@ export default function Login() {
             <div className="flex items-center justify-center lg:justify-start mb-6">
               <Link href="/">
                 <Image
-                  src="/Logo.png"
+                  src="/logo.png"
                   width={2110}
                   height={520}
                   alt="logo"

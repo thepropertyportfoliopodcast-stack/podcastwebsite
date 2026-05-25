@@ -9,7 +9,7 @@ export default function ViewMessage({ text }) {
 
     return (
         <div className="flex flex-col">
-            <p className='gap-[10px] line-clamp-1 text-left  font-[manrope] font-[600] text-[17px] hover:text-[#727272]  ' onClick={toggleModal}>
+            <p className='gap-[10px] line-clamp-1 text-left  font-[manrope] font-[600] text-[17px] hover:text-[#727272] cursor-pointer' onClick={toggleModal}>
                 {text ? text : "-"}
             </p>
 

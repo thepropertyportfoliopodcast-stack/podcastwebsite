@@ -10,6 +10,7 @@ export default function Card({ index, podcast }) {
                 alt={podcast.name}
                 className="w-full h-[223px] object-cover rounded-lg"
             />
+
             <h3 className="text-[16px] sm:text-[18px]  heading text-center mt-3 mb-1 text-[#b5afaf]">
                 {podcast.name}
             </h3>

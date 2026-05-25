@@ -25,10 +25,10 @@ export default function Podcast() {
 
 
   return (
-      <div className="mx-auto container xl:max-w-[1440px] px-4 relative">
+      <div className="mx-auto container xl:max-w-[1310px] px-4 relative">
         {/* Heading */}
         <div className="relative z-[2]">
-          <h2 className="text-center text-4xl lg:text-5xl font-extrabold mb-10">
+          <h2 className="text-center text-[25px] md:text-[35px] xl:text-[40px] font-work font-[800] leading-[1.15] uppercase mb-4 md:mb-10">
             <span className="text-theme">LATEST</span>{" "}
             <span className="text-white">EPISODES</span>
           </h2>
@@ -53,13 +53,8 @@ export default function Podcast() {
                 ))}
             </div>
             {/* View All Button */}
-          <div className="text-center mt-8 mb-4">
-            <Link
-              href={"/episode"}
-              className="px-6 py-3 cursor-pointer rounded-md font-semibold bg-theme hover:opacity-90 transition"
-            >
-              View All
-            </Link>
+          <div className="text-center mt-6 mb-4">
+            <Link href={"/episode"} className=" px-3 py-[9px] min-w-[160px] inline-block rounded-md border-[1px] border-[#fff]  font-[600] text-[20px] text-center transition   hover:bg-gradient-to-r hover:from-[#9747FF] hover:to-[#FC18D8] hover:border-[#FC18D8]">View All</Link>
           </div>
           </>
           )}

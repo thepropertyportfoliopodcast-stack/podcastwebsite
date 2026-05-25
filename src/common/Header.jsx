@@ -27,15 +27,15 @@ export default function Header() {
   // console.log(router);
 
   return (
-     <nav className={`fixed w-full top-0 z-50  transition-all duration-300 ease-in-out bg-black text-white py-4`}>
-      <div className="mx-auto container sm:container md:container lg:container xl:max-w-[1440px] px-4">
+     <nav className={`fixed w-full top-0 z-50  transition-all duration-300 ease-in-out bg-black border-b-[1px] border-b-[#FFFFFF33] text-white py-4`}>
+      <div className="mx-auto container sm:container md:container lg:container xl:max-w-[1310px] px-4">
         <div className="relative flex items-center justify-between">
           {/* Logo */}
             <Link href="/">
               <Image
-                width={2110}
-                height={520}
-                className="h-12 md:h-16 w-auto object-cover"
+                width={211}
+                height={50}
+                className=" max-w-[170px] sm:max-w-[200px] md:max-w-[211px] w-auto object-content"
                 src={"/logo.png"}
                 alt="Logo"
               />
@@ -54,7 +54,7 @@ export default function Header() {
           <div className={`flex lg:hidden ${menuOpen ? "hidden" : ""}`}>
             <button
               type="button"
-              className="absolute right-[15px] top-[10px] z-[1] inline-flex items-center justify-center rounded-[3px] w-[48px] h-[45px] focus:ring-2 focus:ring-inset focus:ring-white"
+              className="absolute right-[0px] top-[1px] sm:top-[5px]  z-[1] border border-[#fff] inline-flex items-center justify-center rounded-[3px] w-[40px] h-[40px] focus:ring-2 focus:ring-inset focus:ring-white"
               aria-controls="mobile-menu"
               aria-expanded={menuOpen}
               onClick={toggleMenu}
@@ -66,7 +66,7 @@ export default function Header() {
           <div className={`flex lg:hidden  ${menuOpen ? "block" : "hidden"}`}>
             <button
               type="button"
-              className="absolute right-[15px] top-[10px] z-[1] inline-flex items-center justify-center rounded-[3px] w-[48px] h-[45px] focus:ring-2 focus:ring-inset focus:ring-white"
+              className="absolute right-[0px] top-[1px] sm:top-[5px]  z-[1] border border-[#fff] inline-flex items-center justify-center rounded-[3px] w-[40px] h-[40px] focus:ring-2 focus:ring-inset focus:ring-white"
               aria-controls="mobile-menu"
               aria-expanded={menuOpen}
               onClick={toggleMenu}
@@ -78,14 +78,14 @@ export default function Header() {
             {menuOpen && (
               <div
                 id="mobile-menu "
-                className="absolute top-0 right-[15px] 11h-full pt-[60px] "
+                className="absolute top-0 right-[0] 11h-full pt-[60px] "
               >
-                <ul className="relative bg-[#222]  w-[250px] z-[9] h-full flex flex-col gap-[15px] font-manrope font-[600] text-[15px] md:text-[18px] lg:text-[20px]  px-[20px] pt-[20px] pb-[30px] rounded-[5px] ">
-                  <li>
-                    <Link href="/" className="text-sm font-semibold ">Home</Link>
+                <ul className="relative bg-[#161616]  w-[250px] z-[9] h-full flex flex-col  font-manrope font-[600] text-[15px] md:text-[18px] lg:text-[20px]  px-[20px] pt-[10px] pb-[20px] ">
+                  <li className='border-b border-b-[#323232]'>
+                    <Link href="/" className="block text-sm font-semibold  py-[9px] ">Home </Link>
                   </li>
-                  <li>
-                    <Link href="/episode" className="text-sm font-semibold ">Episode</Link>
+                  <li className='border-b border-b-[#323232]'>
+                    <Link href="/episode" className="block text-sm font-semibold  py-[9px]">Episode</Link>
 
                   </li>
 
@@ -93,12 +93,12 @@ export default function Header() {
                     <Link href="/e-guide" className="text-sm font-semibold ">E-Guide</Link>
 
                   </li> */}
-                  <li>
-                    <Link href="/about" className="text-sm font-semibold ">About</Link>
+                  <li className='border-b border-b-[#323232]'>
+                    <Link href="/about" className="block text-sm font-semibold  py-[9px]">About</Link>
 
                   </li>
-                  <li>
-                    <Link href="/contact" className="text-sm font-semibold ">Contact</Link>
+                  <li className='border-b border-b-[#323232]'>
+                    <Link href="/contact" className="block text-sm font-semibold  py-[9px]">Contact</Link>
                   </li>
                 </ul>
               </div>

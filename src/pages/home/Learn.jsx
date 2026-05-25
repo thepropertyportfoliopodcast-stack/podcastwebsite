@@ -42,37 +42,35 @@ const learnItems = [
 
 export default function Learn() {
   return (
-      <div className="mx-auto container xl:max-w-[1440px] px-4">
-        <section className="text-white py-8 sm:py-16">
+      <div className="relative mx-auto container xl:max-w-[1310px] px-4  z-3">
+        <section className="text-white py-8 pt-[30px]">
           {/* Heading */}
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold uppercase">
-              What You’ll <span className="text-theme">Find Here</span>
-            </h2>
-            <p className="mt-4 text-gray-300 max-w-2xl mx-auto">
-              Every episode is packed with actionable insights to help you build
-              wealth through smart property investment decisions
+            <h2 className="text-[25px] md:text-[35px] xl:text-[40px] font-work font-[800] leading-[1.15] uppercase">What You'll <span className="text-theme">Learn</span></h2>
+            <p className="mt-4 text-white text-[18px] md:text-[20px] max-w-3xl mx-auto">
+             Every episode is packed with actionable insights to help you build wealth through smart property investment decisions
             </p>
           </div>
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8 z-3 ">
             {learnItems.map((item, idx) => (
               <div
                 key={idx}
-                className="group bg-[#2C2C2C] rounded-2xl p-6 shadow-lg hover:shadow-xl transition justify-items-center sm:justify-items-start text-center sm:text-left border-b-4 border-transparent hover:border-purple-500 relative"
-              >
+                className="group bg-[#0F0F0F] border-[2px] border-[#fff] h-auto md:h-[260px] xl:h-[250px] rounded-2xl p-6 shadow-lg hover:shadow-xl transition justify-items-center sm:justify-items-start text-center sm:text-left border-1 border-[#FFFFFF66] hover:border-[#9747FF] relative">
                 {/* Icon inside a circle */}
-                <div className="bg-gray-700/60 w-14 h-14 flex items-center justify-center rounded-full mb-4 text-gray-300 group-hover:text-purple-500 transition">
+                <div className="bg-[#FFFFFF1A] w-14 h-14 flex items-center justify-center rounded-full mb-4 text-gray-300 group-hover:text-white transition group-hover:bg-gradient-to-r from-[#9747FF] to-[#FC18D8] transition-transform duration-800 group-hover:scale-125">
                   {item.icon}
                 </div>
 
-                <h3 className="text-xl font-semibold mb-2 text-white transition group-hover:bg-gradient-to-r group-hover:from-[#9747FF] group-hover:to-[#FC18D8] group-hover:bg-clip-text group-hover:text-transparent">
+              <div className=" pt-[15px] group-hover:pt-[25px] transition-all duration-800  ease-in-out">
+                <h3 className="text-[22px] font-semibold text-white transition group-hover:bg-gradient-to-r group-hover:from-[#9747FF] group-hover:to-[#FC18D8] group-hover:bg-clip-text group-hover:text-transparent">
                   {item.title}
                 </h3>
 
-                <p className="text-gray-300 text-sm leading-relaxed">
+                <p className="text-white text-[16px] md:text-[18px] leading-relaxed">
                   {item.desc}
                 </p>
+                </div>
               </div>
             ))}
           </div>

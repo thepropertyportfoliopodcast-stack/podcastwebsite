@@ -29,7 +29,9 @@ export default function AudioPlyr() {
     if (player) player.currentTime -= 10;
   };
 
-  if (!selectedEpisode?.link) return null;
+  const isVideo = /\.(mp4|webm|ogg|mov)/.test(selectedEpisode?.link);
+  if (!selectedEpisode || isVideo) return null;
+
 
   return (
     <div className="flex justify-between z-[51] !bg-[#111827] sm:px-3">
@@ -57,7 +59,7 @@ export default function AudioPlyr() {
         src={selectedEpisode.link}
         autoPlay
         showJumpControls={false}
-        onPlay={() => playTrack(selectedEpisode)}
+        // onPlay={() => playTrack(selectedEpisode)}
         onPause={pauseTrack}
         customVolumeControls={[
           RHAP_UI.VOLUME,
