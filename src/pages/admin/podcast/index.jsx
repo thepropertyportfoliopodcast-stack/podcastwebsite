@@ -139,7 +139,7 @@ export default function Index() {
                     height={880}
                     width={1200}
                     alt="Thumbnail"
-                    className="h-full w-full max-w-[200px] object-cover rounded-md shadow-sm"
+                    className="h-full w-full max-w-[360px] object-cover rounded-md shadow-sm"
                   />
                   <div>
                     <h2 className="text-2xl font-bold mb-1">{podcast?.name}</h2>
