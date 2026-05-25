@@ -29,15 +29,15 @@ const ReactQuillEditor = ({ label, desc, handleBioChange }) => {
   ];
 
   return (
-    <div className="mb-6 ">
-      <div className="rounded-md  mb-5">
+    <div className="mb-6 [&_.ql-toolbar]:border-gray-700 [&_.ql-container]:border-gray-700 [&_.ql-toolbar]:rounded-t-md [&_.ql-container]:rounded-b-md [&_.ql-container]:min-h-[200px] [&_.ql-editor]:min-h-[160px] [&_.ql-editor]:text-white [&_.ql-toolbar_.ql-stroke]:stroke-gray-300 [&_.ql-toolbar_.ql-fill]:fill-gray-300 [&_.ql-toolbar_.ql-picker]:text-gray-300">
+      <div className="rounded-md mb-5">
         <ReactQuill
           value={desc}
           onChange={handleBioChange}
           modules={modules}
           formats={formats}
           theme="snow"
-          className="h-[150px] mb-5"
+          className="mb-5"
         />
       </div>
     </div>
