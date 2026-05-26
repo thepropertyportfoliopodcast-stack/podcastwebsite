@@ -118,7 +118,6 @@ body {
   .detail-content s,
   .detail-content del    { @apply line-through; }
 
-  /* ===== Lists ===== */
   .detail-content ul { @apply list-disc pl-6 mb-2; }
   .detail-content ol { @apply pl-6 mb-2; }
   .detail-content li { @apply mb-1; }
