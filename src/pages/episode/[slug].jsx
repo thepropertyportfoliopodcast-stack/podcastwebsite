@@ -193,16 +193,18 @@ export default function Index() {
                   </div>
                 </div>
               </div>
-              <h2 className="mt-[25px] mb-[20px]  text-white  text-[16px] md:text-[18px] lg:text-[25px] font-[600] leading-relaxed">
-                {data?.description}
-              </h2>
+              {data?.description && (
+                <h2 className="capitalize font-bold mt-[25px] mb-[20px] text-white/80 text-[18px] md:text-[20px] leading-relaxed">
+                  {data?.description}
+                </h2>
+              )}
               <div
-                className=" text-left text-[16px] md:text-[18px] lg:text-[20px] text-white font-[600] detail-content"
+                className="detail-content text-left text-[16px] md:text-[17px] lg:text-[18px] text-gray-400"
                 dangerouslySetInnerHTML={{ __html: data?.detail }}
               />
               {data && data?.timestamps && (
                 <div
-                  className=" mt-[20px] md:mt-[40px] lg:mt-[70px] max-w-[680px] text-left text-[16px] md:text-[18px] lg:text-[20px] text-white font-[600] detail-content p-[15px] md:p-[30px] lg:p-[35px] bg-[#0F0F0F] border border-[#FFFFFF66] rounded-[10px] md:rounded-[15px]"
+                  className="mt-[20px] md:mt-[40px] lg:mt-[70px] max-w-[680px] detail-content text-left text-[16px] md:text-[18px] lg:text-[20px] p-[15px] md:p-[30px] lg:p-[35px] bg-[#0F0F0F] border border-[#FFFFFF66] rounded-[10px] md:rounded-[15px]"
                   dangerouslySetInnerHTML={{ __html: data?.timestamps }}
                 />
               )}

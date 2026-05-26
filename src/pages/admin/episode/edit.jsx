@@ -6,12 +6,15 @@ import { useRouter } from "next/router";
 import ReactQuillEditor from "./ReactQuillEditor";
 import axios from "axios";
 import { Api } from "../../api/Api";
+import Loader from "@/common/Loader";
 
 export default function Edit() {
   const router = useRouter();
   const { id } = router.query; 
 //   console.log("id", id);
+  const DESCRIPTION_LIMIT = 150;
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
   const [data, setData] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -155,8 +158,8 @@ export default function Edit() {
     tempVideo.onloadedmetadata = async () => {
       window.URL.revokeObjectURL(tempVideo.src);
       const durationInSec = Math.floor(tempVideo.duration);
-      const durationInMinutes = Number((durationInSec / 60).toFixed(2));
-      const sizeInMB = Number((file.size / (1024 * 1024)).toFixed(2));
+      const durationInMinutes = Math.ceil(durationInSec / 60);
+      const sizeInBytes = file.size;
 
       setFormData((prev) => ({
         ...prev,
@@ -164,7 +167,7 @@ export default function Edit() {
         mimefield: file.type,
         duration: durationInMinutes,
         durationInSec: durationInSec,
-        size: sizeInMB,
+        size: sizeInBytes,
       }));
 
       // Begin Chunk Upload
@@ -193,7 +196,10 @@ export default function Edit() {
     tempVideo.src = URL.createObjectURL(file);
        }
       else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: name === "description" ? value.slice(0, DESCRIPTION_LIMIT) : value,
+      }));
     }
   };
 
@@ -361,7 +367,7 @@ export default function Edit() {
       const payload = new FormData();
       payload.append("title", formData.title);
       payload.append("topic", formData.topic);
-      payload.append("description", formData.description);
+      payload.append("description", (formData.description || "").slice(0, DESCRIPTION_LIMIT));
       payload.append("podcastId", id);
       payload.append("detail", formData?.details);
       payload.append("timestamps", formData.timestamps);
@@ -379,8 +385,10 @@ export default function Edit() {
       if (formData.audioUrl) {
         payload.append("audio", formData.audioUrl);
       }
-      payload.append("link", uploadedFileUrl);
-      payload.append("mimefield", formData.mimeType || "");
+      if (uploadedFileUrl) {
+        payload.append("link", uploadedFileUrl);
+      }
+      payload.append("mimefield", formData.mimefield || "");
       payload.append("duration", formData.duration || 0);
       payload.append("durationInSec", formData.durationInSec || 0);
       payload.append("size", formData.size || 0);
@@ -410,6 +418,7 @@ export default function Edit() {
 
   const fetchDetails = async (id) => {
     try {
+      setFetchLoading(true);
       const main = new Listing();
       const response = await main.AdminEpisodeByUUID(id);
       setData(response?.data?.data || []);
@@ -418,7 +427,7 @@ export default function Edit() {
       setFormData({
       title: response?.data?.data?.title || "",
       topic: response?.data?.data?.topic || "",
-      description: response?.data?.data?.description || "",
+      description: (response?.data?.data?.description || "").slice(0, DESCRIPTION_LIMIT),
       thumbnail: response?.data?.data?.thumbnail || null,
       video: response?.data?.data?.link || null,
       audioUrl: response?.data?.data?.audio || "",
@@ -442,6 +451,9 @@ export default function Edit() {
     } catch (error) {
       console.log("error", error);
       setData({});
+      toast.error(error?.response?.data?.message || "Failed to load episode");
+    } finally {
+      setFetchLoading(false);
     }
   };
 
@@ -455,186 +467,216 @@ export default function Edit() {
 
   return (
     <AuthLayout>
-      <form onSubmit={handleSubmit} className="w-full text-white space-y-6 mx-auto">
-        <h3 className="text-3xl font-bold text-center heading">
-          Edit Episode
-        </h3>
-
-        {/* Title */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">
-            Title <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="title"
-            className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
-            value={formData.title}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Description */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">Description</label>
-          <textarea
-            name="description"
-            rows="4"
-            className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
-            value={formData.description}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Topic */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">
-            Topic <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="topic"
-            className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
-            value={formData.topic}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Thumbnail */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">
-            Thumbnail <span className="text-red-500">*</span>
-          </label>
-          <p className="text-xs text-gray-400">
-            Required size: 3000 × 3000 px
-          </p>
-          <div
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            className="relative w-full h-64 bg-[#1c1c1c] border-2 border-dashed border-gray-600 rounded-xl flex items-center justify-center text-gray-400 cursor-pointer hover:border-white transition"
-          >
-            {thumbnailPreview ? (
-              <img
-                src={thumbnailPreview}
-                alt="Preview"
-                className="h-full object-contain rounded"
-              />
-            ) : (
-              <p className="text-center text-sm">
-                Drag & drop or click to upload
-              </p>
-            )}
-            <input
-              type="file"
-              name="thumbnail"
-              accept="image/*"
-              onChange={handleChange}
-              className="absolute inset-0 opacity-0 cursor-pointer"
-            />
+      {fetchLoading || !id ? (
+        <Loader />
+      ) : (
+      <div className="max-w-5xl mx-auto">
+        <div className="">
+          <div className="flex flex-col gap-1 text-start">
+            <h3 className="text-3xl font-bold heading">Edit Episode</h3>
+            <p className="text-sm text-gray-400">
+              Short summary in Description, full content in Details below.
+            </p>
           </div>
-        </div>
 
-        {/* Video */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">
-            File <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="file"
-            name="video"
-             accept="video/*,audio/*"
-            onChange={handleChange}
-            className="w-full h-fit text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
-          />
-          {uploadingVideo && (
-            <div>
-              <label>Uploading Video...</label>
-              <progress value={uploadProgress} max="100"></progress>
-              <span>{uploadProgress}%</span>
+          <form onSubmit={handleSubmit} className="w-full text-white space-y-8 mx-auto mt-8">
+            <div className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
+              <h4 className="text-lg font-semibold">Basic Info</h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium">
+                    Title <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
+                    value={formData.title}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium">
+                    Topic <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="topic"
+                    className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
+                    value={formData.topic}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-sm font-medium">Description</label>
+                <textarea
+                  name="description"
+                  rows="4"
+                  maxLength={DESCRIPTION_LIMIT}
+                  placeholder={`Short summary (max ${DESCRIPTION_LIMIT} characters). Full description Details me daalein.`}
+                  className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white resize-none"
+                  value={formData.description}
+                  onChange={handleChange}
+                />
+                <div className="flex items-center justify-between text-xs text-gray-400">
+                  <span>Max {DESCRIPTION_LIMIT} characters</span>
+                  <span className={formData.description.length >= DESCRIPTION_LIMIT ? "text-yellow-400" : ""}>
+                    {formData.description.length}/{DESCRIPTION_LIMIT}
+                  </span>
+                </div>
+              </div>
             </div>
-          )}
-          {uploadedFileUrl && (
-            <div className="text-green-400 text-sm mt-1">File uploaded ✔</div>
-          )}
-          {typeof formData.video === "string" && (
-            <video controls className="mt-2 w-full max-h-96 rounded-lg">
-              <source src={data?.link} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          )}
-        </div>
 
-        {/* Audio */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">
-            Audio
-          </label>
+            <div className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
+              <h4 className="text-lg font-semibold">Media</h4>
 
-          <input
-            type="file"
-            name="audio"
-            accept="audio/*"
-            onChange={handleChange}
-            className="w-full text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
-          />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">
+                    Thumbnail <span className="text-red-500">*</span>
+                  </label>
+                  <p className="text-xs text-gray-400">
+                    Required size: 3000 × 3000 px
+                  </p>
+                  <div
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    className="relative w-full h-[320px] bg-[#1c1c1c] border-2 border-dashed border-gray-600 rounded-xl flex items-center justify-center text-gray-400 cursor-pointer hover:border-white transition"
+                  >
+                    {thumbnailPreview ? (
+                      <img
+                        src={thumbnailPreview}
+                        alt="Preview"
+                        className="h-full object-contain rounded"
+                      />
+                    ) : (
+                      <p className="text-center text-sm">
+                        Drag & drop or click to upload
+                      </p>
+                    )}
+                    <input
+                      type="file"
+                      name="thumbnail"
+                      accept="image/*"
+                      onChange={handleChange}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                  </div>
+                </div>
 
-          {uploadingAudio && (
-            <div>
-              <label>Uploading Audio...</label>
-              <progress value={audioUploadProgress} max="100"></progress>
-              <span>{audioUploadProgress}%</span>
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium">
+                      Episode File <span className="text-red-500">*</span>
+                    </label>
+                    <p className="text-xs text-gray-400">
+                      Upload video or audio file
+                    </p>
+                    <input
+                      type="file"
+                      name="video"
+                      accept="video/*,audio/*"
+                      onChange={handleChange}
+                      className="w-full h-fit text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
+                    />
+                    {uploadingVideo && (
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs text-gray-400">
+                          <span>Uploading...</span>
+                          <span>{uploadProgress}%</span>
+                        </div>
+                        <progress className="w-full" value={uploadProgress} max="100"></progress>
+                      </div>
+                    )}
+                    {uploadedFileUrl && (
+                      <div className="text-green-400 text-sm">File uploaded ✔</div>
+                    )}
+                    {typeof formData.video === "string" && (
+                      <video controls className="mt-2 w-full max-h-96 rounded-lg">
+                        <source src={data?.link} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
+                  </div>
+
+                </div>
+              </div>
+                  <div className="mt-4 space-y-3">
+                    <label className="block text-sm font-medium">Audio</label>
+                    <p className="text-xs text-gray-400">
+                      Optional separate audio (if needed)
+                    </p>
+                    <input
+                      type="file"
+                      name="audio"
+                      accept="audio/*"
+                      onChange={handleChange}
+                      className="w-full text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
+                    />
+
+                    {uploadingAudio && (
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs text-gray-400">
+                          <span>Uploading...</span>
+                          <span>{audioUploadProgress}%</span>
+                        </div>
+                        <progress className="w-full" value={audioUploadProgress} max="100"></progress>
+                      </div>
+                    )}
+
+                    {uploadedAudioUrl && (
+                      <div className="text-green-400 text-sm">
+                        Audio uploaded ✔
+                      </div>
+                    )}
+
+                    {uploadedAudioUrl && (
+                      <audio controls className="mt-2 w-full">
+                        <source src={uploadedAudioUrl} />
+                        Your browser does not support the audio tag.
+                      </audio>
+                    )}
+                    {typeof formData.audioUrl === "string" && (
+                      <audio controls className="mt-2 w-full">
+                        <source src={formData.audioUrl} type="audio/mpeg" />
+                        Your browser does not support the audio element.
+                      </audio>
+                    )}
+                  </div>
             </div>
-          )}
 
-          {uploadedAudioUrl && (
-            <div className="text-green-400 text-sm mt-1">
-              Audio uploaded ✔
+            <div className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
+              <h4 className="text-lg font-semibold">Full Content</h4>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">
+                  Details
+                </label>
+                <ReactQuillEditor
+                  label="details"
+                  desc={formData?.details}
+                  handleBioChange={(val) => handleQuillChange('details', val)}
+                />
+              </div>
+
+              <div className="space-y-2 pt-2 mt-6 border-t border-gray-800">
+                <label className="block text-sm font-medium">
+                  Timestamps
+                </label>
+                <ReactQuillEditor
+                  label="timestamps"
+                  desc={formData?.timestamps}
+                  handleBioChange={(val) => handleQuillChange('timestamps', val)}
+                />
+              </div>
             </div>
-          )}
 
-          {uploadedAudioUrl && (
-            <audio controls className="mt-2 w-full">
-              <source src={uploadedAudioUrl} />
-              Your browser does not support the audio tag.
-            </audio>
-          )}
-          {typeof formData.audioUrl === "string" && (
-            <audio controls className="mt-2 w-full">
-              <source src={formData.audioUrl} type="audio/mpeg" />
-              Your browser does not support the audio element.
-            </audio>
-          )}
-        </div>
-
-        {/* Details */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">
-            Details
-          </label>
-          <ReactQuillEditor
-            label="details"
-            desc={formData?.details}
-            handleBioChange={(val) => handleQuillChange('details', val)}
-          />
-        </div>
-        
-        {/* Timestamps */}
-        <div className="space-y-1 mt-[65px]">
-          <label className="block text-sm font-medium">
-            Timestamps
-          </label>
-          <ReactQuillEditor
-            label="timestamps"
-            desc={formData?.timestamps}
-            handleBioChange={(val) => handleQuillChange('timestamps', val)}
-          />
-        </div>
-
-        {/* Platform Availability */}
-        <div className="space-y-4 mt-[65px]">
-          <label className="block text-sm font-medium">
-            Available On
-          </label>
+            <div className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
+              <h4 className="text-lg font-semibold">Platforms</h4>
 
           {/* Spotify */}
           <div className="flex items-center gap-4">
@@ -694,7 +736,10 @@ export default function Edit() {
             {loading ? "Submitting..." : "Submit"}
           </button>
         </div>
-      </form>
+          </form>
+        </div>
+      </div>
+      )}
     </AuthLayout>
   );
 }

@@ -120,8 +120,23 @@ body {
 
   /* ===== Lists ===== */
   .detail-content ul { @apply list-disc pl-6 mb-4; }
-  .detail-content ol { @apply list-decimal pl-6 mb-4; }
+  .detail-content ol { @apply pl-6 mb-4; }
   .detail-content li { @apply mb-2; }
+  .detail-content ol > li { list-style-type: decimal; }
+  .detail-content ol > li[data-list="bullet"] { list-style-type: disc; }
+
+  .detail-content .ql-indent-1 { @apply pl-6; }
+  .detail-content .ql-indent-2 { @apply pl-10; }
+  .detail-content .ql-indent-3 { @apply pl-14; }
+  .detail-content .ql-indent-4 { @apply pl-20; }
+  .detail-content .ql-indent-5 { @apply pl-24; }
+  .detail-content .ql-indent-6 { @apply pl-28; }
+  .detail-content .ql-indent-7 { @apply pl-32; }
+  .detail-content .ql-indent-8 { @apply pl-36; }
+
+  .detail-content .ql-align-center { @apply text-center; }
+  .detail-content .ql-align-right { @apply text-right; }
+  .detail-content .ql-align-justify { @apply text-justify; }
 
   /* ===== Links ===== */
   .detail-content a {

@@ -1,0 +1,349 @@
+import React, { useEffect, useState } from "react";
+import AuthLayout from "@/layout/AuthLayout";
+import toast from "react-hot-toast";
+import Listing from "@/pages/api/Listing";
+import { useRouter } from "next/router";
+import ReactQuillEditor from "./ReactQuillEditor";
+import axios from "axios";
+import { Api } from "../../api/Api";
+
+export default function Add() {
+  const selectedEpisode=null;
+  const router = useRouter();
+  const { id } = router.query; 
+//   console.log("id", id);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    thumbnail: null,
+    video: null,
+    details: null,
+  });
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+
+  const handleQuillChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleChange = async(e) => {
+    const { name, value, files } = e.target;
+
+    if (name === "thumbnail" && files?.[0]) {
+      const file = files[0];
+      if (!file.type.startsWith("image/")) {
+        toast.error("Only image files allowed");
+        return;
+      }
+      setFormData((prev) => ({ ...prev, thumbnail: file }));
+      setThumbnailPreview(URL.createObjectURL(file));
+    } else if (name === "video" && files?.[0]) {
+      const file = files[0];
+
+      if (!file.type.startsWith("video/") && !file.type.startsWith("audio/")) {
+        toast.error("Only video/audio allowed");
+        return;
+      }
+
+      setUploadingVideo(true);
+      toast.loading("Uploading file...");
+
+      try {
+        const url = await uploadLargeFile(file);
+        if (!url) {
+          toast.dismiss();
+          toast.error("Upload failed. Please try again.");
+          return;
+        }
+        setUploadedFileUrl(url);
+        toast.dismiss();
+        toast.success("Upload complete!");
+      } catch (err) {
+        toast.dismiss();
+        toast.error("Upload failed: " + (err.message || "Unknown error"));
+        console.error("Upload error:", err);
+      } finally {
+        setUploadingVideo(false);
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setFormData((prev) => ({ ...prev, thumbnail: file }));
+      setThumbnailPreview(URL.createObjectURL(file));
+    } else {
+      toast.error("Only image files are allowed");
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const uploadLargeFile = async (file) => {
+  setUploadingVideo(true);
+  setUploadProgress(0);
+
+  try {
+    // Check upload target first
+    const targetRes = await Api.get(`/upload/target`);
+    const { target } = targetRes.data;
+
+    if (target === "cloud") {
+      // Cloud upload: Use single file upload
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
+
+      const uploadRes = await Api.post(`/upload/single`, uploadFormData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percent);
+        },
+      });
+
+      const { fileUrl } = uploadRes.data;
+      setUploadedFileUrl(fileUrl);
+      setFormData((prev) => ({ ...prev, videoUrl: fileUrl, size: Number((file.size / (1024 * 1024)).toFixed(2)) }));
+      setUploadProgress(100);
+      toast.success("Upload completed!");
+      return fileUrl;
+    } else {
+      // Local upload: Use multipart chunked upload
+      const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
+      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+      try {
+        const initRes = await Api.post(`/upload/init`, { fileName: file.name, mimeType: file.type });
+        const { uploadId, key } = initRes.data;
+        let uploadedParts = [];
+        
+        for (let i = 0; i < totalChunks; i++) {
+          const start = i * CHUNK_SIZE;
+          const end = Math.min(start + CHUNK_SIZE, file.size);
+          const chunk = file.slice(start, end);
+          const chunkRes = await Api.put(
+            `/upload/part?uploadId=${uploadId}&key=${key}&partNumber=${i + 1}`,
+            chunk,
+            {
+              headers: { "Content-Type": "application/octet-stream", "Content-Length": chunk.size },
+              onUploadProgress: (ev) => {
+                const chunkProgress = ev.loaded / chunk.size;
+                const percent = Math.round(((i + chunkProgress) / totalChunks) * 100);
+                setUploadProgress(percent);
+              },
+            }
+          );
+          uploadedParts.push({ ETag: chunkRes.data.ETag.replace(/"/g, ""), PartNumber: i + 1 });
+        }
+        
+        uploadedParts.sort((a, b) => a.PartNumber - b.PartNumber);
+        const completeRes = await Api.post(`/upload/complete`, { uploadId, key, parts: uploadedParts, mimeType: file.type });
+        const url = completeRes.data.fileUrl;
+        setUploadedFileUrl(url);
+        setFormData((prev) => ({ ...prev, videoUrl: url, size: Number((file.size / (1024 * 1024)).toFixed(2)) }));
+        setUploadProgress(100);
+        toast.success("Upload completed!");
+        return url;
+      } catch (err) {
+        console.error("Multipart upload failed:", err);
+        toast.error("Upload failed. Please try again.");
+        setUploadProgress(0);
+        return null;
+      }
+    }
+  } catch (error) {
+    console.error("Upload failed:", error);
+    const serverMsg = error?.response?.data?.message;
+    const serverErr = error?.response?.data?.error;
+    toast.error(serverMsg ? `${serverMsg}${serverErr ? `: ${serverErr}` : ''}` : "Upload failed, please try again.");
+    setUploadProgress(0);
+    return null;
+  } finally {
+    setUploadingVideo(false);
+  }
+};
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const main = new Listing();
+
+      const payload = new FormData();
+      payload.append("title", formData.title);
+      payload.append("description", formData.description);
+      payload.append("podcastId", id);
+      payload.append("detail", formData.details);
+
+      // Video now handled via chunk upload
+      if (!formData.videoUrl) {
+        toast.error("Please upload the video first!");
+        setLoading(false);
+        return;
+      }
+
+      payload.append("link", formData.videoUrl);
+      payload.append("mimefield", formData.mimeType || "");
+      payload.append("duration", formData.duration || 0);
+      payload.append("durationInSec", formData.durationInSec || 0);
+      payload.append("size", formData.size || 0);
+
+      // Thumbnail still uploaded via backend
+      if (formData.thumbnail) {
+        payload.append("thumbnail", formData.thumbnail);
+      }
+
+      const response = await main.EpisodeAdd(payload);
+
+      if (response?.data?.status) {
+        toast.success(response.data.message);
+        setFormData({
+          title: "",
+          description: "",
+          details: "",
+          thumbnail: null,
+          videoUrl: "",
+          thumbnailPreview: "",
+          duration: 0,
+          durationInSec: 0,
+          mimeType: "",
+          size: 0,
+        });
+
+        router.push("/admin/podcast");
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error("API error:", error);
+      toast.error(error?.response?.data?.message || "Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AuthLayout>
+      <form onSubmit={handleSubmit} className="w-full text-white space-y-6 mx-auto">
+        <h3 className="text-3xl font-bold text-center heading">
+          {selectedEpisode ? "Edit Episode" : "Add Episode"}
+        </h3>
+
+        {/* Title */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">
+            Title <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="title"
+            className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
+            value={formData.title}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Description */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">Description</label>
+          <textarea
+            name="description"
+            rows="4"
+            className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
+            value={formData.description}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Thumbnail */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">
+            Thumbnail <span className="text-red-500">*</span>
+          </label>
+          <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            className="relative w-full h-64 bg-[#1c1c1c] border-2 border-dashed border-gray-600 rounded-xl flex items-center justify-center text-gray-400 cursor-pointer hover:border-white transition"
+          >
+            {thumbnailPreview ? (
+              <img
+                src={thumbnailPreview}
+                alt="Preview"
+                className="h-full object-contain rounded"
+              />
+            ) : (
+              <p className="text-center text-sm">
+                Drag & drop or click to upload
+              </p>
+            )}
+            <input
+              type="file"
+              name="thumbnail"
+              accept="image/*"
+              onChange={handleChange}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+            />
+          </div>
+        </div>
+
+        {/* Video */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">
+            File <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="file"
+            name="video"
+             accept="video/*,audio/*"
+            onChange={handleChange}
+            className="w-full text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
+          />
+          {uploadingVideo && (
+            <div>
+              <label>Uploading Video...</label>
+              <progress value={uploadProgress} max="100"></progress>
+              <span>{uploadProgress}%</span>
+            </div>
+          )}
+          {uploadedFileUrl && (
+            <div className="text-green-400 text-sm mt-1">File uploaded ✔</div>
+          )}
+        </div>
+
+        {/* Video */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">
+            Details
+          </label>
+          <ReactQuillEditor
+            label="details"
+            desc={formData?.details}
+            handleBioChange={(val) => handleQuillChange('details', val)}
+          />
+        </div>
+
+        {/* Submit */}
+        <div className="pt-2 mt-16">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full button-bg font-semibold py-3 rounded-lg transition cursor-pointer"
+          >
+            {loading ? "Submitting..." : "Submit"}
+          </button>
+        </div>
+      </form>
+    </AuthLayout>
+  );
+}

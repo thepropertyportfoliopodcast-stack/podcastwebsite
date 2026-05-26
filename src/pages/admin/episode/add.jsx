@@ -104,8 +104,8 @@ export default function Add() {
     tempVideo.onloadedmetadata = async () => {
       window.URL.revokeObjectURL(tempVideo.src);
       const durationInSec = Math.floor(tempVideo.duration);
-      const durationInMinutes = Number((durationInSec / 60).toFixed(2));
-      const sizeInMB = Number((file.size / (1024 * 1024)).toFixed(2));
+      const durationInMinutes = Math.ceil(durationInSec / 60);
+      const sizeInBytes = file.size;
 
       setFormData((prev) => ({
         ...prev,
@@ -113,7 +113,7 @@ export default function Add() {
         mimefield: file.type,
         duration: durationInMinutes,
         durationInSec: durationInSec,
-        size: sizeInMB,
+        size: sizeInBytes,
       }));
 
       // Begin Chunk Upload
@@ -465,7 +465,7 @@ export default function Add() {
       }
 
       payload.append("link", uploadedFileUrl);
-      payload.append("mimefield", formData.mimeType || "");
+      payload.append("mimefield", formData.mimefield || "");
       payload.append("duration", formData.duration || 0);
       payload.append("durationInSec", formData.durationInSec || 0);
       payload.append("size", formData.size || 0);
