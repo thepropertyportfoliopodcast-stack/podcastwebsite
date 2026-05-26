@@ -106,7 +106,7 @@ body {
   .detail-content h6 { @apply text-base font-semibold mt-4 mb-2 text-white; }
 
   /* ===== Paragraphs & Quotes ===== */
-  .detail-content p { @apply mb-4; }
+  /* .detail-content p { @apply mb-4; } */
   .detail-content blockquote {
     @apply border-l-4 border-gray-600 pl-4 italic mb-4 text-gray-200;
   }
@@ -119,9 +119,9 @@ body {
   .detail-content del    { @apply line-through; }
 
   /* ===== Lists ===== */
-  .detail-content ul { @apply list-disc pl-6 mb-4; }
-  .detail-content ol { @apply pl-6 mb-4; }
-  .detail-content li { @apply mb-2; }
+  .detail-content ul { @apply list-disc pl-6 mb-2; }
+  .detail-content ol { @apply pl-6 mb-2; }
+  .detail-content li { @apply mb-1; }
   .detail-content ol > li { list-style-type: decimal; }
   .detail-content ol > li[data-list="bullet"] { list-style-type: disc; }
 
