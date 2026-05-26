@@ -133,6 +133,8 @@ export default function Index() {
                 ${podcast?.isDeleted ? "opacity-50" : ""}`}
                 href={`/admin/podcast/${podcast?.uuid}`}
               >
+
+                
                 <div className="flex flex-col md:flex-row md:items-center gap-6 flex-1">
                   <Image
                     src={podcast?.thumbnail}
@@ -141,6 +143,7 @@ export default function Index() {
                     alt="Thumbnail"
                     className="h-full w-full max-w-[360px] object-cover rounded-md shadow-sm"
                   />
+
                   <div>
                     <h2 className="text-2xl font-bold mb-1">{podcast?.name}</h2>
                     <p className="text-sm text-gray-400">
