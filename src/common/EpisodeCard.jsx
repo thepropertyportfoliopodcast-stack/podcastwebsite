@@ -61,6 +61,28 @@ export default function EpisodeCard({
     }
   };
 
+  const handlePermanentDelete = async (id) => {
+    if (deleteLoading) return;
+    const ok = window.confirm("Ye episode permanently delete ho jayega. Confirm?");
+    if (!ok) return;
+    setDeleteLoading(true);
+    try {
+      const main = new Listing();
+      const response = await main.EpisodePermanentDelete(id);
+      if (response?.data?.status) {
+        toast.success(response.data.message);
+        fetchDetails(slug);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error("API error:", error);
+      toast.error(error?.response?.data?.message || "Something went wrong!");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   return (
     <div className={`group relative flex flex-col md:flex-row items-center gap-4 sm:gap-6 rounded-[10px] xl:rounded-2xl shadow-lg overflow-hidden p-[10px] md:p-[20px] bg-[#0F0F0F] border-[1px] border-[#FFFFFF66] hover:border-[#FC18D8]  
     ${episode?.isDeleted ? "opacity-50" : ""} transition-colors duration-200 cursor-pointer`}
@@ -156,7 +178,7 @@ export default function EpisodeCard({
       {showMenu && (
         <div
           ref={menuRef}
-          className="absolute right-0 mt-2 w-32 bg-[#1c1c1c] border border-gray-700 rounded-md shadow-lg z-10"
+          className="absolute right-0 mt-2 w-44 bg-[#1c1c1c] border border-gray-700 rounded-md shadow-lg z-10"
         >
           <Link
             href={`/admin/episode/edit?id=${episode?.uuid}`}
@@ -169,10 +191,27 @@ export default function EpisodeCard({
               setShowMenu(false);
               handleDelete(episode?.uuid);
             }}
-            className="flex gap-2 items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-white/10"
+            className="flex gap-2 items-center w-full px-4 py-2 text-sm hover:bg-white/10 border-b border-gray-700"
           >
-            {episode?.isDeleted ? "Enable" : <>Delete <RiDeleteBin5Line size={16} /></>}
+            {episode?.isDeleted ? (
+              <span className="text-green-400">Enable</span>
+            ) : (
+              <span className="text-red-400 flex items-center gap-2">
+                Delete <RiDeleteBin5Line size={16} />
+              </span>
+            )}
           </button>
+          {episode?.isDeleted && (
+            <button
+              onClick={() => {
+                setShowMenu(false);
+                handlePermanentDelete(episode?.uuid);
+              }}
+              className="flex gap-2 items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-white/10"
+            >
+              Delete Permanently <RiDeleteBin5Line size={16} />
+            </button>
+          )}
         </div>
       )}
     </div>

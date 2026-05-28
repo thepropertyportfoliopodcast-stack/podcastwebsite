@@ -78,6 +78,10 @@ class Listing extends Component {
     return Api.delete(`/admin/file/delete/${id}`);
   }
 
+  async EpisodePermanentDelete(id) {
+    return Api.delete(`/admin/file/delete-permanent/${id}`);
+  }
+
   async GuideAdd(data) {
     return Api.post("/admin/guide/add", data);
   }
