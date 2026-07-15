@@ -11,9 +11,9 @@ export default function PodcastDetails({ podcast }) {
             <div className='w-48 h-48 min-w-48 md:w-48 md:h-48 md:min-w-48 relative'>
             <Image
               src={podcast?.thumbnail || podcastImage} // Replace with actual image
-              alt="The Stories of Mahabharata"
-              layout="fill"
-              objectFit="cover"
+              alt={podcast?.name || "Podcast artwork"}
+              fill
+              sizes="192px"
               className="w-full h-full rounded-lg object-cover left-0 md:absolute top-0"
             />
             </div>

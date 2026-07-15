@@ -29,8 +29,9 @@ export default function FullPlayer() {
             <Image
               src={selectedEpisode.thumbnail}
               alt="Podcast Cover"
-              layout="fill"
-              objectFit="cover"
+              fill
+              sizes="(max-width: 640px) 256px, 320px"
+              className="object-cover"
             />
           </div>
         )}

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import React from 'react'
 import { RiChatVoiceLine } from "react-icons/ri";
+import { contentPath } from "@/utils/seo";
 export default function Card({ index, podcast }) {
     // console.log("Link", podcast)
     return (
@@ -16,7 +17,7 @@ export default function Card({ index, podcast }) {
             </h3>
             <p className="text-[14px] sm:text-[16px] paragraph mb-3 text-center line-clamp-2">{podcast.description}</p>
             <Link
-                href={`/podcast/${podcast?.uuid}`}
+                href={contentPath("podcast", podcast)}
                 className="flex items-center justify-center gap-3 text-center mx-auto rounded-[40px] button-bg py-2 px-5 cursor-pointer " >
                 <RiChatVoiceLine size={20} />
                 Listen Now

@@ -10,6 +10,7 @@ import moment from "moment";
 import Image from "next/image";
 import Loader from "@/common/Loader";
 import Link from "next/link";
+import { contentPath, extractUuid, plainText, SITE_URL } from "@/utils/seo";
 
 export default function Index() {
   const { playTrack } = useAudioPlayer();
@@ -23,8 +24,15 @@ export default function Index() {
     try {
       setLoading(true);
       const main = new Listing();
-      const response = await main.EpisodeByID(slug);
-      setData(response?.data?.data || null);
+      const response = await main.EpisodeByID(extractUuid(slug));
+      const episode = response?.data?.data || null;
+      setData(episode);
+      if (episode) {
+        const canonicalPath = contentPath("episode", episode);
+        if (`/episode/${slug}` !== canonicalPath) {
+          router.replace(canonicalPath, undefined, { shallow: true });
+        }
+      }
     } catch (error) {
       console.log("error", error);
       if (error?.response?.status === 404 || error?.message === "NOT_FOUND") {
@@ -45,7 +53,25 @@ export default function Index() {
 
   // console.log("data", data);
   return (
-    <Layout>
+    <Layout seo={data ? {
+      title: data.title,
+      description: plainText(data.description || data.detail).slice(0, 160),
+      path: contentPath("episode", data),
+      image: data.thumbnail,
+      type: "article",
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "PodcastEpisode",
+        name: data.title,
+        description: plainText(data.description || data.detail),
+        datePublished: data.createdAt,
+        duration: data.durationInSec ? `PT${data.durationInSec}S` : undefined,
+        associatedMedia: data.audio || data.link ? { "@type": "MediaObject", contentUrl: data.audio || data.link } : undefined,
+        partOfSeries: { "@type": "PodcastSeries", name: data.podcast?.name, url: `${SITE_URL}${contentPath("podcast", data.podcast)}` },
+        image: data.thumbnail,
+        url: `${SITE_URL}${contentPath("episode", data)}`,
+      },
+    } : { title: "Podcast Episode", noindex: Boolean(error) }}>
       {loading && (
         <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
           <div className="relative w-[70px] h-[70px] mb-6">
@@ -112,8 +138,9 @@ export default function Index() {
         <div className="absolute z-0 w-full  w-[300px] md:w-[400px]  h-full  left-[0] top-[-150px]  z-1">
           <Image
             src={"/lightpinkleft.png"}
-            layout="fill"
-            objectFit="cover"
+            fill
+            sizes="(max-width: 768px) 300px, 400px"
+            alt=""
             className="object-cover w-full"
           />
         </div>
@@ -121,8 +148,9 @@ export default function Index() {
         <div className="absolute z-0  w-[300px] md:w-[400px]  h-full  right-[0] bottom-[-100px]  z-1">
           <Image
             src={"/lightpinkright.png"}
-            layout="fill"
-            objectFit="cover"
+            fill
+            sizes="(max-width: 768px) 300px, 400px"
+            alt=""
             className="object-cover w-full"
           />
         </div>
@@ -135,7 +163,7 @@ export default function Index() {
                 {/* Left: Podcast Cover */}
 
                 <div className="relative w-[270px] min-w-[270px] md:w-[312px] md:min-w-[312px] ld:w-[412px] lg:min-w-[412px] h-full ">
-                  <div class="absolute bottom-[-4px] left-0 right-0 w-full h-[410px] z-1  inset-x-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-b-[10px] lg:rounded-b-[15px]"></div>
+                  <div className="absolute bottom-[-4px] left-0 right-0 w-full h-[410px] z-1  inset-x-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-b-[10px] lg:rounded-b-[15px]"></div>
 
                   <Image
                     src={data?.thumbnail}
@@ -178,14 +206,14 @@ export default function Index() {
 
                       {data?.appleLink &&
                       <a href={`${data?.appleLink}`} target="blank" className="cursor-pointer flex items-center justify-center border border-[#FFFFFF66] rounded-[40px] px-[15px] py-[8px] md:py-[8px] lg:py-[12px] min-w-[80px] sm:min-w-[100px] md:min-w-[100px] lg:min-w-[140px] xl:min-w-[150px] text-center">
-                        <Image  src={'/musicbtn.png'}
+                        <Image src="/musicbtn.png" alt="Listen on Apple Podcasts"
                          height={120} width={80} />
                       </a>
                       }
 
                       {data?.spotifyLink &&
                       <a href={`${data?.spotifyLink}`} target="blank" className="cursor-pointer flex items-center justify-center border border-[#FFFFFF66] rounded-[40px] px-[15px] py-[8px] md:py-[8px] lg:py-[12px] min-w-[80px] sm:min-w-[100px] md:min-w-[100px] lg:min-w-[140px] xl:min-w-[150px] text-center">
-                        <Image  src={'/spoticon.png'}
+                        <Image src="/spoticon.png" alt="Listen on Spotify"
                          height={120} width={80} />
                       </a>
                       }

@@ -38,13 +38,15 @@ export default function AudioPlyr() {
       {isMinimized && (
         <div className="flex gap-2 items-center w-[16vw]">
           <div className=" relative w-18 h-18">
-            <Image
-              src={selectedEpisode?.thumbnail || ""}
-              alt={selectedEpisode?.title}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
+            {selectedEpisode?.thumbnail && (
+              <Image
+                src={selectedEpisode.thumbnail}
+                alt={selectedEpisode?.title || "Podcast episode artwork"}
+                fill
+                sizes="72px"
+                className="object-cover rounded-lg"
+              />
+            )}
           </div>
           <div className="text-sm">
             <p className="capitalize">{selectedEpisode?.title || ""}</p>

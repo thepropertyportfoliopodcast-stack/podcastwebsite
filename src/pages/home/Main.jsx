@@ -25,16 +25,18 @@ export default function Main() {
         <div className="absolute z-0 xl:max-w-[578px] w-full md:w-[578px] h-full md:h-[943px]  aspect-square left-[0] bottom-[-250px]  1111blurcircle rounded-r-full z-1">
           <Image
                 src={"/lightpinkleft.png"}
-                layout="fill"
-                objectFit="cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 578px"
+                alt=""
                 className="object-cover w-full" />
         </div>
 
          <div className="absolute z-0 xl:max-w-[578px] w-full md:w-[578px] h-full md:h-[943px]  aspect-square right-[0] top-[0px]  1111blurcircle rounded-r-full z-1">
           <Image
                 src={"/lightpinkright.png"}
-                layout="fill"
-                objectFit="cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 578px"
+                alt=""
                 className="object-cover w-full" />
         </div>
         <Podcast />

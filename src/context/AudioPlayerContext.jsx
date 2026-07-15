@@ -38,7 +38,7 @@ export const AudioPlayerProvider = ({ children }) => {
 
     audioRef.current.pause();
     audioRef.current.currentTime = 0;
-    audioRef.current.src = "";
+    audioRef.current.removeAttribute("src");
 
     setIsPlaying(false);
     setCurrentTrack(null);
@@ -79,7 +79,7 @@ export const AudioPlayerProvider = ({ children }) => {
       {/* ✅ SINGLE AUDIO INSTANCE */}
       <audio
         ref={audioRef}
-        src={currentTrack || ""}
+        src={currentTrack || undefined}
         onEnded={() => setIsPlaying(false)}
       />
     </AudioPlayerContext.Provider>

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Listing from "../api/Listing";
 import EpisodeCard from "@/common/EpisodeCard";
 import { useRouter } from "next/router";
+import { contentPath, extractUuid, plainText, SITE_URL } from "@/utils/seo";
 
 export default function index() {
   const router = useRouter();
@@ -16,8 +17,15 @@ export default function index() {
     try {
       setLoading(true);
       const main = new Listing();
-      const response = await main.PodcastDetail(slug);
-      setData(response?.data?.data || []);
+      const response = await main.PodcastDetail(extractUuid(slug));
+      const podcast = response?.data?.data || null;
+      setData(podcast);
+      if (podcast) {
+        const canonicalPath = contentPath("podcast", podcast);
+        if (`/podcast/${slug}` !== canonicalPath) {
+          router.replace(canonicalPath, undefined, { shallow: true });
+        }
+      }
     } catch (error) {
       console.log("error", error);
       setData({});
@@ -59,7 +67,22 @@ export default function index() {
   // ];
 
   return (
-    <Layout>
+    <Layout seo={data?.uuid ? {
+      title: data.name,
+      description: plainText(data.description).slice(0, 160),
+      path: contentPath("podcast", data),
+      image: data.thumbnail,
+      type: "website",
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "PodcastSeries",
+        name: data.name,
+        description: plainText(data.description),
+        author: { "@type": "Person", name: data.author },
+        image: data.thumbnail,
+        url: `${SITE_URL}${contentPath("podcast", data)}`,
+      },
+    } : { title: "Podcast" }}>
       <div className=" pt-[118px] lg:pt-[128px] ">
         <div className="mx-auto container sm:container md:container lg:container xl:max-w-[1440px]  px-4">
          <PodcastDetails podcast={data}/>

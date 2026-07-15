@@ -11,13 +11,15 @@ export default function MiniPlayer() {
     <div className="bg-gray-900 text-white p-2 flex justify-between items-center px-4">
       <div className="flex gap-2 items-center">
       <div className=" relative w-12 h-12">
-        <Image
-          src={selectedEpisode?.thumbnail || ""}
-          alt={selectedEpisode?.title}
-          layout="fill"
-          objectFit="cover"
-          className="rounded-lg"
-        />
+        {selectedEpisode?.thumbnail && (
+          <Image
+            src={selectedEpisode.thumbnail}
+            alt={selectedEpisode?.title || "Podcast episode artwork"}
+            fill
+            sizes="48px"
+            className="object-cover rounded-lg"
+          />
+        )}
       </div>
       <div className="text-sm w-1/2 capitalize">{selectedEpisode?.title || ""}</div>
       </div>
