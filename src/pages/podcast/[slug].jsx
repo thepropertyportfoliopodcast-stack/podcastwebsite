@@ -5,13 +5,13 @@ import { useEffect, useState } from "react";
 import Listing from "../api/Listing";
 import EpisodeCard from "@/common/EpisodeCard";
 import { useRouter } from "next/router";
-import { contentPath, extractUuid, plainText, SITE_URL } from "@/utils/seo";
+import { contentPath, extractUuid, metaDescription, plainText, podcastKeywords, SITE_URL } from "@/utils/seo";
 
-export default function index() {
+export default function Index({ initialData = null }) {
   const router = useRouter();
   const { slug } = router.query;
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(initialData);
 
   const fetchDetails = async (slug) => {
     try {
@@ -34,10 +34,12 @@ export default function index() {
   };
 
   useEffect(() => {
-    if (slug) {
+    if (initialData) {
+      setData(initialData);
+    } else if (slug) {
       fetchDetails(slug);
     }
-  }, [slug]);
+  }, [slug, initialData]);
 
   // const episodes = [
   //   {
@@ -69,7 +71,8 @@ export default function index() {
   return (
     <Layout seo={data?.uuid ? {
       title: data.name,
-      description: plainText(data.description).slice(0, 160),
+      description: metaDescription(data.description),
+      keywords: podcastKeywords(data),
       path: contentPath("podcast", data),
       image: data.thumbnail,
       type: "website",
@@ -78,6 +81,7 @@ export default function index() {
         "@type": "PodcastSeries",
         name: data.name,
         description: plainText(data.description),
+        keywords: podcastKeywords(data),
         author: { "@type": "Person", name: data.author },
         image: data.thumbnail,
         url: `${SITE_URL}${contentPath("podcast", data)}`,
@@ -121,4 +125,27 @@ export default function index() {
       </div>
     </Layout>
   );
+}
+
+export async function getServerSideProps({ params, res }) {
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+  try {
+    const response = await fetch(`${apiUrl}/podcast/get/${encodeURIComponent(extractUuid(params.slug))}`);
+    if (response.status === 404) return { notFound: true };
+    if (!response.ok) throw new Error(`Podcast API returned ${response.status}`);
+    const payload = await response.json();
+    const podcast = payload?.data || null;
+    if (!podcast) return { notFound: true };
+
+    const canonicalPath = contentPath("podcast", podcast);
+    if (`/podcast/${params.slug}` !== canonicalPath) {
+      return { redirect: { destination: canonicalPath, permanent: true } };
+    }
+
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
+    return { props: { initialData: podcast } };
+  } catch (error) {
+    console.error("Podcast SSR fetch failed:", error.message);
+    return { props: { initialData: null } };
+  }
 }

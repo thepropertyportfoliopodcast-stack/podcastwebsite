@@ -3,29 +3,62 @@ import { useRouter } from "next/router";
 import { DEFAULT_DESCRIPTION, SITE_NAME, SITE_URL } from "@/utils/seo";
 
 const pageMeta = {
-  "/": ["Australian Property Investing Podcast", DEFAULT_DESCRIPTION],
-  "/episode": ["Property Investment Podcast Episodes", "Browse every episode of The Property Portfolio Podcast for Australian market insights, finance strategies and portfolio-building guidance."],
-  "/about": ["About The Property Portfolio Podcast", "Meet the team behind The Property Portfolio Podcast and learn how we help Australians make informed property investment decisions."],
-  "/contact": ["Contact The Property Portfolio Podcast", "Contact The Property Portfolio Podcast team with questions, feedback or collaboration enquiries."],
-  "/privacy": ["Privacy Policy", "Read the privacy policy for The Property Portfolio Podcast."],
-  "/access": ["Terms of Access", "Read the terms governing access to The Property Portfolio Podcast website."],
-  "/use": ["Terms of Use", "Read the terms governing use of The Property Portfolio Podcast website."],
+  "/": {
+    title: "Australian Property Podcast | Property Portfolio",
+    description: "Listen to Australian property investing insights, market trends, lending strategy and investor stories from The Property Portfolio Podcast.",
+    keywords: "Australian property podcast, Australian property investing podcast, property investment podcast Australia, real estate podcast Australia, property market Australia, investment property podcast, Australian real estate investing",
+  },
+  "/episode": {
+    title: "Property Podcast Episodes | Property Portfolio",
+    description: "Browse every Property Portfolio Podcast episode on Australian property markets, investment strategies, finance, suburb trends and investor insights.",
+    keywords: "property podcast episodes, Australian property podcast episodes, property investment episodes, real estate podcast episodes, Australian property market podcast, investment property podcast Australia, property investing videos",
+  },
+  "/about": {
+    title: "About The Property Portfolio Podcast",
+    description: "Learn about The Property Portfolio Podcast, sharing Australian property insights, market views and investor conversations from Nfinity and PropWealth.",
+    keywords: "Australian property insights, about property podcast, Australian property podcast hosts, property investing Australia, real estate investing podcast, Nfinity Financials podcast, PropWealth podcast",
+  },
+  "/contact": {
+    title: "Contact The Property Portfolio Podcast",
+    description: "Contact The Property Portfolio Podcast for guest enquiries, listener questions, topic ideas, feedback and Australian property collaborations.",
+    keywords: "contact property podcast, property podcast guest enquiry, Australian property podcast contact, property podcast collaboration, real estate podcast Australia contact, property podcast feedback",
+  },
+  "/access": {
+    title: "Terms of Access | The Property Portfolio Podcast",
+    description: "Read the Terms of Access for The Property Portfolio Podcast website, including content access, website use and liability information.",
+    keywords: "terms of access, website terms of access, property podcast terms, website access terms, The Property Portfolio Podcast terms, Australian website terms",
+  },
+  "/use": {
+    title: "Terms of Use | The Property Portfolio Podcast",
+    description: "Read the Terms of Use for The Property Portfolio Podcast website, including user responsibilities, linked sites and content conditions.",
+    keywords: "terms of use, website terms of use, podcast website terms, The Property Portfolio Podcast terms of use, content usage terms, Australian website terms",
+  },
+  "/privacy": {
+    title: "Privacy Policy | The Property Portfolio Podcast",
+    description: "Read how The Property Portfolio Podcast may collect and use personal information, email details, cookies and website data.",
+    keywords: "privacy policy, website privacy policy, podcast privacy policy, The Property Portfolio Podcast privacy, Australian privacy policy, personal information policy",
+  },
 };
 
-export default function SEO({ title, description, path, image = "/logo.png", type = "website", noindex = false, jsonLd }) {
+export default function SEO({ title, description, keywords, path, image = "/logo.png", type = "website", noindex = false, jsonLd }) {
   const router = useRouter();
-  const defaults = pageMeta[router.pathname] || [SITE_NAME, DEFAULT_DESCRIPTION];
-  const metaTitle = title || defaults[0];
-  const fullTitle = metaTitle === SITE_NAME ? SITE_NAME : `${metaTitle} | ${SITE_NAME}`;
-  const metaDescription = description || defaults[1];
+  const defaults = pageMeta[router.pathname] || {
+    title: SITE_NAME,
+    description: DEFAULT_DESCRIPTION,
+    keywords: "Australian property podcast, property investment podcast Australia",
+  };
+  const fullTitle = title ? `${title} | ${SITE_NAME}` : defaults.title;
+  const metaDescription = description || defaults.description;
+  const metaKeywords = keywords || defaults.keywords;
   const canonicalPath = path || router.asPath.split(/[?#]/)[0];
-  const canonical = `${SITE_URL}${canonicalPath === "/" ? "" : canonicalPath}`;
+  const canonical = `${SITE_URL}${canonicalPath === "/" ? "/" : canonicalPath}`;
   const socialImage = image.startsWith("http") ? image : `${SITE_URL}${image}`;
 
   return (
     <Head>
       <title>{fullTitle}</title>
       <meta name="description" content={metaDescription} />
+      <meta name="keywords" content={metaKeywords} />
       <meta name="robots" content={noindex ? "noindex,nofollow" : "index,follow,max-image-preview:large"} />
       <link rel="canonical" href={canonical} />
       <meta property="og:type" content={type} />

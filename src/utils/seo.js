@@ -26,3 +26,38 @@ export function extractUuid(value = "") {
 export function plainText(value = "") {
   return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
+
+export function metaDescription(value = "", fallback = DEFAULT_DESCRIPTION) {
+  const text = plainText(value) || fallback;
+  if (text.length <= 160) return text;
+  return `${text.slice(0, 157).replace(/\s+\S*$/, "")}...`;
+}
+
+export function episodeKeywords(episode = {}) {
+  const primary = [
+    episode.title,
+    episode.topic ? `${episode.topic} property podcast` : null,
+    episode.podcast?.name ? `${episode.podcast.name} episode` : null,
+  ];
+  const secondary = [
+    "Australian property podcast",
+    "property investment podcast Australia",
+    "Australian property market insights",
+    "real estate investing Australia",
+    episode.podcast?.author ? `${episode.podcast.author} property podcast` : null,
+  ];
+  return [...new Set([...primary, ...secondary].filter(Boolean))].join(", ");
+}
+
+export function podcastKeywords(podcast = {}) {
+  const primary = [podcast.name, podcast.name ? `${podcast.name} podcast` : null];
+  const secondary = [
+    "Australian property podcast",
+    "property investment podcast Australia",
+    "Australian real estate investing",
+    "property market Australia",
+    podcast.author ? `${podcast.author} podcast` : null,
+    ...(Array.isArray(podcast.cast) ? podcast.cast.map((person) => `${person} property podcast`) : []),
+  ];
+  return [...new Set([...primary, ...secondary].filter(Boolean))].join(", ");
+}

@@ -10,15 +10,15 @@ import moment from "moment";
 import Image from "next/image";
 import Loader from "@/common/Loader";
 import Link from "next/link";
-import { contentPath, extractUuid, plainText, SITE_URL } from "@/utils/seo";
+import { contentPath, episodeKeywords, extractUuid, metaDescription, plainText, SITE_URL } from "@/utils/seo";
 
-export default function Index() {
+export default function Index({ initialData = null, initialError = null }) {
   const { playTrack } = useAudioPlayer();
   const router = useRouter();
   const { slug } = router.query;
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
+  const [data, setData] = useState(initialData);
+  const [error, setError] = useState(initialError);
 
   const fetchDetails = async (slug) => {
     try {
@@ -46,16 +46,20 @@ export default function Index() {
   }};
 
   useEffect(() => {
-    if (slug) {
+    if (initialData) {
+      setData(initialData);
+      setError(null);
+    } else if (slug) {
       fetchDetails(slug);
     }
-  }, [slug]);
+  }, [slug, initialData]);
 
   // console.log("data", data);
   return (
     <Layout seo={data ? {
       title: data.title,
-      description: plainText(data.description || data.detail).slice(0, 160),
+      description: metaDescription(data.description || data.detail),
+      keywords: episodeKeywords(data),
       path: contentPath("episode", data),
       image: data.thumbnail,
       type: "article",
@@ -64,6 +68,7 @@ export default function Index() {
         "@type": "PodcastEpisode",
         name: data.title,
         description: plainText(data.description || data.detail),
+        keywords: episodeKeywords(data),
         datePublished: data.createdAt,
         duration: data.durationInSec ? `PT${data.durationInSec}S` : undefined,
         associatedMedia: data.audio || data.link ? { "@type": "MediaObject", contentUrl: data.audio || data.link } : undefined,
@@ -242,4 +247,27 @@ export default function Index() {
       </div>)}
     </Layout>
   );
+}
+
+export async function getServerSideProps({ params, res }) {
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+  try {
+    const response = await fetch(`${apiUrl}/file/get/${encodeURIComponent(extractUuid(params.slug))}`);
+    if (response.status === 404) return { notFound: true };
+    if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
+    const payload = await response.json();
+    const episode = payload?.data || null;
+    if (!episode) return { notFound: true };
+
+    const canonicalPath = contentPath("episode", episode);
+    if (`/episode/${params.slug}` !== canonicalPath) {
+      return { redirect: { destination: canonicalPath, permanent: true } };
+    }
+
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
+    return { props: { initialData: episode } };
+  } catch (error) {
+    console.error("Episode SSR fetch failed:", error.message);
+    return { props: { initialData: null, initialError: "GENERIC" } };
+  }
 }
