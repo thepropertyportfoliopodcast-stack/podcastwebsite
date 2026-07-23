@@ -5,7 +5,7 @@ import Link from "next/link";
 
 function HeroSection() {
   return (
-    <section className="relative min-h-[600px] xl:h-[500px] xl:h-[860px] flex items-center justify-center pt-[20px] mt-[70px] md:mt-[80px]">
+    <section className="relative min-h-[600px] flex items-center justify-center pt-[20px] mt-[70px] md:mt-[80px] xl:h-[680px] xl:min-h-[680px] xl:items-start xl:pt-[110px]">
       <div className="mx-auto container py-[20px] py-[0] xl:max-w-[1310px] px-4 text-white flex flex-col lg:flex-row items-center justify-between gap-[20px]">
         {/* Left Content */}
         <div className="max-w-[100%] lg:max-w-[60%] text-center lg:text-left">
