@@ -32,16 +32,25 @@ function HeroSection() {
           <div className="relative overflow-hidden rounded-xl shadow-lg">
             <Image
               src="/heroimg01.jpg"
-              alt="Podcast Host"
+              alt="The Property Portfolio Podcast hosts discussing Australian property investing"
               width={600}
               height={350}
+              sizes="(max-width: 1024px) 100vw, 520px"
+              priority
               className="object-cover w-full h-auto"
             />
           </div>
         </div>
       </div>
       {/* Background */}
-      <div className="absolute inset-0 bg-[url('/herobanner.jpg')] bg-no-repeat bg-center bg-cover z-[-1]" />
+      <Image
+        src="/herobanner.jpg"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-center -z-10"
+      />
     </section>
   );
 }

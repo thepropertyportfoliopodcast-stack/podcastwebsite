@@ -3,8 +3,8 @@ import Listing from "../api/Listing";
 import EpisodeCard from "@/common/EpisodeCard";
 import Link from "next/link";
 import Loader from "@/common/Loader";
-export default function Podcast() {
-  const [data, setData] = useState([]);
+export default function Podcast({ initialEpisodes = [] }) {
+  const [data, setData] = useState(initialEpisodes);
   const [loading, setLoading] = useState(false);
   const fetchEpisodes = async () => {
     try {
@@ -20,8 +20,8 @@ export default function Podcast() {
   };
 
   useEffect(() => {
-    fetchEpisodes();
-  }, []);
+    if (!initialEpisodes.length) fetchEpisodes();
+  }, [initialEpisodes.length]);
 
 
   return (

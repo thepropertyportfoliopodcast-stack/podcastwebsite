@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Popup from "@/common/Popup";
 import toast from "react-hot-toast";
 import Listing from "@/pages/api/Listing";
+import SeoFields from "@/common/SeoFields";
 
 export default function AddEpisode({
   isOpen,
@@ -14,6 +15,10 @@ export default function AddEpisode({
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    seoTitle: "",
+    seoDescription: "",
+    primaryKeyword: "",
+    secondaryKeywords: "",
     thumbnail: null,
     video: null,
   });
@@ -24,6 +29,10 @@ export default function AddEpisode({
     setFormData({
       title: selectedEpisode?.title || "",
       description: selectedEpisode?.description || "",
+      seoTitle: selectedEpisode?.seoTitle || "",
+      seoDescription: selectedEpisode?.seoDescription || "",
+      primaryKeyword: selectedEpisode?.primaryKeyword || "",
+      secondaryKeywords: selectedEpisode?.secondaryKeywords || "",
       thumbnail: selectedEpisode?.thumbnail || null,
       video: selectedEpisode?.link || null,
     });
@@ -82,6 +91,10 @@ export default function AddEpisode({
       const payload = new FormData();
       payload.append("title", formData.title);
       payload.append("description", formData.description);
+      payload.append("seoTitle", formData.seoTitle);
+      payload.append("seoDescription", formData.seoDescription);
+      payload.append("primaryKeyword", formData.primaryKeyword);
+      payload.append("secondaryKeywords", formData.secondaryKeywords);
       payload.append("podcastId", podcast?.id);
       if (formData.thumbnail) payload.append("thumbnail", formData.thumbnail);
       if (formData.video) payload.append("video", formData.video);
@@ -123,6 +136,10 @@ export default function AddEpisode({
       const payload = new FormData();
       payload.append("title", formData.title);
       payload.append("description", formData.description);
+      payload.append("seoTitle", formData.seoTitle);
+      payload.append("seoDescription", formData.seoDescription);
+      payload.append("primaryKeyword", formData.primaryKeyword);
+      payload.append("secondaryKeywords", formData.secondaryKeywords);
       payload.append("podcastId", podcast?.id);
       if (formData.thumbnail instanceof File) {
         payload.append("thumbnail", formData.thumbnail);
@@ -192,6 +209,8 @@ export default function AddEpisode({
             onChange={handleChange}
           />
         </div>
+
+        <SeoFields formData={formData} onChange={handleChange} />
 
         {/* Thumbnail */}
         <div className="space-y-1">

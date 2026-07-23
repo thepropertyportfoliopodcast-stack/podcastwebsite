@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import ReactQuillEditor from "./ReactQuillEditor";
 import axios from "axios";
 import { Api } from "../../api/Api";
+import SeoFields from "@/common/SeoFields";
 
 export default function Add() {
   const selectedEpisode=null;
@@ -17,6 +18,10 @@ export default function Add() {
     title: "",
     description: "",
     topic: "",
+    seoTitle: "",
+    seoDescription: "",
+    primaryKeyword: "",
+    secondaryKeywords: "",
     thumbnail: null,
     video: null,
     audio: null,
@@ -453,6 +458,10 @@ export default function Add() {
       payload.append("podcastId", id);
       payload.append("detail", formData.details);
       payload.append("timestamps", formData.timestamps);
+      payload.append("seoTitle", formData.seoTitle);
+      payload.append("seoDescription", formData.seoDescription);
+      payload.append("primaryKeyword", formData.primaryKeyword);
+      payload.append("secondaryKeywords", formData.secondaryKeywords);
 
       // Video now handled via chunk upload
       if (!uploadedFileUrl) {
@@ -483,6 +492,10 @@ export default function Add() {
           title: "",
           description: "",
           topic: "",
+          seoTitle: "",
+          seoDescription: "",
+          primaryKeyword: "",
+          secondaryKeywords: "",
           details: "",
           thumbnail: null,
           videoUrl: "",
@@ -551,6 +564,8 @@ export default function Add() {
             onChange={handleChange}
           />
         </div>
+
+        <SeoFields formData={formData} onChange={handleChange} />
 
         {/* Thumbnail */}
         <div className="space-y-1">

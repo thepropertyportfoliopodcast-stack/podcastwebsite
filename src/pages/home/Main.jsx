@@ -10,7 +10,7 @@ import Guide from "./Guide";
 import Testimonials from "./Testimonials";
 
 import NewsletterBanner from "@/common/NewsletterBanner";
-export default function Main() {
+export default function Main({ initialEpisodes = [] }) {
   return (
     <Layout>
       <div className="max-w-[1440px] m-auto">
@@ -39,7 +39,7 @@ export default function Main() {
                 alt=""
                 className="object-cover w-full" />
         </div>
-        <Podcast />
+        <Podcast initialEpisodes={initialEpisodes} />
       </section>
 
       {/* <MeetYourHost /> */}

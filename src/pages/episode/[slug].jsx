@@ -57,17 +57,19 @@ export default function Index({ initialData = null, initialError = null }) {
   // console.log("data", data);
   return (
     <Layout seo={data ? {
-      title: data.title,
-      description: metaDescription(data.description || data.detail),
+      title: data.seoTitle || data.title,
+      appendSiteName: !data.seoTitle,
+      description: data.seoDescription || metaDescription(data.description || data.detail),
       keywords: episodeKeywords(data),
       path: contentPath("episode", data),
       image: data.thumbnail,
       type: "article",
+      publishedTime: data.createdAt,
       jsonLd: {
         "@context": "https://schema.org",
         "@type": "PodcastEpisode",
         name: data.title,
-        description: plainText(data.description || data.detail),
+        description: data.seoDescription || plainText(data.description || data.detail),
         keywords: episodeKeywords(data),
         datePublished: data.createdAt,
         duration: data.durationInSec ? `PT${data.durationInSec}S` : undefined,

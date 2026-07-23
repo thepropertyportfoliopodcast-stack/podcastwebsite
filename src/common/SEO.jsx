@@ -38,21 +38,39 @@ const pageMeta = {
     description: "Read how The Property Portfolio Podcast may collect and use personal information, email details, cookies and website data.",
     keywords: "privacy policy, website privacy policy, podcast privacy policy, The Property Portfolio Podcast privacy, Australian privacy policy, personal information policy",
   },
+  "/host": {
+    title: "Meet the Hosts | The Property Portfolio Podcast",
+    description: "Meet the hosts and property professionals behind The Property Portfolio Podcast and discover their experience in Australian property and finance.",
+    keywords: "Australian property podcast hosts, property experts Australia, property investment podcast hosts",
+  },
+  "/e-guide": {
+    title: "Australian Property Investment Guides | Property Portfolio",
+    description: "Explore practical Australian property investment guides covering finance, portfolio strategy, market research and informed investing.",
+    keywords: "Australian property investment guides, property investing resources, property finance guide Australia",
+  },
 };
 
-export default function SEO({ title, description, keywords, path, image = "/logo.png", type = "website", noindex = false, jsonLd }) {
+export default function SEO({ title, description, keywords, path, image = "/logo.png", type = "website", noindex = false, jsonLd, appendSiteName = true, publishedTime }) {
   const router = useRouter();
   const defaults = pageMeta[router.pathname] || {
     title: SITE_NAME,
     description: DEFAULT_DESCRIPTION,
     keywords: "Australian property podcast, property investment podcast Australia",
   };
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : defaults.title;
+  const fullTitle = title ? (appendSiteName ? `${title} | ${SITE_NAME}` : title) : defaults.title;
   const metaDescription = description || defaults.description;
   const metaKeywords = keywords || defaults.keywords;
   const canonicalPath = path || router.asPath.split(/[?#]/)[0];
   const canonical = `${SITE_URL}${canonicalPath === "/" ? "/" : canonicalPath}`;
   const socialImage = image.startsWith("http") ? image : `${SITE_URL}${image}`;
+  const structuredData = jsonLd || {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: fullTitle,
+    description: metaDescription,
+    url: canonical,
+    isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL },
+  };
 
   return (
     <Head>
@@ -67,11 +85,13 @@ export default function SEO({ title, description, keywords, path, image = "/logo
       <meta property="og:description" content={metaDescription} />
       <meta property="og:url" content={canonical} />
       <meta property="og:image" content={socialImage} />
+      <meta property="og:image:alt" content={fullTitle} />
+      {publishedTime && <meta property="article:published_time" content={publishedTime} />}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={metaDescription} />
       <meta name="twitter:image" content={socialImage} />
-      {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
     </Head>
   );
 }

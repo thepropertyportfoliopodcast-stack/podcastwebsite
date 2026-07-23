@@ -7,6 +7,7 @@ import ReactQuillEditor from "./ReactQuillEditor";
 import axios from "axios";
 import { Api } from "../../api/Api";
 import Loader from "@/common/Loader";
+import SeoFields from "@/common/SeoFields";
 
 export default function Edit() {
   const router = useRouter();
@@ -34,6 +35,10 @@ export default function Edit() {
     spotifyLink: "",
     isApple: false,
     appleLink: "",
+    seoTitle: "",
+    seoDescription: "",
+    primaryKeyword: "",
+    secondaryKeywords: "",
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null); 
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -371,6 +376,10 @@ export default function Edit() {
       payload.append("podcastId", id);
       payload.append("detail", formData?.details);
       payload.append("timestamps", formData.timestamps);
+      payload.append("seoTitle", formData.seoTitle);
+      payload.append("seoDescription", formData.seoDescription);
+      payload.append("primaryKeyword", formData.primaryKeyword);
+      payload.append("secondaryKeywords", formData.secondaryKeywords);
       if (formData.thumbnail instanceof File) { 
         payload.append("thumbnail", formData.thumbnail);
       }
@@ -441,6 +450,10 @@ export default function Edit() {
       spotifyLink: response?.data?.data?.spotifyLink || "",
       isApple: !!response?.data?.data?.appleLink,
       appleLink: response?.data?.data?.appleLink || "",
+      seoTitle: response?.data?.data?.seoTitle || "",
+      seoDescription: response?.data?.data?.seoDescription || "",
+      primaryKeyword: response?.data?.data?.primaryKeyword || "",
+      secondaryKeywords: response?.data?.data?.secondaryKeywords || "",
     });
 
     if (response?.data?.data?.thumbnail) {
@@ -530,6 +543,8 @@ export default function Edit() {
                 </div>
               </div>
             </div>
+
+            <SeoFields formData={formData} onChange={handleChange} />
 
             <div className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
               <h4 className="text-lg font-semibold">Media</h4>

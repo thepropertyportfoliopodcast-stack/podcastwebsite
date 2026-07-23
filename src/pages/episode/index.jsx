@@ -8,11 +8,11 @@ import EpisodeCard from "@/common/EpisodeCard";
 import Testimonials from "../home/Testimonials";
 import Loader from "@/common/Loader";
 
-export default function Index() {
-  const [data, setData] = useState([]);
-  const [topics, setTopics] = useState([]);
+export default function Index({ initialEpisodes = [], initialTopics = [], initialPagination = {} }) {
+  const [data, setData] = useState(initialEpisodes);
+  const [topics, setTopics] = useState(initialTopics);
   const [page, setPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(true);
+  const [hasNextPage, setHasNextPage] = useState(Boolean(initialPagination.hasNextPage));
   const [selectedTopic, setSelectedTopic] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -50,7 +50,9 @@ export default function Index() {
 
   useEffect(() => {
     setPage(1);
-    fetchEpisodes(searchText, selectedTopic, 1, false);
+    if (selectedTopic || searchText || !initialEpisodes.length) {
+      fetchEpisodes(searchText, selectedTopic, 1, false);
+    }
   }, [selectedTopic]);
 
   const handleSearchChange = (e) => {
@@ -203,4 +205,25 @@ export default function Index() {
       </div>
     </Layout>
   );
+}
+
+export async function getServerSideProps({ res }) {
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+  try {
+    const response = await fetch(`${apiUrl}/file/getAll?search=&topic=&page=1&limit=10`);
+    if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
+    const payload = await response.json();
+    const data = payload?.data || {};
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
+    return {
+      props: {
+        initialEpisodes: data.episodes || [],
+        initialTopics: data.topics || [],
+        initialPagination: data.pagination || {},
+      },
+    };
+  } catch (error) {
+    console.error("Episode listing SSR fetch failed:", error.message);
+    return { props: { initialEpisodes: [], initialTopics: [], initialPagination: {} } };
+  }
 }

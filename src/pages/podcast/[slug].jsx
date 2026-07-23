@@ -70,8 +70,9 @@ export default function Index({ initialData = null }) {
 
   return (
     <Layout seo={data?.uuid ? {
-      title: data.name,
-      description: metaDescription(data.description),
+      title: data.seoTitle || data.name,
+      appendSiteName: !data.seoTitle,
+      description: data.seoDescription || metaDescription(data.description),
       keywords: podcastKeywords(data),
       path: contentPath("podcast", data),
       image: data.thumbnail,
@@ -80,7 +81,7 @@ export default function Index({ initialData = null }) {
         "@context": "https://schema.org",
         "@type": "PodcastSeries",
         name: data.name,
-        description: plainText(data.description),
+        description: data.seoDescription || plainText(data.description),
         keywords: podcastKeywords(data),
         author: { "@type": "Person", name: data.author },
         image: data.thumbnail,

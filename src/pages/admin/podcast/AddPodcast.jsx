@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Popup from "@/common/Popup";
 import toast from "react-hot-toast";
 import Listing from "@/pages/api/Listing";
+import SeoFields from "@/common/SeoFields";
 
 export default function AddPodcast({ isOpen, onClose, fetchPodcasts, selectedPodcast }) {
   // console.log("selectedPodcast", selectedPodcast);
@@ -14,6 +15,10 @@ export default function AddPodcast({ isOpen, onClose, fetchPodcasts, selectedPod
     description: "",
     email: "",
     language: "",
+    seoTitle: "",
+    seoDescription: "",
+    primaryKeyword: "",
+    secondaryKeywords: "",
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
 
@@ -30,6 +35,10 @@ export default function AddPodcast({ isOpen, onClose, fetchPodcasts, selectedPod
         language: Array.isArray(selectedPodcast?.language)
                   ? selectedPodcast.language.join(", ")
                   : selectedPodcast?.language || "",
+        seoTitle: selectedPodcast?.seoTitle || "",
+        seoDescription: selectedPodcast?.seoDescription || "",
+        primaryKeyword: selectedPodcast?.primaryKeyword || "",
+        secondaryKeywords: selectedPodcast?.secondaryKeywords || "",
       });
   
       if (selectedPodcast?.thumbnail) {
@@ -93,6 +102,10 @@ export default function AddPodcast({ isOpen, onClose, fetchPodcasts, selectedPod
       if (formData.language) payload.append("language", JSON.stringify(languageArray));
       payload.append("thumbnail", formData.thumbnail);
       payload.append("description", formData.description);
+      payload.append("seoTitle", formData.seoTitle);
+      payload.append("seoDescription", formData.seoDescription);
+      payload.append("primaryKeyword", formData.primaryKeyword);
+      payload.append("secondaryKeywords", formData.secondaryKeywords);
       const response = await main.PodcastAdd(payload);
       if (response?.data?.status) {
         toast.success(response.data.message);
@@ -104,6 +117,10 @@ export default function AddPodcast({ isOpen, onClose, fetchPodcasts, selectedPod
           description: "",
           email: "",
           language: "",
+          seoTitle: "",
+          seoDescription: "",
+          primaryKeyword: "",
+          secondaryKeywords: "",
         });
         fetchPodcasts();
         onClose();
@@ -135,6 +152,10 @@ export default function AddPodcast({ isOpen, onClose, fetchPodcasts, selectedPod
       if (formData.email) payload.append("email", formData.email);
       if (formData.language) payload.append("language", languageArray);
       payload.append("description", formData.description);
+      payload.append("seoTitle", formData.seoTitle);
+      payload.append("seoDescription", formData.seoDescription);
+      payload.append("primaryKeyword", formData.primaryKeyword);
+      payload.append("secondaryKeywords", formData.secondaryKeywords);
       if (formData.thumbnail instanceof File) {
         payload.append("thumbnail", formData.thumbnail);
       }
@@ -147,6 +168,10 @@ export default function AddPodcast({ isOpen, onClose, fetchPodcasts, selectedPod
           cast: "",
           thumbnail: null,
           description: "",
+          seoTitle: "",
+          seoDescription: "",
+          primaryKeyword: "",
+          secondaryKeywords: "",
         });
         fetchPodcasts();
         onClose();
@@ -265,6 +290,8 @@ export default function AddPodcast({ isOpen, onClose, fetchPodcasts, selectedPod
               />
             </div>
           </div>
+
+          <SeoFields formData={formData} onChange={handleChange} />
 
           {/* Description */}
           <div className="space-y-1">

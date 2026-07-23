@@ -35,6 +35,8 @@ export function metaDescription(value = "", fallback = DEFAULT_DESCRIPTION) {
 
 export function episodeKeywords(episode = {}) {
   const primary = [
+    episode.primaryKeyword,
+    ...(episode.secondaryKeywords ? episode.secondaryKeywords.split(",") : []),
     episode.title,
     episode.topic ? `${episode.topic} property podcast` : null,
     episode.podcast?.name ? `${episode.podcast.name} episode` : null,
@@ -50,7 +52,12 @@ export function episodeKeywords(episode = {}) {
 }
 
 export function podcastKeywords(podcast = {}) {
-  const primary = [podcast.name, podcast.name ? `${podcast.name} podcast` : null];
+  const primary = [
+    podcast.primaryKeyword,
+    ...(podcast.secondaryKeywords ? podcast.secondaryKeywords.split(",") : []),
+    podcast.name,
+    podcast.name ? `${podcast.name} podcast` : null,
+  ];
   const secondary = [
     "Australian property podcast",
     "property investment podcast Australia",

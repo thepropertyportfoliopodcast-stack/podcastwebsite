@@ -5,10 +5,12 @@ import { Toaster } from "react-hot-toast";
 import { RoleProvider } from "@/context/RoleContext";
 import NextNProgress from 'nextjs-progressbar';
 import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
-import AudioPlyr from "@/components/AudioPlyrWrapper";
+import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 // import AudioPlayerWrapper from "@/components/AudioPlayerWrapper";
+
+const AudioPlyr = dynamic(() => import("@/components/AudioPlyrWrapper"), { ssr: false });
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
