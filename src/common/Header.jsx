@@ -32,7 +32,8 @@ export default function Header() {
             <Link href="/">
               <Image
                 width={211}
-                height={50}
+                height={52}
+                style={{ width: "auto", height: "auto" }}
                 className=" max-w-[170px] sm:max-w-[200px] md:max-w-[211px] w-auto h-auto object-content"
                 src={"/logo.webp"}
                 alt="The Property Portfolio Podcast"

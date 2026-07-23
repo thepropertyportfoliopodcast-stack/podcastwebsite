@@ -38,6 +38,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3">
               <Image src={"/logo.webp"} alt="The Property Portfolio Podcast" width={170} height={42}
+                style={{ width: "auto", height: "auto" }}
                 sizes="170px" className="w-auto max-w-[170px] h-auto object-content" />
             </div>
             <p className="mt-[4px] ms-[10px] max-w-[169px] pt-[2px] pb-[2px] text-white text-[9.1px] font-[600] border-t-[1px] border-t-[#fff] border-b-[1px] border-b-[#fff] ">

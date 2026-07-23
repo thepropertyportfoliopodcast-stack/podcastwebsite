@@ -24,6 +24,7 @@ export default function Main({ initialEpisodes = [] }) {
                 src={"/lightpinkleft.webp"}
                 fill
                 sizes="(max-width: 768px) 100vw, 578px"
+                quality={80}
                 alt=""
                 className="object-cover w-full" />
         </div>
@@ -33,6 +34,7 @@ export default function Main({ initialEpisodes = [] }) {
                 src={"/lightpinkright.webp"}
                 fill
                 sizes="(max-width: 768px) 100vw, 578px"
+                quality={80}
                 alt=""
                 className="object-cover w-full" />
         </div>

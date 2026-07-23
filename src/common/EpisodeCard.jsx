@@ -103,7 +103,7 @@ export default function EpisodeCard({
         alt={episode?.title || "Podcast episode artwork"}
         fill
         sizes="(max-width: 767px) 270px, 300px"
-        quality={70}
+        quality={82}
         className="object-contain rounded-[10px] transition-transform duration-300 group-hover:scale-105"
       />
     )}

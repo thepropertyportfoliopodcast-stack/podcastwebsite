@@ -35,6 +35,7 @@ function HeroSection() {
               alt="The Property Portfolio Podcast hosts discussing Australian property investing"
               fill
               sizes="(max-width: 1024px) 100vw, 520px"
+              quality={85}
               className="object-cover"
             />
           </div>
@@ -49,6 +50,7 @@ function HeroSection() {
         fetchPriority="high"
         loading="eager"
         sizes="100vw"
+        quality={88}
         className="object-cover object-center -z-10"
       />
     </section>
