@@ -26,7 +26,7 @@ export default function InvestorSection() {
             </p>
           </div>
 
-          <Link href={"/about"} className="mt-8 px-6 py-[10px] min-w-[180px] inline-block rounded-md border-[1px] border-[#fff]  font-[600] text-[20px] text-center transition   hover:bg-gradient-to-r hover:from-[#9747FF] hover:to-[#FC18D8] hover:border-[#FC18D8]">Learn More</Link>
+          <Link href={"/about"} className="mt-8 px-6 py-[10px] min-w-[180px] inline-block rounded-md border-[1px] border-[#fff]  font-[600] text-[20px] text-center transition   hover:bg-gradient-to-r hover:from-[#9747FF] hover:to-[#FC18D8] hover:border-[#FC18D8]">Learn more about the podcast</Link>
         </div>
 
         {/* Right Image */}

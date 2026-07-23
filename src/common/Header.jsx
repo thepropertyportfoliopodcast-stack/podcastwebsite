@@ -1,9 +1,7 @@
-'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { RiMenu3Line } from "react-icons/ri";
 import { IoCloseSharp } from "react-icons/io5";
-import Logo from "../assets/logo.avif"
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
@@ -36,8 +34,10 @@ export default function Header() {
                 width={211}
                 height={50}
                 className=" max-w-[170px] sm:max-w-[200px] md:max-w-[211px] w-auto h-auto object-content"
-                src={"/logo.png"}
-                alt="Logo"
+                src={"/logo.webp"}
+                alt="The Property Portfolio Podcast"
+                sizes="(max-width: 640px) 170px, (max-width: 768px) 200px, 211px"
+                priority
               />
             </Link>
 
@@ -51,33 +51,23 @@ export default function Header() {
           </nav>
           {/* Mobile Menu Open Button */}
 
-          <div className={`flex lg:hidden ${menuOpen ? "hidden" : ""}`}>
+          <div className="flex lg:hidden">
             <button
               type="button"
               className="absolute right-[0px] top-[1px] sm:top-[5px]  z-[1] border border-[#fff] inline-flex items-center justify-center rounded-[3px] w-[40px] h-[40px] focus:ring-2 focus:ring-inset focus:ring-white"
               aria-controls="mobile-menu"
               aria-expanded={menuOpen}
+              aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
               onClick={toggleMenu}
             >
-              <RiMenu3Line size={30} />
+              {menuOpen ? <IoCloseSharp size={30} aria-hidden="true" /> : <RiMenu3Line size={30} aria-hidden="true" />}
             </button>
           </div>
-          {/* Mobile Menu Close Button */}
-          <div className={`flex lg:hidden  ${menuOpen ? "block" : "hidden"}`}>
-            <button
-              type="button"
-              className="absolute right-[0px] top-[1px] sm:top-[5px]  z-[1] border border-[#fff] inline-flex items-center justify-center rounded-[3px] w-[40px] h-[40px] focus:ring-2 focus:ring-inset focus:ring-white"
-              aria-controls="mobile-menu"
-              aria-expanded={menuOpen}
-              onClick={toggleMenu}
-            >
-              <IoCloseSharp size={30} />
-            </button>
-
+          <div className="flex lg:hidden">
             {/* Mobile Menu Panel */}
             {menuOpen && (
               <div
-                id="mobile-menu "
+                id="mobile-menu"
                 className="absolute top-0 right-[0] 11h-full pt-[60px] "
               >
                 <ul className="relative bg-[#161616]  w-[250px] z-[9] h-full flex flex-col  font-manrope font-[600] text-[15px] md:text-[18px] lg:text-[20px]  px-[20px] pt-[10px] pb-[20px] ">

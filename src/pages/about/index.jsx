@@ -85,7 +85,7 @@ const Index = () => {
 
       <div className="relative overflow-hidden mt-2  md:mt-10 ">
             <div className="absolute z-0 xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square left-[0] top-[-100px]  1111blurcircle rounded-r-full z-1">
-              <Image src={"/lightpinkleft.png"} layout="fill" objectFit="cover" className="object-cover w-full" />
+              <Image src={"/lightpinkleft.webp"} fill sizes="(max-width: 768px) 100vw, 578px" alt="" className="object-cover w-full" />
             </div>
 
              

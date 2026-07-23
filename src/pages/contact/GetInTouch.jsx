@@ -128,8 +128,11 @@ export default function GetInTouch() {
                   <a
                     href="https://www.facebook.com/thepropertyportfoliopodcast"
                     className=""
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Follow The Property Portfolio Podcast on Facebook"
                   >
-                    <svg
+                    <svg aria-hidden="true" focusable="false"
                       width="24"
                       height="24"
                       viewBox="0 0 24 24"
@@ -162,8 +165,11 @@ export default function GetInTouch() {
                   <a
                     href="https://www.instagram.com/propertyportfoliopodcast/"
                     className=""
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Follow The Property Portfolio Podcast on Instagram"
                   >
-                    <svg
+                    <svg aria-hidden="true" focusable="false"
                       width="26"
                       height="26"
                       viewBox="0 0 26 26"
@@ -224,8 +230,11 @@ export default function GetInTouch() {
                   <a
                     href="https://www.linkedin.com/company/the-property-portfolio-podcast/"
                     className=""
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Follow The Property Portfolio Podcast on LinkedIn"
                   >
-                    <svg
+                    <svg aria-hidden="true" focusable="false"
                       width="26"
                       height="26"
                       viewBox="0 0 26 26"
@@ -252,8 +261,11 @@ export default function GetInTouch() {
                   <a
                     href="https://www.youtube.com/@ThePropertyPortfolioPodcast"
                     className=""
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Follow The Property Portfolio Podcast on YouTube"
                   >
-                    <svg
+                    <svg aria-hidden="true" focusable="false"
                       width="31"
                       height="22"
                       viewBox="0 0 31 22"
@@ -277,11 +289,11 @@ export default function GetInTouch() {
                       </defs>
                     </svg>
                   </a>
-                  <a href="https://podcasts.apple.com/us/podcast/the-property-portfolio-podcast/id1863885688" target="blank">
-                    <img   width="26" height="26" src="/musicicon.svg" alt="" />
+                  <a href="https://podcasts.apple.com/us/podcast/the-property-portfolio-podcast/id1863885688" target="_blank" rel="noopener noreferrer" aria-label="Listen to The Property Portfolio Podcast on Apple Podcasts">
+                    <img width="26" height="26" src="/musicicon.svg" alt="" aria-hidden="true" />
                   </a>
-                  <a href="https://open.spotify.com/show/7BWrKVuUSeX1Qat3VEjUaU" target="blank">
-                    <img width="26" height="26"  src="/spotify.svg" alt="" />
+                  <a href="https://open.spotify.com/show/7BWrKVuUSeX1Qat3VEjUaU" target="_blank" rel="noopener noreferrer" aria-label="Listen to The Property Portfolio Podcast on Spotify">
+                    <img width="26" height="26" src="/spotify.svg" alt="" aria-hidden="true" />
                   </a>
                 </div>
               </div>

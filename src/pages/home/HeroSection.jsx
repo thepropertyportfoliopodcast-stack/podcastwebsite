@@ -29,25 +29,25 @@ function HeroSection() {
         </div>
         {/* Right Image */}
         <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-[40%]">
-          <div className="relative overflow-hidden rounded-xl shadow-lg">
+          <div className="relative aspect-[12/7] overflow-hidden rounded-xl shadow-lg">
             <Image
               src="/heroimg01.jpg"
               alt="The Property Portfolio Podcast hosts discussing Australian property investing"
-              width={600}
-              height={350}
+              fill
               sizes="(max-width: 1024px) 100vw, 520px"
-              priority
-              className="object-cover w-full h-auto"
+              className="object-cover"
             />
           </div>
         </div>
       </div>
       {/* Background */}
       <Image
-        src="/herobanner.jpg"
+        src="/herobanner.webp"
         alt=""
         fill
         priority
+        fetchPriority="high"
+        loading="eager"
         sizes="100vw"
         className="object-cover object-center -z-10"
       />

@@ -34,7 +34,7 @@ export default function MeetYourHost() {
                 
                  <div className="absolute z-0 max-w-[180px] md:max-w-[278px] xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square left-[0] top-[-300px]  1111blurcircle rounded-r-full z-1">
                           <Image
-                                src={"/lightpinkleft.png"}
+                                src={"/lightpinkleft.webp"}
                                 layout="fill"
                                 objectFit="cover"
                                 className="object-cover w-full" />
@@ -42,7 +42,7 @@ export default function MeetYourHost() {
 
                          <div className="absolute z-0 max-w-[180px] md:max-w-[278px] xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square right-[0] bottom-[-300px]  1111blurcircle rounded-r-full z-1">
                           <Image
-                                src={"/lightpinkright.png"}
+                                src={"/lightpinkright.webp"}
                                 layout="fill"
                                 objectFit="cover"
                                 className="object-cover w-full" />
@@ -98,7 +98,7 @@ export default function MeetYourHost() {
                 
                  <div className="absolute z-0 max-w-[180px] md:max-w-[278px] xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square left-[0] top-[10px]  1111blurcircle rounded-r-full z-1">
                           <Image
-                                src={"/lightpinkleft.png"}
+                                src={"/lightpinkleft.webp"}
                                 layout="fill"
                                 objectFit="cover"
                                 className="object-cover w-full" />
@@ -158,7 +158,7 @@ export default function MeetYourHost() {
 
                          <div className="absolute z-0 max-w-[180px] md:max-w-[278px] xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square right-[0] bottom-[-150px]  1111blurcircle rounded-r-full z-1">
                           <Image
-                                src={"/lightpinkright.png"}
+                                src={"/lightpinkright.webp"}
                                 layout="fill"
                                 objectFit="cover"
                                 className="object-cover w-full" />

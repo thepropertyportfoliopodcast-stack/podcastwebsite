@@ -1,13 +1,7 @@
 
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@100..900&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap');
-
-
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
-
-
-.font-work { font-family: "Work Sans", sans-serif;}
-.font-outfit {font-family: "Open Sans", sans-serif;}
+.font-work { font-family: Arial, Helvetica, sans-serif;}
+.font-outfit {font-family: Arial, Helvetica, sans-serif;}
 
 
   body {
@@ -32,7 +26,7 @@
   --text-paragraph:  #999999;
   --linear-gradient :linear-gradient(to right, #f9a8d4, #f9a8d4, #f472b6);
   --theme: linear-gradient(90deg, #9747FF 0%, #FC18D8 100%);
-}body{background-color:#000000;color:white;font-family:"Inter",sans-serif;}
+}body{background-color:#000000;color:white;font-family:Arial,Helvetica,sans-serif;}
 .hero_bg{background:var(--linear-gradient);}
 .detail_bg{background:var(--linear-gradient);}
 .button-bg{background:var(--pink);color:var(--white);font-weight:600;}

@@ -144,7 +144,7 @@ export default function Index({ initialData = null, initialError = null }) {
       <div className="bg-[#0a0a0a] pt-[118px] lg:pt-[128px] pb-[40px] md:pb-[60px] lg:pb-[80px] ">
         <div className="absolute z-0 w-full  w-[300px] md:w-[400px]  h-full  left-[0] top-[-150px]  z-1">
           <Image
-            src={"/lightpinkleft.png"}
+            src={"/lightpinkleft.webp"}
             fill
             sizes="(max-width: 768px) 300px, 400px"
             alt=""
@@ -154,7 +154,7 @@ export default function Index({ initialData = null, initialError = null }) {
 
         <div className="absolute z-0  w-[300px] md:w-[400px]  h-full  right-[0] bottom-[-100px]  z-1">
           <Image
-            src={"/lightpinkright.png"}
+            src={"/lightpinkright.webp"}
             fill
             sizes="(max-width: 768px) 300px, 400px"
             alt=""
@@ -212,14 +212,14 @@ export default function Index({ initialData = null, initialError = null }) {
                       </button>
 
                       {data?.appleLink &&
-                      <a href={`${data?.appleLink}`} target="blank" className="cursor-pointer flex items-center justify-center border border-[#FFFFFF66] rounded-[40px] px-[15px] py-[8px] md:py-[8px] lg:py-[12px] min-w-[80px] sm:min-w-[100px] md:min-w-[100px] lg:min-w-[140px] xl:min-w-[150px] text-center">
+                      <a href={`${data?.appleLink}`} target="_blank" rel="noopener noreferrer" aria-label={`Listen to ${data.title} on Apple Podcasts`} className="cursor-pointer flex items-center justify-center border border-[#FFFFFF66] rounded-[40px] px-[15px] py-[8px] md:py-[8px] lg:py-[12px] min-w-[80px] sm:min-w-[100px] md:min-w-[100px] lg:min-w-[140px] xl:min-w-[150px] text-center">
                         <Image src="/musicbtn.png" alt="Listen on Apple Podcasts"
                          height={120} width={80} />
                       </a>
                       }
 
                       {data?.spotifyLink &&
-                      <a href={`${data?.spotifyLink}`} target="blank" className="cursor-pointer flex items-center justify-center border border-[#FFFFFF66] rounded-[40px] px-[15px] py-[8px] md:py-[8px] lg:py-[12px] min-w-[80px] sm:min-w-[100px] md:min-w-[100px] lg:min-w-[140px] xl:min-w-[150px] text-center">
+                      <a href={`${data?.spotifyLink}`} target="_blank" rel="noopener noreferrer" aria-label={`Listen to ${data.title} on Spotify`} className="cursor-pointer flex items-center justify-center border border-[#FFFFFF66] rounded-[40px] px-[15px] py-[8px] md:py-[8px] lg:py-[12px] min-w-[80px] sm:min-w-[100px] md:min-w-[100px] lg:min-w-[140px] xl:min-w-[150px] text-center">
                         <Image src="/spoticon.png" alt="Listen on Spotify"
                          height={120} width={80} />
                       </a>

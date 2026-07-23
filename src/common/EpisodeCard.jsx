@@ -102,14 +102,15 @@ export default function EpisodeCard({
         src={episode.thumbnail}
         alt={episode?.title || "Podcast episode artwork"}
         fill
-        sizes="(max-width: 768px) 270px, 300px"
+        sizes="(max-width: 767px) 270px, 300px"
+        quality={70}
         className="object-contain rounded-[10px] transition-transform duration-300 group-hover:scale-105"
       />
     )}
     {/* Hover Play Icon */}
     <div className="absolute  top-0 bottom-0 left-0 right-0 w-full h-full inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
       <div className="bg-theme p-4 sm:p-5 rounded-full">
-        <FaPlay className="text-white text-2xl sm:text-3xl" />
+        <FaPlay className="text-white text-2xl sm:text-3xl" aria-hidden="true" />
       </div>
     </div>
   </div>
@@ -143,7 +144,7 @@ export default function EpisodeCard({
         <span>{episode?.podcast?.author || data?.author || "N/A"}</span>
       </span> |
       <span className="flex items-center gap-1">
-        <IoMdTime size={14} /> {episode?.duration} mins
+        <IoMdTime size={14} aria-hidden="true" /> {episode?.duration} mins
       </span>
     </div>
 
@@ -165,7 +166,7 @@ export default function EpisodeCard({
 
     {/* Listen Button */}
     <button className="mt-[25px] flex items-center gap-2 px-6 py-[10px] rounded-full text-[20px] font-semibold bg-theme lg:mx-0 cursor-pointer w-fit cursor-pointer">
-     <MdOutlineHeadphones size={23} /> Listen Now
+     <MdOutlineHeadphones size={23} aria-hidden="true" /> Listen Now
     </button>
   </div>
 

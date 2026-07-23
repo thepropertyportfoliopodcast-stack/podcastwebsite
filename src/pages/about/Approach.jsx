@@ -8,7 +8,7 @@ export default function Approach() {
          
                   <div className="absolute z-0 xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square right-[0] top-[0px]  1111blurcircle rounded-r-full z-1">
                    <Image
-                         src={"/lightpinkright.png"}
+                         src={"/lightpinkright.webp"}
                          layout="fill"
                          objectFit="cover"
                          className="object-cover w-full" />

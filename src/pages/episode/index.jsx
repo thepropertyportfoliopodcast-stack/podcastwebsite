@@ -5,7 +5,6 @@ import Image from "next/image";
 import Heading from "@/common/Heading";
 import Listing from "../api/Listing";
 import EpisodeCard from "@/common/EpisodeCard";
-import Testimonials from "../home/Testimonials";
 import Loader from "@/common/Loader";
 
 export default function Index({ initialEpisodes = [], initialTopics = [], initialPagination = {} }) {
@@ -88,7 +87,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
 
           <div className="absolute z-0 xl:max-w-[578px] w-full md:w-[578px] h-full md:h-[943px]  aspect-square left-[0] bottom-[-250px]  rounded-r-full z-1">
             <Image
-              src={"/lightpinkleft.png"}
+              src={"/lightpinkleft.webp"}
               fill
               sizes="(max-width: 768px) 100vw, 578px"
               priority
@@ -99,7 +98,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
 
           <div className="absolute z-0 xl:max-w-[578px] w-full md:w-[500px] h-full md:h-[700px]  aspect-square right-[0] top-[-250px]  rounded-r-full z-1">
             <Image
-              src={"/lightpinkright.png"}
+              src={"/lightpinkright.webp"}
               fill
               sizes="(max-width: 768px) 100vw, 500px"
               alt=""

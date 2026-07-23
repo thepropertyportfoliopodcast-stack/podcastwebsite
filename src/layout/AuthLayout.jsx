@@ -66,7 +66,7 @@ export default function AuthLayout({ children }) {
               <Link href="/">
                 <img
                   className="max-w-[170px] h-auto"
-                  src="/logo.png"
+                  src="/logo.webp"
                 />
               </Link>
             <div className="flex gap-2 items-center">
