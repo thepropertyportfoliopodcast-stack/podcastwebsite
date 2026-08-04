@@ -38,16 +38,6 @@ const pageMeta = {
     description: "Read how The Property Portfolio Podcast may collect and use personal information, email details, cookies and website data.",
     keywords: "privacy policy, website privacy policy, podcast privacy policy, The Property Portfolio Podcast privacy, Australian privacy policy, personal information policy",
   },
-  "/host": {
-    title: "Meet the Hosts | The Property Portfolio Podcast",
-    description: "Meet the hosts and property professionals behind The Property Portfolio Podcast and discover their experience in Australian property and finance.",
-    keywords: "Australian property podcast hosts, property experts Australia, property investment podcast hosts",
-  },
-  "/e-guide": {
-    title: "Australian Property Investment Guides | Property Portfolio",
-    description: "Explore practical Australian property investment guides covering finance, portfolio strategy, market research and informed investing.",
-    keywords: "Australian property investment guides, property investing resources, property finance guide Australia",
-  },
 };
 
 export default function SEO({ title, description, keywords, path, image = "/logo.webp", type = "website", noindex = false, jsonLd, appendSiteName = true, publishedTime }) {

@@ -46,7 +46,6 @@ export default function Header() {
           <nav className="hidden lg:flex gap-x-10">
             <Link href="/" className="text-sm font-semibold ">Home</Link>
             <Link href="/episode" className="text-sm font-semibold ">Episode</Link>
-            {/* <Link href="/e-guide" className="text-sm font-semibold ">E-Guide</Link> */}
             <Link href="/about" className="text-sm font-semibold ">About</Link>
             <Link href="/contact" className="text-sm font-semibold ">Contact</Link>
           </nav>
@@ -80,10 +79,6 @@ export default function Header() {
 
                   </li>
 
-                  {/* <li>
-                    <Link href="/e-guide" className="text-sm font-semibold ">E-Guide</Link>
-
-                  </li> */}
                   <li className='border-b border-b-[#323232]'>
                     <Link href="/about" className="block text-sm font-semibold  py-[9px]">About</Link>
 

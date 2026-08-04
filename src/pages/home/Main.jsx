@@ -45,7 +45,6 @@ export default function Main({ initialEpisodes = [] }) {
       <section className="bg-[#000000] relative mb-[20px] md:mb-12 overflow-hidden">
         <Learn />
       </section>
-      {/* <Guide /> */}
       {/* <Testimonials /> */}  
       <NewsletterBanner />
       {/* <TopicsGrid /> */}
