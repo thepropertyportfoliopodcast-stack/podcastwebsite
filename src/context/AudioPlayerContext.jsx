@@ -1,4 +1,5 @@
 import { createContext, useContext, useRef, useState, useEffect } from "react";
+import { encodeMediaUrl } from "@/utils/mediaUrl";
 
 const AudioPlayerContext = createContext();
 
@@ -23,7 +24,7 @@ export const AudioPlayerProvider = ({ children }) => {
   setSelectedEpisode(episode);
 
   if (!isVideo) {
-    setCurrentTrack(episode.link);
+    setCurrentTrack(encodeMediaUrl(episode.link));
   } else {
     setCurrentTrack(null);
   }

@@ -26,6 +26,7 @@ export default function Add() {
     video: null,
     audio: null,
     audioUrl: "",
+    audioSize: 0,
     details: null,
     timestamps: null,
     mimefield: "",
@@ -157,6 +158,7 @@ export default function Add() {
         setFormData((prev) => ({
           ...prev,
           audio: file,
+          audioSize: file.size,
         }));
 
         setUploadingAudio(true);
@@ -313,6 +315,7 @@ export default function Add() {
               });
 
               const rawETag = uploadRes.headers["etag"] || uploadRes.headers["ETag"];
+              if (!rawETag) throw new Error("Storage did not expose the ETag response header");
               const cleanETag = rawETag.replace(/"/g, "");
 
               return { ETag: cleanETag, PartNumber: partNumber };
@@ -386,7 +389,7 @@ export default function Add() {
                   }
               };
 
-              chunkTasks.push(
+              chunkTasks.push(() =>
                   uploadChunkWithRetry(chunk, partNumber, uploadId, key, MAX_RETRIES, Api, onProgress)
               );
           }
@@ -394,7 +397,7 @@ export default function Add() {
           const allUploadedParts = [];
           for (let i = 0; i < chunkTasks.length; i += CONCURRENCY_LIMIT) {
               const batch = chunkTasks.slice(i, i + CONCURRENCY_LIMIT);
-              const results = await Promise.all(batch);
+              const results = await Promise.all(batch.map((uploadPart) => uploadPart()));
               allUploadedParts.push(...results);
               
               // --- NEW: Move active bytes to completed bytes after batch success ---
@@ -471,6 +474,7 @@ export default function Add() {
       }
       if (formData.audioUrl) {
         payload.append("audio", formData.audioUrl);
+        payload.append("audioSize", formData.audioSize || 0);
       }
 
       payload.append("link", uploadedFileUrl);
@@ -504,6 +508,9 @@ export default function Add() {
           durationInSec: 0,
           mimeType: "",
           size: 0,
+          audio: null,
+          audioUrl: "",
+          audioSize: 0,
         });
 
         router.push("/admin/podcast");

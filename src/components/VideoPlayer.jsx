@@ -3,6 +3,7 @@ import Plyr from "plyr";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { IoMdClose } from "react-icons/io";
 import "plyr/dist/plyr.css";
+import { encodeMediaUrl } from "@/utils/mediaUrl";
 
 export default function VideoPlayer() {
   const { selectedEpisode, setCurrentTrack, setSelectedEpisode } =
@@ -61,7 +62,7 @@ export default function VideoPlayer() {
         <video
           poster={selectedEpisode?.thumbnail}
           ref={videoRef}
-          src={selectedEpisode?.link}
+          src={encodeMediaUrl(selectedEpisode?.link)}
           playsInline
           controls
           autoPlay

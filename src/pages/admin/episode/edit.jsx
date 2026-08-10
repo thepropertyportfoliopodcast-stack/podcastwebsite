@@ -25,6 +25,7 @@ export default function Edit() {
     video: null,
     audio: null,
     audioUrl: "",
+    audioSize: 0,
     details: null,
     timestamps: null,
     mimefield: "",
@@ -123,6 +124,7 @@ export default function Edit() {
         setFormData((prev) => ({
           ...prev,
           audio: file,
+          audioSize: file.size,
         }));
 
         setUploadingAudio(true);
@@ -254,6 +256,7 @@ export default function Edit() {
               });
 
               const rawETag = uploadRes.headers["etag"] || uploadRes.headers["ETag"];
+              if (!rawETag) throw new Error("Storage did not expose the ETag response header");
               const cleanETag = rawETag.replace(/"/g, "");
 
               return { ETag: cleanETag, PartNumber: partNumber };
@@ -318,7 +321,7 @@ export default function Edit() {
                   setUploadProgress(percent);
               };
 
-              chunkTasks.push(
+              chunkTasks.push(() =>
                   uploadChunkWithRetry(chunk, partNumber, uploadId, key, MAX_RETRIES, Api, onProgress)
               );
           }
@@ -326,7 +329,7 @@ export default function Edit() {
           const allUploadedParts = [];
           for (let i = 0; i < chunkTasks.length; i += CONCURRENCY_LIMIT) {
               const batch = chunkTasks.slice(i, i + CONCURRENCY_LIMIT);
-              const results = await Promise.all(batch);
+              const results = await Promise.all(batch.map((uploadPart) => uploadPart()));
               allUploadedParts.push(...results);
               
               // --- NEW: Move active bytes to completed bytes after batch success ---
@@ -393,6 +396,7 @@ export default function Edit() {
 
       if (formData.audioUrl) {
         payload.append("audio", formData.audioUrl);
+        if (formData.audioSize) payload.append("audioSize", formData.audioSize);
       }
       if (uploadedFileUrl) {
         payload.append("link", uploadedFileUrl);
@@ -440,6 +444,7 @@ export default function Edit() {
       thumbnail: response?.data?.data?.thumbnail || null,
       video: response?.data?.data?.link || null,
       audioUrl: response?.data?.data?.audio || "",
+      audioSize: response?.data?.data?.audioSize || 0,
       details: response?.data?.data?.detail || null,
       timestamps: response?.data?.data?.timestamps || null,
       mimefield: response?.data?.data?.mimefield || "",

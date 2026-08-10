@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { GoScreenFull } from "react-icons/go";
 import { BsFullscreenExit } from "react-icons/bs";
 import Image from "next/image";
+import { encodeMediaUrl } from "@/utils/mediaUrl";
 
 export default function AudioPlyr() {
   const AudioPlayer = require("react-h5-audio-player").default;
@@ -58,7 +59,7 @@ export default function AudioPlyr() {
       )}
       <AudioPlayer
         ref={playerRef}
-        src={selectedEpisode.link}
+        src={encodeMediaUrl(selectedEpisode.link)}
         autoPlay
         showJumpControls={false}
         // onPlay={() => playTrack(selectedEpisode)}
