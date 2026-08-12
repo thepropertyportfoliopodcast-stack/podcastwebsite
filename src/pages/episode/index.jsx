@@ -87,26 +87,9 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
         <div className="relative ">
           {/* Background color divs */}
 
-          <div className="absolute z-0 xl:max-w-[578px] w-full md:w-[578px] h-full md:h-[943px]  aspect-square left-[0] bottom-[-250px]  rounded-r-full z-1">
-            <Image
-              src={"/lightpinkleft.webp"}
-              fill
-              sizes="(max-width: 768px) 100vw, 578px"
-              priority
-              alt=""
-              className="object-cover w-full"
-            />
-          </div>
+          <div className="pointer-events-none absolute -left-[24rem] bottom-[-18rem] h-[760px] w-[760px] rounded-full bg-[radial-gradient(circle,rgba(252,24,216,.4)_0%,rgba(151,71,255,.22)_40%,transparent_70%)] blur-3xl" aria-hidden="true" />
 
-          <div className="absolute z-0 xl:max-w-[578px] w-full md:w-[500px] h-full md:h-[700px]  aspect-square right-[0] top-[-250px]  rounded-r-full z-1">
-            <Image
-              src={"/lightpinkright.webp"}
-              fill
-              sizes="(max-width: 768px) 100vw, 500px"
-              alt=""
-              className="object-cover w-full"
-            />
-          </div>
+          <div className="pointer-events-none absolute -right-[24rem] top-[-18rem] h-[720px] w-[720px] rounded-full bg-[radial-gradient(circle,rgba(151,71,255,.4)_0%,rgba(252,24,216,.2)_42%,transparent_72%)] blur-3xl" aria-hidden="true" />
 
           <div className="max-w-[1310px] mx-auto px-4 pb-[20px] lg:pb-[50px] w-full mb-4 lg:mb-10 relative z-[2]">
             {/* Heading Section */}

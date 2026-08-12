@@ -4,11 +4,11 @@ import Link from "next/link";
 
 export default function NewVoice() {
   return (
-    <section className="relative pt-[10px] md:pt-[20px] lg:pt-[50px]">
-      <div className="mx-auto container xl:max-w-[1310px] px-4 flex flex-col lg:flex-row items-center justify-between gap-[10px] md:gap-[25px]">
+    <section className="relative p-6 md:p-10 lg:p-14">
+      <div className="mx-auto flex flex-col items-center justify-between gap-10 lg:flex-row lg:gap-14">
         {/* Left Content */}
         <div className="text-white w-full max-w-[100%] lg:max-w-[50%] text-center lg:text-left relative z-[2]">
-          <h1 className="text-[25px] md:text-[35px] xl:text-[40px] font-work font-[800] leading-[1.15] uppercase">
+          <h1 className="text-[28px] font-black uppercase leading-[1.1] md:text-[40px] xl:text-[48px]">
            Build Your <span className="text-theme"> Financial  Freedom </span> Alongside Australia’s Leading Voices.
               
             
@@ -69,7 +69,7 @@ export default function NewVoice() {
             alt="Podcast Recording"
             width={700}
             height={800}
-            className="rounded-xl object-cover w-full"
+            className="w-full rounded-[26px] border border-white/15 object-cover p-2 shadow-2xl"
           />
         </div>
       </div>

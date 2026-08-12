@@ -32,24 +32,12 @@ export default function MeetYourHost() {
             {/* Host 1 */}
               <div className="relative">
                 
-                 <div className="absolute z-0 max-w-[180px] md:max-w-[278px] xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square left-[0] top-[-300px]  1111blurcircle rounded-r-full z-1">
-                          <Image
-                                src={"/lightpinkleft.webp"}
-                                layout="fill"
-                                objectFit="cover"
-                                className="object-cover w-full" />
-                        </div>
+                 <div className="pointer-events-none absolute -left-72 top-[-260px] h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(252,24,216,.3)_0%,rgba(151,71,255,.18)_42%,transparent_72%)] blur-3xl" aria-hidden="true" />
 
-                         <div className="absolute z-0 max-w-[180px] md:max-w-[278px] xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square right-[0] bottom-[-300px]  1111blurcircle rounded-r-full z-1">
-                          <Image
-                                src={"/lightpinkright.webp"}
-                                layout="fill"
-                                objectFit="cover"
-                                className="object-cover w-full" />
-                        </div>
+                         <div className="pointer-events-none absolute -right-72 bottom-[-260px] h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(151,71,255,.3)_0%,rgba(252,24,216,.17)_42%,transparent_72%)] blur-3xl" aria-hidden="true" />
               
               <div
-                className={`mx-auto container xl:max-w-[1310px] px-4 flex flex-col mb-[40px] lg:flex-row items-center gap-[10px] md:gap-5 xl:gap-10 mb-[20px] lg:mb-[30px] xl:mb-[50px] relative z-[2]`}
+                className="relative z-[2] mx-auto container mb-8 flex flex-col items-center gap-6 rounded-[30px] border border-white/10 bg-white/[.035] px-5 py-6 shadow-xl backdrop-blur xl:max-w-[1310px] md:p-8 lg:flex-row lg:gap-12"
               >
                 <div className="flex justify-center w-full lg:w-1/2">
                   <div className="w-full max-w-[700px] aspect-[7/5] overflow-hidden rounded-lg">
@@ -58,7 +46,7 @@ export default function MeetYourHost() {
                       alt="Podcast Host"
                       width={700}
                       height={500}
-                      className=" rounded-lg 1object-contain w-full 11h-full transform transition-transform duration-500 hover:scale-110"
+                      className="h-full w-full rounded-[24px] object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
                 </div>
@@ -96,18 +84,12 @@ export default function MeetYourHost() {
             {/* Host 2 */}
             <div className="relative">
                 
-                 <div className="absolute z-0 max-w-[180px] md:max-w-[278px] xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square left-[0] top-[10px]  1111blurcircle rounded-r-full z-1">
-                          <Image
-                                src={"/lightpinkleft.webp"}
-                                layout="fill"
-                                objectFit="cover"
-                                className="object-cover w-full" />
-                        </div>
+                 <div className="pointer-events-none absolute -left-72 top-0 h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(252,24,216,.28)_0%,rgba(151,71,255,.17)_42%,transparent_72%)] blur-3xl" aria-hidden="true" />
 
                         
               
               <div
-                className={`mx-auto container xl:max-w-[1310px] px-4 flex flex-col    mb-[40px] lg:flex-row lg:flex-row-reverse items-center gap-[10px] md:gap-5 xl:gap-10 mb-[20px] lg:mb-[30px] xl:mb-[50px] relative z-[2]`}
+                className="relative z-[2] mx-auto container mb-8 flex flex-col items-center gap-6 rounded-[30px] border border-white/10 bg-white/[.035] px-5 py-6 shadow-xl backdrop-blur xl:max-w-[1310px] md:p-8 lg:flex-row-reverse lg:gap-12"
               >
                 <div className="flex justify-center  w-full lg:w-1/2">
                   <div className="w-full max-w-[700px] aspect-[7/5] overflow-hidden rounded-lg">
@@ -116,7 +98,7 @@ export default function MeetYourHost() {
                       alt="Podcast Host"
                       width={700}
                       height={550}
-                      className="rounded-lg 1object-contain w-full 11h-full transform transition-transform duration-500 hover:scale-110"
+                      className="h-full w-full rounded-[24px] object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
                 </div>
@@ -156,16 +138,10 @@ export default function MeetYourHost() {
                 
                
 
-                         <div className="absolute z-0 max-w-[180px] md:max-w-[278px] xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square right-[0] bottom-[-150px]  1111blurcircle rounded-r-full z-1">
-                          <Image
-                                src={"/lightpinkright.webp"}
-                                layout="fill"
-                                objectFit="cover"
-                                className="object-cover w-full" />
-                        </div>
+                         <div className="pointer-events-none absolute -right-72 bottom-[-140px] h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(151,71,255,.3)_0%,rgba(252,24,216,.16)_42%,transparent_72%)] blur-3xl" aria-hidden="true" />
               
               <div
-                className={`mx-auto container xl:max-w-[1310px] px-4 flex flex-col mb-[40px] lg:flex-row items-center gap-[10px] md:gap-5 xl:gap-10 mb-[20px] lg:mb-[30px] xl:mb-[50px] relative z-[2]`}
+                className="relative z-[2] mx-auto container flex flex-col items-center gap-6 rounded-[30px] border border-white/10 bg-white/[.035] px-5 py-6 shadow-xl backdrop-blur xl:max-w-[1310px] md:p-8 lg:flex-row lg:gap-12"
               >
                 <div className="flex justify-center w-full lg:w-1/2">
                   <div className="w-full max-w-[700px] aspect-[7/5] overflow-hidden rounded-lg">
@@ -174,7 +150,7 @@ export default function MeetYourHost() {
                       alt="Podcast Host"
                       width={700}
                       height={550}
-                      className="rounded-lg 1object-contain w-full 11h-full transform transition-transform duration-500 hover:scale-110"
+                      className="h-full w-full rounded-[24px] object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
                 </div>

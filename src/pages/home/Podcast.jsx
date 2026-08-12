@@ -3,10 +3,10 @@ import EpisodeCard from "@/common/EpisodeCard";
 import Link from "next/link";
 export default function Podcast({ initialEpisodes = [] }) {
   return (
-      <div className="mx-auto container xl:max-w-[1310px] px-4 relative">
+      <div className="relative z-[2] mx-auto container px-4 xl:max-w-[1310px]">
         {/* Heading */}
         <div className="relative z-[2]">
-          <h2 className="text-center text-[25px] md:text-[35px] xl:text-[40px] font-work font-[800] leading-[1.15] uppercase mb-4 md:mb-10">
+          <h2 className="mb-8 text-center text-[25px] font-[800] uppercase leading-[1.15] md:mb-12 md:text-[35px] xl:text-[44px]">
             <span className="text-theme">LATEST</span>{" "}
             <span className="text-white">EPISODES</span>
           </h2>
@@ -14,7 +14,7 @@ export default function Podcast({ initialEpisodes = [] }) {
 
           {/* Episode */}
             <>
-            <div className="space-y-8">
+            <div className="space-y-6 rounded-[28px] border border-white/10 bg-black/25 p-3 backdrop-blur md:p-6">
               {(Array.isArray(initialEpisodes) ? initialEpisodes : []).map((ep) => (
                   <EpisodeCard
                     episode={ep}

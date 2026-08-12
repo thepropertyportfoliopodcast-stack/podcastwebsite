@@ -42,7 +42,7 @@ const learnItems = [
 
 export default function Learn() {
   return (
-      <div className="relative mx-auto container xl:max-w-[1310px] px-4  z-3">
+      <div className="relative z-[2] mx-auto container px-4 xl:max-w-[1310px]">
         <section className="text-white py-8 pt-[30px]">
           {/* Heading */}
           <div className="text-center mb-12">
@@ -56,7 +56,7 @@ export default function Learn() {
             {learnItems.map((item, idx) => (
               <div
                 key={idx}
-                className="group bg-[#0F0F0F] border-[2px] border-[#fff] h-auto md:h-[260px] xl:h-[250px] rounded-2xl p-6 shadow-lg hover:shadow-xl transition justify-items-center sm:justify-items-start text-center sm:text-left border-1 border-[#FFFFFF66] hover:border-[#9747FF] relative">
+                className="group relative h-auto rounded-2xl border border-white/15 bg-white/[.035] p-6 text-center shadow-lg backdrop-blur transition duration-300 hover:-translate-y-2 hover:border-[#9747FF] hover:shadow-[#9747FF]/20 sm:min-h-[245px] sm:text-left">
                 {/* Icon inside a circle */}
                 <div className="bg-[#FFFFFF1A] w-14 h-14 flex items-center justify-center rounded-full mb-4 text-gray-300 group-hover:text-white transition group-hover:bg-gradient-to-r from-[#9747FF] to-[#FC18D8] transition-transform duration-800 group-hover:scale-125">
                   {item.icon}

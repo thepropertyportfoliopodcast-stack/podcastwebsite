@@ -6,13 +6,7 @@ export default function Approach() {
     <section className="py-[20px] md:py-[40px] mb-1 md:mb-3">
       <div className=" mt-[20px] mb-[20px] md:mt-[60px] md:mb-[60px]">
          
-                  <div className="absolute z-0 xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square right-[0] top-[0px]  1111blurcircle rounded-r-full z-1">
-                   <Image
-                         src={"/lightpinkright.webp"}
-                         layout="fill"
-                         objectFit="cover"
-                         className="object-cover w-full" />
-                 </div>
+                  <div className="pointer-events-none absolute -right-72 top-0 h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(151,71,255,.3)_0%,rgba(252,24,216,.16)_42%,transparent_72%)] blur-3xl" aria-hidden="true" />
         <div className="text-center flex flex-col items-center relative z-[2]">
           <h2 className="mb-[20px] text-[25px] md:text-[35px] xl:text-[40px] font-work font-[800] leading-[1.15] uppercase">
             <span className="text-white">Our</span>
