@@ -86,15 +86,51 @@ export default function EpisodePage({ initialData }) {
             </div>
           </section>
 
-          <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-[#0d0d0d] px-5 py-10 md:px-10 md:py-14">
-            <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-[#9747FF]/20 blur-3xl" aria-hidden="true" />
-            <div className="pointer-events-none absolute -bottom-28 -right-20 h-72 w-72 rounded-full bg-[#FC18D8]/15 blur-3xl" aria-hidden="true" />
-            <div className="relative mx-auto mb-10 max-w-2xl text-center">
-              <p className="mb-3 text-sm font-bold uppercase tracking-[0.3em] text-[#c99cff]">Experience behind every conversation</p>
-              <h2 className="text-3xl font-extrabold uppercase md:text-5xl">Meet the minds behind the mic</h2>
+          <section className="relative isolate overflow-hidden rounded-[36px] border border-white/10 bg-[#090909] px-5 py-12 md:px-10 md:py-16 lg:px-14">
+            <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#9747FF]/25 blur-[100px]" aria-hidden="true" />
+            <div className="pointer-events-none absolute -bottom-40 -left-20 h-80 w-80 rounded-full bg-[#FC18D8]/15 blur-[90px]" aria-hidden="true" />
+            <div className="pointer-events-none absolute -bottom-44 -right-20 h-80 w-80 rounded-full bg-[#6f5cff]/15 blur-[90px]" aria-hidden="true" />
+            <div className="pointer-events-none absolute inset-x-10 top-[46%] hidden h-px bg-gradient-to-r from-transparent via-white/15 to-transparent md:block" aria-hidden="true" />
+
+            <div className="relative mx-auto mb-12 max-w-2xl text-center md:mb-16">
+              <h2 className="text-3xl font-extrabold md:text-5xl">Meet the minds behind the mic</h2>
               <p className="mt-4 text-white/60">Finance, acquisition and property strategy expertise brought together in one conversation.</p>
             </div>
-            <div className="relative grid gap-5 md:grid-cols-3">{hosts.map((host, index) => <article key={host.name} className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/15 bg-white/[0.045] p-6 backdrop-blur-sm transition duration-300 hover:-translate-y-2 hover:border-white/30 ${index === 1 ? "md:-translate-y-4 md:hover:-translate-y-6" : ""}`}><div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${host.accent}`} aria-hidden="true" /><span className="absolute right-5 top-4 text-5xl font-black text-white/[0.04]" aria-hidden="true">0{index + 1}</span><div className="relative mx-auto mt-3 h-44 w-44"><div className={`absolute inset-0 rounded-full bg-gradient-to-br ${host.accent} opacity-50 blur-xl transition group-hover:opacity-80`} aria-hidden="true" /><div className="relative h-full w-full overflow-hidden rounded-full border-2 border-white/30"><Image src={host.image} alt={host.name} fill sizes="176px" className="object-cover transition duration-500 group-hover:scale-105" /></div></div><div className="mt-7 flex flex-1 flex-col text-center"><h3 className="text-2xl font-extrabold">{host.name}</h3><div className={`mx-auto my-4 h-px w-16 bg-gradient-to-r ${host.accent}`} aria-hidden="true" /><p className="text-sm font-semibold leading-6 text-white/70">{host.designation}</p></div></article>)}</div>
+
+            <div className="relative grid gap-6 md:grid-cols-3 md:items-end">
+              {hosts.map((host, index) => (
+                <article
+                  key={host.name}
+                  className={`group relative overflow-hidden rounded-[30px] border border-white/15 bg-[#111] shadow-2xl transition duration-500 hover:-translate-y-3 hover:border-white/40 hover:shadow-[#9747FF]/20 ${index === 1 ? "md:mb-8" : ""}`}
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    <Image
+                      src={host.image}
+                      alt={host.name}
+                      fill
+                      sizes="(max-width: 767px) 100vw, 33vw"
+                      className="object-cover object-top transition duration-700 ease-out group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/5 to-transparent" aria-hidden="true" />
+                    <div className={`absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t ${host.accent} opacity-25 blur-2xl transition duration-500 group-hover:opacity-45`} aria-hidden="true" />
+                    <span className="absolute left-5 top-5 rounded-full border border-white/25 bg-black/35 px-3 py-1 text-xs font-extrabold tracking-[0.2em] text-white/80 backdrop-blur-md">
+                      HOST 0{index + 1}
+                    </span>
+                    <span className="absolute -right-2 top-2 text-[92px] font-black leading-none text-white/[0.08] transition duration-500 group-hover:text-white/[0.13]" aria-hidden="true">
+                      0{index + 1}
+                    </span>
+                  </div>
+
+                  <div className="relative -mt-20 p-6 pt-0 md:p-7 md:pt-0">
+                    <div className="rounded-2xl border border-white/15 bg-black/55 p-5 backdrop-blur-xl transition duration-500 group-hover:border-white/25 group-hover:bg-black/70">
+                      <div className={`mb-4 h-1 w-12 rounded-full bg-gradient-to-r ${host.accent} transition-all duration-500 group-hover:w-20`} aria-hidden="true" />
+                      <h3 className="text-2xl font-extrabold md:text-[28px]">{host.name}</h3>
+                      <p className="mt-3 min-h-[48px] text-sm font-semibold leading-6 text-white/65">{host.designation}</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
           </section>
         </div>
       </div>
