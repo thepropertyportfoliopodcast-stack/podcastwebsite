@@ -443,7 +443,7 @@ export default function Edit() {
       setFetchLoading(true);
       const main = new Listing();
       const response = await main.AdminEpisodeByUUID(id);
-      setData(response?.data?.data || []);
+      setData(response?.data?.data && typeof response.data.data === "object" ? response.data.data : null);
     //   console.log("response?.data?.data?.detail",response?.data?.data?.detail);
       // Updating the fields as required
       setFormData({
@@ -481,7 +481,7 @@ export default function Edit() {
     setThumbnailPreview(null);
     } catch (error) {
       console.log("error", error);
-      setData({});
+      setData(null);
       toast.error(error?.response?.data?.message || "Failed to load episode");
     } finally {
       setFetchLoading(false);

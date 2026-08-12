@@ -15,10 +15,10 @@ export default function index() {
       setLoading(true);
       const main = new Listing();
       const response = await main.AdminGuideGet();
-      setData(response?.data?.data || []);
+      setData(Array.isArray(response?.data?.data) ? response.data.data : []);
     } catch (error) {
       console.log("error", error);
-      setData({});
+      setData([]);
     }
     setLoading(false);
   };
@@ -49,7 +49,7 @@ export default function index() {
       ) : (
         <div className="grid gap-8 md:grid-cols-2">
           {data &&
-            data?.map((guide, index) => (
+            (Array.isArray(data) ? data : []).map((guide, index) => (
               <GuideCard guide={guide} key={index} />
             ))}
         </div>

@@ -8,8 +8,8 @@ import EpisodeCard from "@/common/EpisodeCard";
 import Loader from "@/common/Loader";
 
 export default function Index({ initialEpisodes = [], initialTopics = [], initialPagination = {} }) {
-  const [data, setData] = useState(initialEpisodes);
-  const [topics, setTopics] = useState(initialTopics);
+  const [data, setData] = useState(Array.isArray(initialEpisodes) ? initialEpisodes : []);
+  const [topics, setTopics] = useState(Array.isArray(initialTopics) ? initialTopics : []);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(Boolean(initialPagination.hasNextPage));
   const [selectedTopic, setSelectedTopic] = useState("");
@@ -31,12 +31,14 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
       const main = new Listing();
       const response = await main.EpisodeGetAll(search, topic, pageNumber, LIMIT);
       const resData = response?.data?.data;
-      setTopics(resData?.topics || []);
+      const nextTopics = Array.isArray(resData?.topics) ? resData.topics : [];
+      const nextEpisodes = Array.isArray(resData?.episodes) ? resData.episodes : [];
+      setTopics(nextTopics);
       setHasNextPage(resData?.pagination?.hasNextPage);
       if (append) {
-        setData(prev => [...prev, ...(resData?.episodes || [])]);
+        setData(prev => [...(Array.isArray(prev) ? prev : []), ...nextEpisodes]);
       } else {
-        setData(resData?.episodes || []);
+        setData(nextEpisodes);
       }
     } catch (error) {
       console.log("error", error);
@@ -159,8 +161,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
                 >
                   <option 
                   className="bg-white text-black" value="">All Topics</option>
-                  {topics &&
-                    topics?.map((topics, index) => (
+                  {topics.map((topics, index) => (
                       <option className="bg-white text-black" key={index} value={topics}>
                         {topics}
                       </option>
@@ -174,7 +175,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
             ) : (
               <div className="space-y-8">
                 {data &&
-                  data?.map((ep, index) => (
+                  (Array.isArray(data) ? data : []).map((ep, index) => (
                     <EpisodeCard
                       episode={ep}
                       key={index}

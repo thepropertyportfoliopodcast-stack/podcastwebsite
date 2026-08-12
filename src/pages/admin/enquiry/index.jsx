@@ -27,15 +27,17 @@ export default function index() {
       const main = new Listing();
       const response = await main.enquiryGet(pg, limit, { signal });
 
-      const records = response?.data?.data?.records;
+      const records = Array.isArray(response?.data?.data?.records)
+        ? response.data.data.records
+        : [];
       const pagination = response?.data?.data?.pagination;
 
-      if (records) {
+      if (records.length || pg === 1) {
         setLisitng((prevData) => {
           if (pg === 1) {
             return records;
           } else {
-            return [...prevData, ...records];
+            return [...(Array.isArray(prevData) ? prevData : []), ...records];
           }
         });
 

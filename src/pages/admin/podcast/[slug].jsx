@@ -25,10 +25,10 @@ export default function Detail() {
       setLoading(true);
       const main = new Listing();
       const response = await main.AdminPodcastDetail(slug);
-      setData(response?.data?.data || []);
+      setData(response?.data?.data && typeof response.data.data === "object" ? response.data.data : null);
     } catch (error) {
       console.log("error", error);
-      setData({});
+      setData(null);
     }
     setLoading(false);
   };
@@ -143,7 +143,7 @@ export default function Detail() {
         </Link>
         </div>
          <div className="space-y-8 mt-6">
-          {data && data?.episodes && data?.episodes?.map((item,index)=>(
+          {(Array.isArray(data?.episodes) ? data.episodes : []).map((item,index)=>(
             <EpisodeCard episode={item} key={index} setIsEpisodePopupOpen={setIsEpisodePopupOpen} setSelectedEpisode={setSelectedEpisode} fetchDetails={fetchDetails} isAdmin={true} slug={slug} data={data}/>
           ))}
          </div>

@@ -21,8 +21,13 @@ export default function EpisodePage({ initialData }) {
   const [expanded, setExpanded] = useState(false);
   const data = initialData;
   const transcript = data.transcript || plainText(data.detail) || data.description;
-  const topics = data.topicsCovered?.length ? data.topicsCovered : [data.topic].filter(Boolean);
-  const related = (data.podcast?.episodes || []).filter((episode) => episode.uuid !== data.uuid).slice(0, 2);
+  const topics = Array.isArray(data.topicsCovered) && data.topicsCovered.length
+    ? data.topicsCovered
+    : [data.topic].filter(Boolean);
+  const related = (Array.isArray(data.podcast?.episodes) ? data.podcast.episodes : [])
+    .filter((episode) => episode.uuid !== data.uuid)
+    .slice(0, 2);
+  const reelLinks = Array.isArray(data.reelLinks) ? data.reelLinks : [];
 
   return (
     <Layout seo={{
@@ -73,7 +78,7 @@ export default function EpisodePage({ initialData }) {
             </div>
             <div>
               <h2 className="mb-5 text-3xl font-bold">Episode reels</h2>
-              {data.reelLinks?.length ? <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{data.reelLinks.slice(0, 4).map((url) => <div key={url} className="h-[500px] overflow-hidden rounded-2xl border border-white/15 bg-[#111]"><iframe title="Instagram episode reel" src={instagramEmbed(url)} className="h-full w-full" loading="lazy" allow="autoplay; encrypted-media" /></div>)}</div> : <div className="rounded-2xl border border-white/15 bg-[#111] p-8 text-white/60"><FaInstagram className="mb-3" size={28} />Reels will appear here when their Instagram links are added.</div>}
+              {reelLinks.length ? <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{reelLinks.slice(0, 4).map((url) => <div key={url} className="h-[500px] overflow-hidden rounded-2xl border border-white/15 bg-[#111]"><iframe title="Instagram episode reel" src={instagramEmbed(url)} className="h-full w-full" loading="lazy" allow="autoplay; encrypted-media" /></div>)}</div> : <div className="rounded-2xl border border-white/15 bg-[#111] p-8 text-white/60"><FaInstagram className="mb-3" size={28} />Reels will appear here when their Instagram links are added.</div>}
             </div>
           </section>
 
@@ -93,7 +98,8 @@ export async function getServerSideProps({ params, res }) {
     const response = await fetch(`${apiUrl}/file/get/${encodeURIComponent(extractUuid(params.slug))}`);
     if (response.status === 404) return { notFound: true };
     if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
-    const episode = (await response.json())?.data;
+    const payload = (await response.json())?.data;
+    const episode = payload && typeof payload === "object" && !Array.isArray(payload) ? payload : null;
     if (!episode) return { notFound: true };
     const canonicalPath = contentPath("episode", episode);
     if (`/episode/${params.slug}` !== canonicalPath) return { redirect: { destination: canonicalPath, permanent: true } };

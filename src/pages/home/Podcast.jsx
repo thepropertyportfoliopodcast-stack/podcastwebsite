@@ -15,7 +15,7 @@ export default function Podcast({ initialEpisodes = [] }) {
           {/* Episode */}
             <>
             <div className="space-y-8">
-              {initialEpisodes.map((ep) => (
+              {(Array.isArray(initialEpisodes) ? initialEpisodes : []).map((ep) => (
                   <EpisodeCard
                     episode={ep}
                     key={ep.id || ep.slug || ep.title}

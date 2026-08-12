@@ -18,7 +18,7 @@ export default function Index() {
       setLoading(true);
       const main = new Listing();
       const response = await main.Dashboard();
-      setData(response?.data?.data || []);
+      setData(response?.data?.data && typeof response.data.data === "object" ? response.data.data : {});
     } catch (error) {
       console.log("error", error);
       setData({});
@@ -89,10 +89,9 @@ export default function Index() {
               Latest Episodes
             </h1>
           </div>
-          {data?.latestEpisodes?.map((episode) => (
-            <div className="mt-3">
+          {(Array.isArray(data?.latestEpisodes) ? data.latestEpisodes : []).map((episode) => (
+            <div className="mt-3" key={episode.uuid}>
               <EpisodeCard
-                key={episode.uuid}
                 episode={episode}
                 isAdmin={true}     // dashboard/admin context
                 fetchDetails={() => {}} // noop since dashboard doesn’t refetch list

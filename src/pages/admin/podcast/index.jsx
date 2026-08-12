@@ -25,10 +25,10 @@ export default function Index() {
       setLoading(true);
       const main = new Listing();
       const response = await main.AdminPodcastGet();
-      setData(response?.data?.data || []);
+      setData(Array.isArray(response?.data?.data) ? response.data.data : []);
     } catch (error) {
       console.log("error", error);
-      setData({});
+      setData([]);
     }
     setLoading(false);
   };
@@ -77,7 +77,7 @@ export default function Index() {
         ) : data?.length === 0 ? (
           <p className="text-gray-500 text-center mt-20">No podcasts found.</p>
         ) : (
-          data?.map((podcast) => (
+          (Array.isArray(data) ? data : []).map((podcast) => (
             <div
               key={podcast.id}
               className={`bg-[#1a1a1a] rounded-2xl shadow-xl overflow-hidden w-full relative`}

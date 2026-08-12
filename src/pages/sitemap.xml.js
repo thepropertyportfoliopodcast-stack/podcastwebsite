@@ -14,8 +14,8 @@ export async function getServerSideProps({ res }) {
       fetch(`${apiUrl}/file/getAll?search=&topic=&page=1&limit=100`).then((response) => response.json()),
       fetch(`${apiUrl}/podcast/get-detail/all`).then((response) => response.json()),
     ]);
-    const episodes = episodesResponse?.data?.episodes || [];
-    const podcasts = podcastsResponse?.data || [];
+    const episodes = Array.isArray(episodesResponse?.data?.episodes) ? episodesResponse.data.episodes : [];
+    const podcasts = Array.isArray(podcastsResponse?.data) ? podcastsResponse.data : [];
     dynamicEntries = [
       ...episodes.map((episode) => ({ path: contentPath("episode", episode), modified: episode.createdAt })),
       ...podcasts.map((podcast) => ({ path: contentPath("podcast", podcast), modified: podcast.createdAt })),

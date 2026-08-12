@@ -22,11 +22,13 @@ export default function SubscriberList() {
       const main = new Listing();
       const response = await main.GetSubscriber(pg, limit, { signal });
 
-      const records = response?.data?.data?.records;
+      const records = Array.isArray(response?.data?.data?.records)
+        ? response.data.data.records
+        : [];
       const pagination = response?.data?.data?.pagination;
 
-      if (records) {
-        setListing((prev) => (pg === 1 ? records : [...prev, ...records]));
+      if (records.length || pg === 1) {
+        setListing((prev) => (pg === 1 ? records : [...(Array.isArray(prev) ? prev : []), ...records]));
 
         setHasMore(pagination?.nextPage !== null);
       }

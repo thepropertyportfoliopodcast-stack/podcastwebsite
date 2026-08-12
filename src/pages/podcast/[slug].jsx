@@ -18,7 +18,9 @@ export default function Index({ initialData = null }) {
       setLoading(true);
       const main = new Listing();
       const response = await main.PodcastDetail(extractUuid(slug));
-      const podcast = response?.data?.data || null;
+      const podcast = response?.data?.data && typeof response.data.data === "object" && !Array.isArray(response.data.data)
+        ? response.data.data
+        : null;
       setData(podcast);
       if (podcast) {
         const canonicalPath = contentPath("podcast", podcast);
@@ -28,7 +30,7 @@ export default function Index({ initialData = null }) {
       }
     } catch (error) {
       console.log("error", error);
-      setData({});
+      setData(null);
     }
     setLoading(false);
   };
@@ -119,7 +121,7 @@ export default function Index({ initialData = null }) {
               </div>
             ))}
           </div> */}
-           {data && data?.episodes && data?.episodes?.map((item,index)=>(
+           {(Array.isArray(data?.episodes) ? data.episodes : []).map((item,index)=>(
               <EpisodeCard episode={item} key={index} setIsEpisodePopupOpen={false} setSelectedEpisode={null} fetchDetails={fetchDetails} isAdmin={false}/>
             ))}
         </div>
@@ -135,7 +137,9 @@ export async function getServerSideProps({ params, res }) {
     if (response.status === 404) return { notFound: true };
     if (!response.ok) throw new Error(`Podcast API returned ${response.status}`);
     const payload = await response.json();
-    const podcast = payload?.data || null;
+    const podcast = payload?.data && typeof payload.data === "object" && !Array.isArray(payload.data)
+      ? payload.data
+      : null;
     if (!podcast) return { notFound: true };
 
     const canonicalPath = contentPath("podcast", podcast);
