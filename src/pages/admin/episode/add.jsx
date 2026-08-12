@@ -40,6 +40,7 @@ export default function Add() {
     mimefield: "",
     duration: 0,
     durationInSec: 0,
+    episodeNumber: "",
     publishedDate: "",
     size: 0,
   });
@@ -501,6 +502,7 @@ export default function Add() {
       payload.append("mimefield", formData.mimefield || "");
       payload.append("duration", formData.duration || 0);
       payload.append("durationInSec", formData.durationInSec || 0);
+      payload.append("episodeNumber", formData.episodeNumber);
       payload.append("publishedDate", formData.publishedDate);
       payload.append("size", formData.size || 0);
 
@@ -579,7 +581,7 @@ export default function Add() {
           />
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           <div className="space-y-1">
             <label className="block text-sm font-medium">
               Category <span className="text-red-500">*</span>
@@ -591,6 +593,10 @@ export default function Add() {
               value={formData.topic}
               onChange={handleChange}
             />
+          </div>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium">Episode number</label>
+            <input type="number" min="1" step="1" name="episodeNumber" value={formData.episodeNumber} onChange={handleChange} placeholder="24" className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white" />
           </div>
           <div className="space-y-1">
             <label className="block text-sm font-medium">Publication date</label>

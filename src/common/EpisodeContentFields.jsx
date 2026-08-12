@@ -5,7 +5,7 @@ export default function EpisodeContentFields({ formData, onChange, onTranscriptC
     <section className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
       <div>
         <h4 className="text-lg font-semibold">Video and episode content</h4>
-        <p className="mt-1 text-sm text-gray-400">Use one timestamp, topic, or Instagram Reel URL per line.</p>
+        <p className="mt-1 text-sm text-gray-400">Add a YouTube URL, then enter one timestamp per line. Clicking a timestamp on the episode page will jump to that point and play the video.</p>
       </div>
 
       <label className="block space-y-2">
@@ -14,8 +14,9 @@ export default function EpisodeContentFields({ formData, onChange, onTranscriptC
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium">Clickable timestamps</span>
+        <span className="text-sm font-medium">Clickable YouTube timestamps</span>
         <textarea className={fieldClass} rows="7" name="timestamps" value={formData.timestamps || ""} onChange={onChange} placeholder={"00:00 | Introduction\n03:25 | Market overview\n12:40 | Investment strategy"} />
+        <span className="block text-xs text-gray-400">Accepted formats: MM:SS | Title or HH:MM:SS | Title. Enter each chapter on a new line.</span>
       </label>
 
       <label className="block space-y-2">

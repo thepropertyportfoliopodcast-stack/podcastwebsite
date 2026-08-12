@@ -24,6 +24,7 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
   const mountRef = useRef(null);
   const playerRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(0);
+  const [playerReady, setPlayerReady] = useState(false);
   const id = youtubeId(url);
   const chapters = useMemo(() => parseChapters(timestamps), [timestamps]);
   const activeIndex = chapters.reduce((active, chapter, index) => currentTime >= chapter.seconds ? index : active, 0);
@@ -35,6 +36,7 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
       playerRef.current = new window.YT.Player(mountRef.current, {
         videoId: id,
         playerVars: { rel: 0 },
+        events: { onReady: () => setPlayerReady(true) },
       });
     };
     if (window.YT?.Player) initialise();
@@ -55,7 +57,12 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
     return () => { window.clearInterval(timer); playerRef.current?.destroy?.(); playerRef.current = null; };
   }, [id]);
 
-  const seek = (seconds) => { playerRef.current?.seekTo?.(seconds, true); playerRef.current?.playVideo?.(); };
+  const seek = (seconds) => {
+    if (!playerReady || !playerRef.current) return;
+    playerRef.current.seekTo(seconds, true);
+    playerRef.current.playVideo();
+    setCurrentTime(seconds);
+  };
 
   if (!id) return null;
   return (
@@ -67,7 +74,7 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
         <h2 className="sticky top-0 flex items-center gap-3 bg-[#111] pb-4 text-xl font-bold text-[#c99cff]"><FaClock aria-hidden="true" /><span>Timestamps</span></h2>
         <div className="space-y-2">
           {chapters.map((chapter, index) => (
-            <button key={`${chapter.time}-${chapter.label}`} type="button" onClick={() => seek(chapter.seconds)} className={`w-full rounded-xl border px-4 py-3 text-left transition ${index === activeIndex ? "border-[#9747FF] bg-[#9747FF]/20 text-[#cda7ff]" : "border-white/10 text-white hover:border-white/30"}`}>
+            <button key={`${chapter.time}-${chapter.label}`} type="button" onClick={() => seek(chapter.seconds)} disabled={!playerReady} aria-label={`Play ${chapter.label} at ${chapter.time}`} className={`w-full rounded-xl border px-4 py-3 text-left transition disabled:cursor-wait disabled:opacity-60 ${index === activeIndex ? "border-[#9747FF] bg-[#9747FF]/20 text-[#cda7ff]" : "border-white/10 text-white hover:border-white/30"}`}>
               <span className="mr-3 font-bold">{chapter.time}</span>{chapter.label}
             </button>
           ))}

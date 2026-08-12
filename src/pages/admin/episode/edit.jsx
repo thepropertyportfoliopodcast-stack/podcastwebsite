@@ -38,6 +38,7 @@ export default function Edit() {
     mimefield: "",
     duration: 0,
     durationInSec: 0,
+    episodeNumber: "",
     publishedDate: "",
     size: 0,
     isSpotify: false,
@@ -422,6 +423,7 @@ export default function Edit() {
       payload.append("mimefield", formData.mimefield || "");
       payload.append("duration", formData.duration || 0);
       payload.append("durationInSec", formData.durationInSec || 0);
+      payload.append("episodeNumber", formData.episodeNumber);
       payload.append("publishedDate", formData.publishedDate);
       payload.append("size", formData.size || 0);
       const response = await main.EpisodeUpdate(id, payload);
@@ -474,6 +476,7 @@ export default function Edit() {
       mimefield: response?.data?.data?.mimefield || "",
       duration: response?.data?.data?.duration || 0,
       durationInSec: response?.data?.data?.durationInSec || 0,
+      episodeNumber: response?.data?.data?.episodeNumber || "",
       publishedDate: response?.data?.data?.createdAt ? new Date(response.data.data.createdAt).toISOString().slice(0, 10) : "",
       size: response?.data?.data?.size || 0,
       isSpotify: !!response?.data?.data?.spotifyLink,
@@ -554,7 +557,8 @@ export default function Edit() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+                <div className="space-y-1"><label className="block text-sm font-medium">Episode number</label><input type="number" min="1" step="1" name="episodeNumber" value={formData.episodeNumber} onChange={handleChange} placeholder="24" className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white" /></div>
                 <div className="space-y-1"><label className="block text-sm font-medium">Publication date</label><input type="date" name="publishedDate" value={formData.publishedDate} onChange={handleChange} className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700" /></div>
                 <div className="space-y-1"><label className="block text-sm font-medium">Duration (minutes)</label><input type="number" min="0" step="1" value={formData.duration || ""} onChange={(event) => setFormData((current) => ({ ...current, duration: Number(event.target.value), durationInSec: Number(event.target.value) * 60 }))} className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700" /></div>
               </div>
