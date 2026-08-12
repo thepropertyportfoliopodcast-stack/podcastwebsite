@@ -11,6 +11,7 @@ import PodcastDetails from "@/common/PodcastDetails";
 import Link from "next/link";
 import Loader from "@/common/Loader";
 import toast from "react-hot-toast";
+import { mockDataEnabled, mockPodcast } from "@/data/mockPodcast";
 
 export default function Detail() {
   const router = useRouter();
@@ -21,6 +22,11 @@ export default function Detail() {
   const [selectedEpisode, setSelectedEpisode] = useState(null);
 
   const fetchDetails = async (slug) => {
+    if (mockDataEnabled()) {
+      setData(mockPodcast);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const main = new Listing();

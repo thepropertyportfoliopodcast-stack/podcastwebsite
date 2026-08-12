@@ -10,6 +10,7 @@ import { MdEdit } from "react-icons/md";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import toast from "react-hot-toast";
 import Loader from "@/common/Loader";
+import { mockDataEnabled, mockPodcast } from "@/data/mockPodcast";
 
 export default function Index() {
   const [loading, setLoading] = useState(false);
@@ -21,6 +22,11 @@ export default function Index() {
   const menuRef = useRef();
 
   const fetchPodcasts = async () => {
+    if (mockDataEnabled()) {
+      setData([mockPodcast]);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const main = new Listing();

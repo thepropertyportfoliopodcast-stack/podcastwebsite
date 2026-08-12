@@ -1,5 +1,6 @@
 import Main from "./home/Main";
 import { getCachedValue } from "@/utils/serverCache";
+import { mockDataEnabled, mockEpisodes } from "@/data/mockPodcast";
 
 
 export default function Home({ initialEpisodes = [] }) {
@@ -14,6 +15,10 @@ export async function getServerSideProps({ res }) {
     "Cache-Control",
     "public, s-maxage=300, stale-while-revalidate=3600"
   );
+
+  if (mockDataEnabled()) {
+    return { props: { initialEpisodes: mockEpisodes } };
+  }
 
   try {
     const episodes = await getCachedValue("homepage-episodes", async () => {
