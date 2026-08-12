@@ -1,13 +1,5 @@
-import Heading from "@/common/Heading";
 import Layout from "@/layout/Layout";
-import Image from "next/image";
 import React from "react";
-import {
-  HiOutlineMicrophone,
-  HiOutlineUsers,
-  HiOutlineBriefcase,
-  HiOutlineChartBar,
-} from "react-icons/hi";
 import MeetYourHost from "./MeetYourHost";
 import Mission from "./mission";
 import NewVoice from "./NewVoice";
@@ -15,89 +7,23 @@ import Vision from "./Vision";
 import Approach from "./Approach";
 
 const Index = () => {
-  const journeyEvents = [
-    {
-      year: "2021",
-      title: "The Beginning",
-      description:
-        "Started as weekend conversations about property investing between two mates who wanted to share knowledge.",
-    },
-    {
-      year: "2022",
-      title: "First 50 Episode",
-      description:
-        "Started as weekend conversations about property investing between two mates who wanted to share knowledge.",
-    },
-    {
-      year: "2023",
-      title: "Community Growth",
-      description:
-        "Started as weekend conversations about property investing between two mates who wanted to share knowledge.",
-    },
-    {
-      year: "2024",
-      title: "Industry Recognition",
-      description:
-        "Started as weekend conversations about property investing between two mates who wanted to share knowledge.",
-    },
-    {
-      year: "2025",
-      title: "Expanding Impact",
-      description:
-        "Started as weekend conversations about property investing between two mates who wanted to share knowledge.",
-    },
-  ];
-
-  const stats = [
-    {
-      value: "150+",
-      label: "Episode published",
-      icon: <HiOutlineMicrophone size={16} className=" text-white" />,
-    },
-    {
-      value: "75k+",
-      label: "Monthly listener",
-      icon: <HiOutlineUsers size={16} className=" text-white" />,
-    },
-    {
-      value: "20+",
-      label: "Year Experience",
-      icon: <HiOutlineBriefcase size={16} className=" text-white" />,
-    },
-    {
-      value: "500+",
-      label: "Property analyze",
-      icon: <HiOutlineChartBar size={16} className=" text-white" />,
-    },
-  ];
-
   return (
     <Layout>
-      <div className=" pt-[118px] lg:pt-[128px] pb-[40px] md:pb-[60px] lg:pb-[0px]">
+      <main className="relative isolate overflow-hidden bg-[#070707] pb-20 pt-[118px] lg:pt-[128px]">
+        <div className="pointer-events-none absolute -left-[26rem] top-20 h-[780px] w-[780px] rounded-full bg-[radial-gradient(circle,#fc18d8_0%,#9747ff_38%,transparent_70%)] opacity-35 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -right-[28rem] top-[70rem] h-[820px] w-[820px] rounded-full bg-[radial-gradient(circle,#9747ff_0%,#fc18d8_42%,transparent_72%)] opacity-30 blur-3xl" aria-hidden="true" />
+        <div className="relative">
           <NewVoice />
           <MeetYourHost />
-      </div>
-
-
-
-
-
-
-      <div className="relative overflow-hidden mt-2  md:mt-10 ">
-            <div className="absolute z-0 xl:max-w-[378px] w-full md:w-[578px] h-full md:h-[800px]  aspect-square left-[0] top-[-100px]  1111blurcircle rounded-r-full z-1">
-              <Image src={"/lightpinkleft.webp"} fill sizes="(max-width: 768px) 100vw, 578px" alt="" className="object-cover w-full" />
+          <div className="relative mx-auto mt-12 max-w-[1310px] px-4 md:mt-20">
+            <div className="grid gap-5 md:grid-cols-2">
+              <Vision />
+              <Mission />
             </div>
-
-             
-
-        <div className="px-4 max-w-[1310px] m-auto">
-          <div className="flex gap-[15px] flex-wrap md:flex-nowrap">
-            <Vision />
-            <Mission />
+            <Approach />
           </div>
-          <Approach />
         </div>
-      </div>
+      </main>
     </Layout>
   );
 };

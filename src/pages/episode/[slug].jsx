@@ -6,12 +6,9 @@ import Layout from "@/layout/Layout";
 import YouTubeChapterPlayer from "@/components/YouTubeChapterPlayer";
 import { contentPath, episodeKeywords, extractUuid, metaDescription, plainText, SITE_URL } from "@/utils/seo";
 import { mockDataEnabled, mockEpisode } from "@/data/mockPodcast";
+import { fallbackHosts, fixedShowcaseHosts, resolveEpisodeHosts } from "@/data/hosts";
 
-const hosts = [
-  { name: "Parag Dixit", designation: "Mortgage & Investment Strategy Expert", image: "/paragimg.jpg", accent: "from-[#9747FF] to-[#FC18D8]" },
-  { name: "Julius Dabre", designation: "Property Acquisition Specialist", image: "/juliusimg.jpg", accent: "from-[#FC18D8] to-[#ff7ad9]" },
-  { name: "Mudit Khandelwal", designation: "Strategic Finance Director", image: "/muditimg.jpg", accent: "from-[#6f5cff] to-[#9747FF]" },
-];
+const hostAccents = ["from-[#FC18D8] to-[#ff7ad9]", "from-[#9747FF] to-[#FC18D8]", "from-[#6f5cff] to-[#9747FF]"];
 
 function instagramEmbed(url = "") {
   const clean = url.split("?")[0].replace(/\/$/, "");
@@ -29,6 +26,7 @@ export default function EpisodePage({ initialData }) {
     .filter((episode) => episode.uuid !== data.uuid)
     .slice(0, 2);
   const reelLinks = Array.isArray(data.reelLinks) ? data.reelLinks : [];
+  const episodeHosts = resolveEpisodeHosts(data, Array.isArray(data.hostProfiles) ? data.hostProfiles : fallbackHosts);
 
   return (
     <Layout seo={{
@@ -39,16 +37,17 @@ export default function EpisodePage({ initialData }) {
       type: "article", publishedTime: data.createdAt,
       jsonLd: { "@context": "https://schema.org", "@type": "PodcastEpisode", name: data.title, description: data.seoDescription || plainText(data.description || data.detail), datePublished: data.createdAt, duration: data.durationInSec ? `PT${data.durationInSec}S` : undefined, associatedMedia: data.youtubeUrl ? { "@type": "VideoObject", embedUrl: data.youtubeUrl } : undefined, partOfSeries: { "@type": "PodcastSeries", name: data.podcast?.name }, image: data.thumbnail, url: `${SITE_URL}${contentPath("episode", data)}` },
     }}>
-      <div className="bg-[#070707] pb-16 pt-[110px] text-white md:pt-[125px]">
-        <div className="mx-auto max-w-[1310px] space-y-12 px-4">
+      <div className="relative isolate overflow-hidden bg-[#070707] pb-16 pt-[110px] text-white md:pt-[125px]">
+        <div className="pointer-events-none absolute -left-[22rem] top-44 h-[720px] w-[720px] rounded-full bg-[radial-gradient(circle,#fc18d8_0%,#9747ff_38%,transparent_70%)] opacity-35 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -right-[24rem] top-[58rem] h-[760px] w-[760px] rounded-full bg-[radial-gradient(circle,#9747ff_0%,#fc18d8_40%,transparent_72%)] opacity-30 blur-3xl" aria-hidden="true" />
+        <div className="relative mx-auto max-w-[1310px] space-y-12 px-4">
           <section className="grid items-center gap-7 rounded-3xl border border-white/15 bg-[#111] p-5 md:grid-cols-[360px_1fr] md:p-8 lg:grid-cols-[430px_1fr]">
             <div className="relative aspect-square overflow-hidden rounded-2xl">
               <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority sizes="(max-width: 768px) 100vw, 430px" className="object-cover" />
             </div>
             <div>
-              <p className="mb-3 text-sm font-bold uppercase tracking-[.2em] text-[#c99cff]">The Property Portfolio Podcast</p>
-              <h1 className="text-3xl font-extrabold leading-tight md:text-5xl lg:text-6xl">{data.title}</h1>
-              <p className="mt-4 text-base text-white/70 md:text-lg">Hosted by {data.podcast?.author}</p>
+              <h1 className="bg-gradient-to-r from-[#9747FF] via-[#d536f0] to-[#FC18D8] bg-clip-text text-3xl font-extrabold leading-tight text-transparent md:text-5xl lg:text-6xl">{data.title}</h1>
+              <div className="mt-4 flex flex-wrap items-center gap-x-1.5 text-base text-white/70 md:text-lg"><span>Hosted by</span>{episodeHosts.map((host, index) => <span key={host.slug} className="contents"><Link href={`/host/${host.slug}`} className="font-bold text-[#c99cff] transition hover:text-[#FC18D8] hover:underline">{host.name}</Link>{index < episodeHosts.length - 1 && <span aria-hidden="true">{index === episodeHosts.length - 2 ? "and" : ","}</span>}</span>)}</div>
               <div className="mt-7 flex flex-wrap gap-3">
                 {data.youtubeUrl && <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Watch this episode on YouTube" className="grid h-12 w-12 place-items-center rounded-full border border-white/20 bg-white/5 hover:bg-red-600"><FaYoutube aria-hidden="true" size={23} /></a>}
                 {data.spotifyLink && <a href={data.spotifyLink} target="_blank" rel="noopener noreferrer" aria-label="Listen on Spotify" className="grid h-12 w-12 place-items-center rounded-full border border-white/20 bg-white/5 hover:bg-green-600"><FaSpotify aria-hidden="true" size={23} /></a>}
@@ -97,11 +96,12 @@ export default function EpisodePage({ initialData }) {
               <p className="mt-4 text-white/60">Finance, acquisition and property strategy expertise brought together in one conversation.</p>
             </div>
 
-            <div className="relative grid gap-6 md:grid-cols-3 md:items-end">
-              {hosts.map((host, index) => (
+            <div className="relative overflow-x-auto pb-4">
+            <div className="grid min-w-[820px] grid-cols-3 items-end gap-6 px-1 pt-10">
+              {fixedShowcaseHosts.map((host, index) => (
                 <article
                   key={host.name}
-                  className={`group relative overflow-hidden rounded-[30px] border border-white/15 bg-[#111] shadow-2xl transition duration-500 hover:-translate-y-3 hover:border-white/40 hover:shadow-[#9747FF]/20 ${index === 1 ? "md:mb-8" : ""}`}
+                  className={`group relative overflow-hidden rounded-[30px] border border-white/15 bg-[#111] shadow-2xl transition duration-500 hover:-translate-y-3 hover:border-white/40 hover:shadow-[#9747FF]/20 ${index === 1 ? "mb-10" : ""}`}
                 >
                   <div className="relative aspect-[4/5] overflow-hidden">
                     <Image
@@ -112,7 +112,7 @@ export default function EpisodePage({ initialData }) {
                       className="object-cover object-top transition duration-700 ease-out group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/5 to-transparent" aria-hidden="true" />
-                    <div className={`absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t ${host.accent} opacity-25 blur-2xl transition duration-500 group-hover:opacity-45`} aria-hidden="true" />
+                    <div className={`absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t ${hostAccents[index]} opacity-25 blur-2xl transition duration-500 group-hover:opacity-45`} aria-hidden="true" />
                     <span className="absolute left-5 top-5 rounded-full border border-white/25 bg-black/35 px-3 py-1 text-xs font-extrabold tracking-[0.2em] text-white/80 backdrop-blur-md">
                       HOST 0{index + 1}
                     </span>
@@ -123,13 +123,14 @@ export default function EpisodePage({ initialData }) {
 
                   <div className="relative -mt-20 p-6 pt-0 md:p-7 md:pt-0">
                     <div className="rounded-2xl border border-white/15 bg-black/55 p-5 backdrop-blur-xl transition duration-500 group-hover:border-white/25 group-hover:bg-black/70">
-                      <div className={`mb-4 h-1 w-12 rounded-full bg-gradient-to-r ${host.accent} transition-all duration-500 group-hover:w-20`} aria-hidden="true" />
-                      <h3 className="text-2xl font-extrabold md:text-[28px]">{host.name}</h3>
+                      <div className={`mb-4 h-1 w-12 rounded-full bg-gradient-to-r ${hostAccents[index]} transition-all duration-500 group-hover:w-20`} aria-hidden="true" />
+                      <h3 className="whitespace-nowrap text-xl font-extrabold lg:text-[26px]">{host.name}</h3>
                       <p className="mt-3 min-h-[48px] text-sm font-semibold leading-6 text-white/65">{host.designation}</p>
                     </div>
                   </div>
                 </article>
               ))}
+            </div>
             </div>
           </section>
         </div>
@@ -141,15 +142,20 @@ export default function EpisodePage({ initialData }) {
 export async function getServerSideProps({ params, res }) {
   const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
   if (mockDataEnabled()) {
-    return { props: { initialData: mockEpisode } };
+    return { props: { initialData: { ...mockEpisode, hostProfiles: fallbackHosts } } };
   }
   try {
     const response = await fetch(`${apiUrl}/file/get/${encodeURIComponent(extractUuid(params.slug))}`);
     if (response.status === 404) return { notFound: true };
     if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
     const payload = (await response.json())?.data;
-    const episode = payload && typeof payload === "object" && !Array.isArray(payload) ? payload : null;
+    let episode = payload && typeof payload === "object" && !Array.isArray(payload) ? payload : null;
     if (!episode) return { notFound: true };
+    try {
+      const hostsResponse = await fetch(`${apiUrl}/host/get`);
+      const hostsPayload = hostsResponse.ok ? (await hostsResponse.json())?.data : [];
+      episode = { ...episode, hostProfiles: Array.isArray(hostsPayload) ? hostsPayload : [] };
+    } catch { episode = { ...episode, hostProfiles: [] }; }
     const canonicalPath = contentPath("episode", episode);
     if (`/episode/${params.slug}` !== canonicalPath) return { redirect: { destination: canonicalPath, permanent: true } };
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");

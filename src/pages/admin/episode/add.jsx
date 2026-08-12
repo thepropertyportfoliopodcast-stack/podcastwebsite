@@ -8,6 +8,8 @@ import axios from "axios";
 import { Api } from "../../api/Api";
 import SeoFields from "@/common/SeoFields";
 import EpisodeContentFields from "@/common/EpisodeContentFields";
+import HostSelector from "@/common/HostSelector";
+import { fallbackHosts } from "@/data/hosts";
 
 export default function Add() {
   const selectedEpisode=null;
@@ -34,6 +36,7 @@ export default function Add() {
     transcript: "",
     topicsCovered: "",
     reelLinks: "",
+    hostSlugs: [],
     mimefield: "",
     duration: 0,
     durationInSec: 0,
@@ -48,6 +51,11 @@ export default function Add() {
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [audioUploadProgress, setAudioUploadProgress] = useState(0);
   const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
+  const [hosts, setHosts] = useState([]);
+
+  useEffect(() => {
+    new Listing().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts(process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true" ? fallbackHosts : []));
+  }, []);
 
   const validateImageDimensions = (file, requiredWidth, requiredHeight) => {
     return new Promise((resolve, reject) => {
@@ -470,6 +478,7 @@ export default function Add() {
       payload.append("transcript", formData.transcript);
       payload.append("topicsCovered", formData.topicsCovered);
       payload.append("reelLinks", formData.reelLinks);
+      payload.append("hostSlugs", JSON.stringify(formData.hostSlugs));
       payload.append("seoTitle", formData.seoTitle);
       payload.append("seoDescription", formData.seoDescription);
       payload.append("primaryKeyword", formData.primaryKeyword);
@@ -582,6 +591,8 @@ export default function Add() {
         </div>
 
         <SeoFields formData={formData} onChange={handleChange} />
+
+        <HostSelector hosts={hosts} selected={formData.hostSlugs} onChange={(hostSlugs) => setFormData((current) => ({ ...current, hostSlugs }))} />
 
         {/* Thumbnail */}
         <div className="space-y-1">

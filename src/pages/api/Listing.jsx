@@ -53,6 +53,12 @@ class Listing extends Component {
   async AdminPodcastDetail(data) {
     return Api.get(`/admin/podcast/get/${data}`);
   }
+
+  async HostGet() { return Api.get("/host/get"); }
+  async HostDetail(id) { return Api.get(`/host/get/${id}`); }
+  async AdminHostGet() { return Api.get("/admin/host/get"); }
+  async HostAdd(data) { return Api.post("/admin/host/add", data); }
+  async HostUpdate(id, data) { return Api.post(`/admin/host/update/${id}`, data); }
   
   async PodcastAdd(data) {
     return Api.post("/admin/podcast/add", data);

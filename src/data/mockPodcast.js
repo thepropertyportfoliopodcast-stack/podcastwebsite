@@ -46,6 +46,7 @@ export const mockEpisode = {
     "Renting versus home ownership",
   ],
   reelLinks: [],
+  hostSlugs: ["parag-dixit", "julius-dabre", "mudit-khandelwal"],
   topic: "Property market",
   spotifyLink: "https://open.spotify.com/",
   appleLink: "https://podcasts.apple.com/",

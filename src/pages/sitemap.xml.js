@@ -10,15 +10,18 @@ export async function getServerSideProps({ res }) {
   let dynamicEntries = [];
 
   try {
-    const [episodesResponse, podcastsResponse] = await Promise.all([
+    const [episodesResponse, podcastsResponse, hostsResponse] = await Promise.all([
       fetch(`${apiUrl}/file/getAll?search=&topic=&page=1&limit=100`).then((response) => response.json()),
       fetch(`${apiUrl}/podcast/get-detail/all`).then((response) => response.json()),
+      fetch(`${apiUrl}/host/get`).then((response) => response.json()),
     ]);
     const episodes = Array.isArray(episodesResponse?.data?.episodes) ? episodesResponse.data.episodes : [];
     const podcasts = Array.isArray(podcastsResponse?.data) ? podcastsResponse.data : [];
+    const hosts = Array.isArray(hostsResponse?.data) ? hostsResponse.data : [];
     dynamicEntries = [
       ...episodes.map((episode) => ({ path: contentPath("episode", episode), modified: episode.createdAt })),
       ...podcasts.map((podcast) => ({ path: contentPath("podcast", podcast), modified: podcast.createdAt })),
+      ...hosts.map((host) => ({ path: `/host/${host.slug}`, modified: host.updatedAt })),
     ];
   } catch (error) {
     console.error("Sitemap data fetch failed:", error.message);
