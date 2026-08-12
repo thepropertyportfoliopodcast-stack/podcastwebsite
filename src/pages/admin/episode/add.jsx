@@ -7,6 +7,7 @@ import ReactQuillEditor from "./ReactQuillEditor";
 import axios from "axios";
 import { Api } from "../../api/Api";
 import SeoFields from "@/common/SeoFields";
+import EpisodeContentFields from "@/common/EpisodeContentFields";
 
 export default function Add() {
   const selectedEpisode=null;
@@ -28,7 +29,11 @@ export default function Add() {
     audioUrl: "",
     audioSize: 0,
     details: null,
-    timestamps: null,
+    timestamps: "",
+    youtubeUrl: "",
+    transcript: "",
+    topicsCovered: "",
+    reelLinks: "",
     mimefield: "",
     duration: 0,
     durationInSec: 0,
@@ -461,14 +466,18 @@ export default function Add() {
       payload.append("podcastId", id);
       payload.append("detail", formData.details);
       payload.append("timestamps", formData.timestamps);
+      payload.append("youtubeUrl", formData.youtubeUrl);
+      payload.append("transcript", formData.transcript);
+      payload.append("topicsCovered", formData.topicsCovered);
+      payload.append("reelLinks", formData.reelLinks);
       payload.append("seoTitle", formData.seoTitle);
       payload.append("seoDescription", formData.seoDescription);
       payload.append("primaryKeyword", formData.primaryKeyword);
       payload.append("secondaryKeywords", formData.secondaryKeywords);
 
       // Video now handled via chunk upload
-      if (!uploadedFileUrl) {
-        toast.error("Please upload the video first!");
+      if (!uploadedFileUrl && !formData.youtubeUrl) {
+        toast.error("Please add a YouTube URL or upload a video first!");
         setLoading(false);
         return;
       }
@@ -477,7 +486,7 @@ export default function Add() {
         payload.append("audioSize", formData.audioSize || 0);
       }
 
-      payload.append("link", uploadedFileUrl);
+      if (uploadedFileUrl) payload.append("link", uploadedFileUrl);
       payload.append("mimefield", formData.mimefield || "");
       payload.append("duration", formData.duration || 0);
       payload.append("durationInSec", formData.durationInSec || 0);
@@ -611,7 +620,7 @@ export default function Add() {
         {/* Video */}
         <div className="space-y-1">
           <label className="block text-sm font-medium">
-            File <span className="text-red-500">*</span>
+            Video file <span className="text-gray-400">(optional when using YouTube)</span>
           </label>
           <input
             type="file"
@@ -680,17 +689,11 @@ export default function Add() {
           />
         </div>
 
-         {/* Timestamps */}
-        <div className="space-y-1 mt-[65px]">
-          <label className="block text-sm font-medium">
-            Timestamps
-          </label>
-          <ReactQuillEditor
-            label="timestamps"
-            desc={formData?.timestamps}
-            handleBioChange={(val) => handleQuillChange('timestamps', val)}
-          />
-        </div>
+        <EpisodeContentFields
+          formData={formData}
+          onChange={handleChange}
+          onTranscriptChange={(value) => setFormData((prev) => ({ ...prev, transcript: value }))}
+        />
 
         {/* Submit */}
         <div className="pt-2 mt-16">

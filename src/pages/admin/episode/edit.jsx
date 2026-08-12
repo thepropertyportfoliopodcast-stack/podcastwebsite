@@ -8,6 +8,7 @@ import axios from "axios";
 import { Api } from "../../api/Api";
 import Loader from "@/common/Loader";
 import SeoFields from "@/common/SeoFields";
+import EpisodeContentFields from "@/common/EpisodeContentFields";
 
 export default function Edit() {
   const router = useRouter();
@@ -27,7 +28,11 @@ export default function Edit() {
     audioUrl: "",
     audioSize: 0,
     details: null,
-    timestamps: null,
+    timestamps: "",
+    youtubeUrl: "",
+    transcript: "",
+    topicsCovered: "",
+    reelLinks: "",
     mimefield: "",
     duration: 0,
     durationInSec: 0,
@@ -379,6 +384,10 @@ export default function Edit() {
       payload.append("podcastId", id);
       payload.append("detail", formData?.details);
       payload.append("timestamps", formData.timestamps);
+      payload.append("youtubeUrl", formData.youtubeUrl);
+      payload.append("transcript", formData.transcript);
+      payload.append("topicsCovered", formData.topicsCovered);
+      payload.append("reelLinks", formData.reelLinks);
       payload.append("seoTitle", formData.seoTitle);
       payload.append("seoDescription", formData.seoDescription);
       payload.append("primaryKeyword", formData.primaryKeyword);
@@ -446,7 +455,11 @@ export default function Edit() {
       audioUrl: response?.data?.data?.audio || "",
       audioSize: response?.data?.data?.audioSize || 0,
       details: response?.data?.data?.detail || null,
-      timestamps: response?.data?.data?.timestamps || null,
+      timestamps: response?.data?.data?.timestamps || "",
+      youtubeUrl: response?.data?.data?.youtubeUrl || "",
+      transcript: response?.data?.data?.transcript || "",
+      topicsCovered: (response?.data?.data?.topicsCovered || []).join("\n"),
+      reelLinks: (response?.data?.data?.reelLinks || []).join("\n"),
       mimefield: response?.data?.data?.mimefield || "",
       duration: response?.data?.data?.duration || 0,
       durationInSec: response?.data?.data?.durationInSec || 0,
@@ -683,17 +696,13 @@ export default function Edit() {
                 />
               </div>
 
-              <div className="space-y-2 pt-2 mt-6 border-t border-gray-800">
-                <label className="block text-sm font-medium">
-                  Timestamps
-                </label>
-                <ReactQuillEditor
-                  label="timestamps"
-                  desc={formData?.timestamps}
-                  handleBioChange={(val) => handleQuillChange('timestamps', val)}
-                />
-              </div>
             </div>
+
+            <EpisodeContentFields
+              formData={formData}
+              onChange={handleChange}
+              onTranscriptChange={(value) => setFormData((prev) => ({ ...prev, transcript: value }))}
+            />
 
             <div className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
               <h4 className="text-lg font-semibold">Platforms</h4>
