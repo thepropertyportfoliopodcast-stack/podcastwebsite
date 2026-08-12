@@ -42,17 +42,17 @@ export default function EpisodePage({ initialData }) {
         <div className="pointer-events-none absolute -left-[22rem] top-44 h-[720px] w-[720px] rounded-full bg-[radial-gradient(circle,#fc18d8_0%,#9747ff_38%,transparent_70%)] opacity-35 blur-3xl" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-[24rem] top-[58rem] h-[760px] w-[760px] rounded-full bg-[radial-gradient(circle,#9747ff_0%,#fc18d8_40%,transparent_72%)] opacity-30 blur-3xl" aria-hidden="true" />
         <div className="relative mx-auto max-w-[1310px] space-y-12 px-4">
-          <section className="grid items-center gap-7 rounded-3xl border border-white/15 bg-[#111] p-5 md:grid-cols-[360px_1fr] md:p-8 lg:grid-cols-[430px_1fr]">
-            <div className="relative aspect-square overflow-hidden rounded-2xl">
+          <section className="grid items-stretch gap-7 rounded-3xl border border-white/15 bg-[#111] p-5 md:grid-cols-[minmax(280px,360px)_1fr] md:p-8 lg:grid-cols-[minmax(360px,430px)_1fr]">
+            <div className="relative aspect-square overflow-hidden rounded-2xl md:aspect-auto md:h-full md:min-h-[360px] lg:min-h-[430px]">
               <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority sizes="(max-width: 768px) 100vw, 430px" className="object-cover" />
             </div>
-            <div>
-              <h1 className="bg-gradient-to-r from-[#9747FF] via-[#d536f0] to-[#FC18D8] bg-clip-text text-3xl font-extrabold leading-tight text-transparent md:text-5xl lg:text-6xl">{data.title}</h1>
+            <div className="flex min-w-0 flex-col justify-center py-1 md:py-4">
+              <h1 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">{data.title}</h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-1.5 text-base text-white/70 md:text-lg"><span>Hosted by</span>{episodeHosts.map((host, index) => <span key={host.slug} className="contents"><Link href={`/host/${host.slug}`} className="font-bold text-[#c99cff] transition hover:text-[#FC18D8] hover:underline">{host.name}</Link>{index < episodeHosts.length - 1 && <span aria-hidden="true">{index === episodeHosts.length - 2 ? "and" : ","}</span>}</span>)}</div>
-              <div className="mt-7 flex flex-wrap gap-3">
-                {data.youtubeUrl && <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Watch this episode on YouTube" className="grid h-12 w-12 place-items-center rounded-full border border-white/20 bg-white/5 hover:bg-red-600"><FaYoutube aria-hidden="true" size={23} /></a>}
-                {data.spotifyLink && <a href={data.spotifyLink} target="_blank" rel="noopener noreferrer" aria-label="Listen on Spotify" className="grid h-12 w-12 place-items-center rounded-full border border-white/20 bg-white/5 hover:bg-green-600"><FaSpotify aria-hidden="true" size={23} /></a>}
-                {data.appleLink && <a href={data.appleLink} target="_blank" rel="noopener noreferrer" aria-label="Listen on Apple Podcasts" className="grid h-12 w-12 place-items-center rounded-full border border-white/20 bg-white/5 hover:bg-purple-600"><FaApple aria-hidden="true" size={23} /></a>}
+              <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
+                {data.youtubeUrl && <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Watch this episode on YouTube" className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 font-bold transition hover:border-red-500 hover:bg-red-600 sm:justify-start"><FaYoutube aria-hidden="true" size={22} /><span>YouTube</span></a>}
+                {data.spotifyLink && <a href={data.spotifyLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Spotify" className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 font-bold transition hover:border-[#1ed760] hover:bg-[#1ed760] hover:text-black sm:justify-start"><FaSpotify aria-hidden="true" size={22} /><span>Spotify</span></a>}
+                {data.appleLink && <a href={data.appleLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Apple Podcasts" className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 font-bold transition hover:border-[#9747FF] hover:bg-[#9747FF] sm:justify-start"><FaApple aria-hidden="true" size={22} /><span>Apple Podcasts</span></a>}
               </div>
             </div>
           </section>
@@ -115,12 +115,6 @@ export default function EpisodePage({ initialData }) {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/5 to-transparent" aria-hidden="true" />
                     <div className={`absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t ${hostAccents[index]} opacity-25 blur-2xl transition duration-500 group-hover:opacity-45`} aria-hidden="true" />
-                    <span className="absolute left-5 top-5 rounded-full border border-white/25 bg-black/35 px-3 py-1 text-xs font-extrabold tracking-[0.2em] text-white/80 backdrop-blur-md">
-                      HOST 0{index + 1}
-                    </span>
-                    <span className="absolute -right-2 top-2 text-[92px] font-black leading-none text-white/[0.08] transition duration-500 group-hover:text-white/[0.13]" aria-hidden="true">
-                      0{index + 1}
-                    </span>
                   </div>
 
                   <div className="relative -mt-20 p-6 pt-0 md:p-7 md:pt-0">
