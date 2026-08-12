@@ -29,6 +29,18 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
       else{
         setLoadingMore(true);
       }
+      if (mockDataEnabled()) {
+        const searchValue = search.trim().toLowerCase();
+        const filtered = mockEpisodes.filter((episode) => {
+          const matchesSearch = !searchValue || episode.title?.toLowerCase().includes(searchValue) || episode.description?.toLowerCase().includes(searchValue);
+          const matchesTopic = !topic || episode.topic === topic;
+          return matchesSearch && matchesTopic;
+        });
+        setData(filtered);
+        setTopics(["Property market", "First-home buyers", "Investing"]);
+        setHasNextPage(false);
+        return;
+      }
       const main = new Listing();
       const response = await main.EpisodeGetAll(search, topic, pageNumber, LIMIT);
       const resData = response?.data?.data;
