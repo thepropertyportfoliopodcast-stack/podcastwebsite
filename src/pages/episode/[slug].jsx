@@ -33,7 +33,7 @@ export default function EpisodePage({ initialData }) {
       type: "article", publishedTime: data.createdAt,
       jsonLd: { "@context": "https://schema.org", "@type": "PodcastEpisode", name: data.title, description: data.seoDescription || plainText(data.description || data.detail), datePublished: data.createdAt, duration: data.durationInSec ? `PT${data.durationInSec}S` : undefined, associatedMedia: data.youtubeUrl ? { "@type": "VideoObject", embedUrl: data.youtubeUrl } : undefined, partOfSeries: { "@type": "PodcastSeries", name: data.podcast?.name }, image: data.thumbnail, url: `${SITE_URL}${contentPath("episode", data)}` },
     }}>
-      <main className="bg-[#070707] pb-16 pt-[110px] text-white md:pt-[125px]">
+      <div className="bg-[#070707] pb-16 pt-[110px] text-white md:pt-[125px]">
         <div className="mx-auto max-w-[1310px] space-y-12 px-4">
           <section className="grid items-center gap-7 rounded-3xl border border-white/15 bg-[#111] p-5 md:grid-cols-[360px_1fr] md:p-8 lg:grid-cols-[430px_1fr]">
             <div className="relative aspect-square overflow-hidden rounded-2xl">
@@ -82,7 +82,7 @@ export default function EpisodePage({ initialData }) {
             <div className="grid gap-5 md:grid-cols-3">{hosts.map((host) => <article key={host.name} className="rounded-2xl border border-white/15 bg-[#111] p-6 text-center"><div className="relative mx-auto h-40 w-40 overflow-hidden rounded-full border-2 border-[#9747FF]"><Image src={host.image} alt={host.name} fill sizes="160px" className="object-cover" /></div><h3 className="mt-5 text-xl font-bold">{host.name}</h3><p className="mt-2 text-[#c99cff]">{host.designation}</p></article>)}</div>
           </section>
         </div>
-      </main>
+      </div>
     </Layout>
   );
 }
