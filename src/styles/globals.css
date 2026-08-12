@@ -16,16 +16,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-html[data-theme="light"] {
-  --background: #fffaff;
-  --foreground: #21152a;
-  --surface: rgba(255, 255, 255, 0.82);
-  --surface-raised: #ffffff;
-  --muted: #65586e;
-  color-scheme: light;
-}
-
-
 /* width */
 ::-webkit-scrollbar {
   width: 10px;
@@ -52,96 +42,6 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background-color 200ms ease, color 200ms ease;
-}
-
-.public-theme {
-  min-height: 100vh;
-  background: var(--background);
-  color: var(--foreground);
-  transition: background-color 200ms ease, color 200ms ease;
-}
-
-html[data-theme="light"] .public-theme {
-  background:
-    radial-gradient(circle at 8% 18%, rgba(252, 24, 216, 0.11), transparent 28rem),
-    radial-gradient(circle at 92% 48%, rgba(151, 71, 255, 0.13), transparent 32rem),
-    linear-gradient(180deg, #fffaff 0%, #ffffff 46%, #fbf7ff 100%);
-}
-
-html[data-theme="light"] .public-theme .site-header {
-  border-color: rgba(151, 71, 255, 0.2) !important;
-  background: rgba(255, 255, 255, 0.92) !important;
-  color: #24162d !important;
-  box-shadow: 0 8px 30px rgba(73, 34, 104, 0.08);
-  backdrop-filter: blur(16px);
-}
-
-html[data-theme="light"] .public-theme .theme-toggle {
-  border-color: rgba(151, 71, 255, 0.35) !important;
-  background: linear-gradient(135deg, rgba(151, 71, 255, 0.14), rgba(252, 24, 216, 0.14)) !important;
-  color: #7a2bc1 !important;
-}
-
-html[data-theme="light"] .public-theme .mobile-menu-panel {
-  border: 1px solid rgba(151, 71, 255, 0.18);
-  background: rgba(255, 255, 255, 0.98) !important;
-  color: #24162d !important;
-  box-shadow: 0 18px 50px rgba(73, 34, 104, 0.16);
-}
-
-html[data-theme="light"] .public-theme [class*="bg-[#000"],
-html[data-theme="light"] .public-theme [class*="bg-[#070"],
-html[data-theme="light"] .public-theme [class*="bg-[#090"],
-html[data-theme="light"] .public-theme [class*="bg-[#0a0"],
-html[data-theme="light"] .public-theme [class*="bg-[#0F0"],
-html[data-theme="light"] .public-theme [class*="bg-[#111"],
-html[data-theme="light"] .public-theme [class*="bg-[#141"],
-html[data-theme="light"] .public-theme [class*="bg-[#151"],
-html[data-theme="light"] .public-theme [class*="bg-black"] {
-  background-color: rgba(255, 255, 255, 0.82) !important;
-  color: #21152a;
-  box-shadow: 0 12px 36px rgba(88, 45, 119, 0.08);
-}
-
-html[data-theme="light"] .public-theme [class*="text-white"],
-html[data-theme="light"] .public-theme [class*="text-gray-100"],
-html[data-theme="light"] .public-theme [class*="text-gray-200"],
-html[data-theme="light"] .public-theme [class*="text-gray-300"],
-html[data-theme="light"] .public-theme [class*="text-gray-400"] {
-  color: #403449 !important;
-}
-
-html[data-theme="light"] .public-theme .theme-hero,
-html[data-theme="light"] .public-theme .theme-hero [class*="text-white"],
-html[data-theme="light"] .public-theme .bg-theme,
-html[data-theme="light"] .public-theme .bg-theme [class*="text-white"],
-html[data-theme="light"] .public-theme [class*="bg-gradient-to-r"][class*="text-white"] {
-  color: #ffffff !important;
-}
-
-html[data-theme="light"] .public-theme [class*="border-white"],
-html[data-theme="light"] .public-theme [class*="border-gray-7"] {
-  border-color: rgba(91, 48, 119, 0.2) !important;
-}
-
-html[data-theme="light"] .public-theme footer {
-  background: linear-gradient(135deg, #faf2ff 0%, #f7e9ff 45%, #fff5fc 100%) !important;
-  color: #291833 !important;
-  border-top: 1px solid rgba(151, 71, 255, 0.18);
-}
-
-html[data-theme="light"] .public-theme footer [class*="text-white"] {
-  color: #291833 !important;
-}
-
-html[data-theme="light"] .public-theme .detail-content,
-html[data-theme="light"] .public-theme .detail-content h1,
-html[data-theme="light"] .public-theme .detail-content h2,
-html[data-theme="light"] .public-theme .detail-content h3,
-html[data-theme="light"] .public-theme .detail-content h4,
-html[data-theme="light"] .public-theme .detail-content strong {
-  color: #302039 !important;
 }
 
 /* Audio Player CSS */

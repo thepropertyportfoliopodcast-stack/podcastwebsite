@@ -6,7 +6,7 @@ import SEO from "../common/SEO";
 export default function Layout({ children, seo = {} }) {
 
     return (
-        <div className="public-theme min-h-screen">
+        <div className="min-h-screen bg-black text-white">
             <SEO {...seo} />
             <Header />
             <main>{children}</main>

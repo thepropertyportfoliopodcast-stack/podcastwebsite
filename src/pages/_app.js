@@ -9,7 +9,6 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
-import { ThemeProvider } from "@/context/ThemeContext";
 // import AudioPlayerWrapper from "@/components/AudioPlayerWrapper";
 
 const AudioPlyr = dynamic(() => import("@/components/AudioPlyrWrapper"), { ssr: false });
@@ -46,13 +45,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
       }}
     />
-    <ThemeProvider>
-      <RoleProvider>
-        <AudioPlayerProvider>
-          <Component {...pageProps} />
-          <DeferredAudioPlayer />
-        </AudioPlayerProvider>
-      </RoleProvider>
-    </ThemeProvider>
+    <RoleProvider>
+      <AudioPlayerProvider>
+        <Component {...pageProps} />
+        <DeferredAudioPlayer />
+      </AudioPlayerProvider>
+    </RoleProvider>
   </>;
 }
