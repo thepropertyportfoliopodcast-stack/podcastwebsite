@@ -5,6 +5,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const nextConfig = {
+  // Isolate HMR output from production builds so `next build` cannot corrupt
+  // a running development session.
+  distDir: process.env.NODE_ENV === 'development' ? '.next-dev' : '.next',
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
@@ -69,10 +72,6 @@ const nextConfig = {
         pathname: '**',
       },
     ],
-  },
-  webpack: (config) => {
-    config.ignoreWarnings = [{ module: /plyr/ }];
-    return config;
   },
 };
 
