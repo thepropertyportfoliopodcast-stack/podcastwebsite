@@ -28,6 +28,7 @@ const relatedEpisodes = [
 
 export const mockEpisode = {
   id: 901,
+  episodeNumber: 24,
   uuid: MOCK_EPISODE_UUID,
   slug: "is-australia-raising-a-generation-of-renters",
   title: "Is Australia Raising a Generation of Renters?",

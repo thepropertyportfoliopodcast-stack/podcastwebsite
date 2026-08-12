@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaApple, FaBookOpen, FaCheck, FaInstagram, FaMicrophoneAlt, FaPlayCircle, FaSpotify, FaUsers, FaYoutube } from "react-icons/fa";
+import { FaApple, FaBookOpen, FaCalendarAlt, FaCheck, FaChevronRight, FaClock, FaInstagram, FaMicrophoneAlt, FaPlayCircle, FaSpotify, FaTag, FaUser, FaUsers, FaYoutube } from "react-icons/fa";
 import Layout from "@/layout/Layout";
 import YouTubeChapterPlayer from "@/components/YouTubeChapterPlayer";
 import SpotifyEmbed from "@/components/SpotifyEmbed";
@@ -14,6 +14,20 @@ const hostAccents = ["from-[#FC18D8] to-[#ff7ad9]", "from-[#9747FF] to-[#FC18D8]
 function instagramEmbed(url = "") {
   const clean = url.split("?")[0].replace(/\/$/, "");
   return clean ? `${clean}/embed` : "";
+}
+
+function episodeDuration(seconds, minutes) {
+  const total = Number(seconds) || (Number(minutes) * 60) || 0;
+  if (!total) return "Duration unavailable";
+  const hours = Math.floor(total / 3600);
+  const mins = Math.floor((total % 3600) / 60);
+  const secs = total % 60;
+  return [hours ? `${hours} hr` : "", mins ? `${mins} min` : "", secs ? `${secs} sec` : ""].filter(Boolean).join(" ");
+}
+
+function episodeDate(value) {
+  if (!value) return "Date unavailable";
+  return new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(value));
 }
 
 export default function EpisodePage({ initialData }) {
@@ -46,16 +60,25 @@ export default function EpisodePage({ initialData }) {
             <div className="relative aspect-square overflow-hidden rounded-2xl md:aspect-auto md:h-full md:min-h-[360px] lg:min-h-[430px]">
               <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority sizes="(max-width: 768px) 100vw, 430px" className="object-cover" />
             </div>
-            <div className="flex min-w-0 flex-col justify-center py-1 md:py-4">
-              <h1 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">{data.title}</h1>
-              <div className="mt-5 rounded-2xl border border-[#c99cff]/25 bg-[#9747FF]/10 p-3 sm:p-4">
-                <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[.16em] text-[#c99cff]"><FaUsers aria-hidden="true" /><span>Meet your hosts</span></div>
-                <div className="flex flex-wrap gap-2">{episodeHosts.map((host) => <Link key={host.slug} href={`/host/${host.slug}`} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/25 px-3 py-2 text-sm font-bold text-[#c99cff] transition hover:border-[#FC18D8] hover:bg-[#FC18D8]/10 hover:text-white sm:px-4"><span className="grid h-6 w-6 place-items-center rounded-full bg-[#c99cff]/15"><FaUsers size={12} aria-hidden="true" /></span>{host.name}</Link>)}</div>
+            <div className="flex min-w-0 flex-col justify-center py-1 md:py-2">
+              <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-white/50 sm:text-sm"><Link href="/" className="transition hover:text-[#c99cff]">Home</Link><FaChevronRight size={9} aria-hidden="true"/><Link href="/episode" className="transition hover:text-[#c99cff]">Episodes</Link><FaChevronRight size={9} aria-hidden="true"/><span className="text-white/75">{data.episodeNumber ? `Episode ${data.episodeNumber}` : "Episode"}</span></nav>
+              {data.episodeNumber && <div className="mb-4 w-fit rounded-lg bg-gradient-to-r from-[#9747FF] to-[#FC18D8] px-3 py-1.5 text-xs font-extrabold uppercase tracking-[.12em] text-white sm:text-sm">EP. {data.episodeNumber}</div>}
+              <h1 className="text-3xl font-extrabold leading-[1.08] text-white sm:text-4xl md:text-[42px] lg:text-[52px]">{data.title}</h1>
+              <p className="mt-4 line-clamp-3 text-sm font-medium leading-6 text-white/65 sm:text-base sm:leading-7">{data.description}</p>
+
+              <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-3">{episodeHosts.map((host, index) => <span key={host.slug} className="flex items-center gap-3"><Link href={`/host/${host.slug}`} className="inline-flex items-center gap-2 font-bold text-[#c99cff] transition hover:text-[#FC18D8] hover:underline"><FaUser aria-hidden="true" />{host.name}</Link>{index < episodeHosts.length - 1 && <span className="text-[#c99cff]" aria-hidden="true">♦</span>}</span>)}</div>
+
+              <div className="mt-5 flex flex-wrap gap-x-4 gap-y-3 text-sm font-semibold text-white/65">
+                <span className="inline-flex items-center gap-2"><FaCalendarAlt className="text-[#c99cff]" aria-hidden="true" />{episodeDate(data.createdAt)}</span>
+                <span className="hidden text-[#c99cff] sm:inline" aria-hidden="true">|</span>
+                <span className="inline-flex items-center gap-2"><FaClock className="text-[#c99cff]" aria-hidden="true" />{episodeDuration(data.durationInSec, data.duration)}</span>
+                {data.topic && <><span className="hidden text-[#c99cff] sm:inline" aria-hidden="true">|</span><span className="inline-flex items-center gap-2"><FaTag className="text-[#c99cff]" aria-hidden="true" />{data.topic}</span></>}
               </div>
-              <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
-                {data.youtubeUrl && <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Watch this episode on YouTube" className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 font-bold transition hover:border-red-500 hover:bg-red-600 sm:justify-start"><FaYoutube aria-hidden="true" size={22} /><span>YouTube</span></a>}
-                {data.spotifyLink && <a href={data.spotifyLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Spotify" className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 font-bold transition hover:border-[#1ed760] hover:bg-[#1ed760] hover:text-black sm:justify-start"><FaSpotify aria-hidden="true" size={22} /><span>Spotify</span></a>}
-                {data.appleLink && <a href={data.appleLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Apple Podcasts" className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 font-bold transition hover:border-[#9747FF] hover:bg-[#9747FF] sm:justify-start"><FaApple aria-hidden="true" size={22} /><span>Apple Podcasts</span></a>}
+
+              <div className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {data.youtubeUrl && <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Watch this episode on YouTube" className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#9747FF] to-[#7b22d3] px-4 py-3 text-sm font-bold transition hover:brightness-110"><FaYoutube aria-hidden="true" size={21} /><span>Watch on YouTube</span></a>}
+                {data.spotifyLink && <a href={data.spotifyLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Spotify" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/30 bg-black/30 px-4 py-3 text-sm font-bold transition hover:border-[#1ed760] hover:text-[#1ed760]"><FaSpotify className="text-[#1ed760]" aria-hidden="true" size={21} /><span>Listen on Spotify</span></a>}
+                {data.appleLink && <a href={data.appleLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Apple Podcasts" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/30 bg-black/30 px-4 py-3 text-sm font-bold transition hover:border-[#c99cff] hover:text-[#c99cff] sm:col-span-2 xl:col-span-1"><FaApple className="text-[#c99cff]" aria-hidden="true" size={21} /><span>Apple Podcasts</span></a>}
               </div>
             </div>
           </section>
