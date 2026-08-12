@@ -10,18 +10,19 @@ const Index = () => {
   return (
     <Layout>
       <main className="relative isolate overflow-hidden bg-[#070707] pb-24 pt-[118px] lg:pt-[128px]">
-        <div className="pointer-events-none absolute -left-[26rem] top-20 h-[780px] w-[780px] rounded-full bg-[radial-gradient(circle,#fc18d8_0%,#9747ff_38%,transparent_70%)] opacity-35 blur-3xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute -right-[28rem] top-[70rem] h-[820px] w-[820px] rounded-full bg-[radial-gradient(circle,#9747ff_0%,#fc18d8_42%,transparent_72%)] opacity-30 blur-3xl" aria-hidden="true" />
-        <div className="relative space-y-16 md:space-y-24">
-          <section className="mx-auto max-w-[1310px] px-4">
+        <div className="pointer-events-none absolute -left-[28rem] top-20 h-[900px] w-[900px] rounded-full bg-[radial-gradient(circle,rgba(252,24,216,.28)_0%,rgba(151,71,255,.16)_38%,transparent_70%)] blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -right-[30rem] top-[65rem] h-[980px] w-[980px] rounded-full bg-[radial-gradient(circle,rgba(151,71,255,.3)_0%,rgba(252,24,216,.14)_42%,transparent_72%)] blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -left-[30rem] bottom-[10rem] h-[900px] w-[900px] rounded-full bg-[radial-gradient(circle,rgba(252,24,216,.18),transparent_68%)] blur-3xl" aria-hidden="true" />
+        <div className="relative space-y-16 px-4 sm:px-6 md:space-y-24 lg:px-8">
+          <section className="mx-auto max-w-[1310px]">
             <div className="overflow-hidden rounded-[34px] border border-white/10 bg-white/[.035] shadow-2xl backdrop-blur">
               <NewVoice />
             </div>
           </section>
-          <section className="relative border-y border-white/10 bg-black/20 py-14 md:py-20">
+          <section className="relative mx-auto max-w-[1380px] py-4 md:py-8">
             <MeetYourHost />
           </section>
-          <div className="relative mx-auto max-w-[1310px] px-4">
+          <div className="relative mx-auto max-w-[1310px]">
             <div className="grid gap-6 md:grid-cols-2">
               <Vision />
               <Mission />
