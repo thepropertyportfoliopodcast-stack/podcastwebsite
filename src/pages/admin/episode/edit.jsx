@@ -10,7 +10,6 @@ import Loader from "@/common/Loader";
 import SeoFields from "@/common/SeoFields";
 import EpisodeContentFields from "@/common/EpisodeContentFields";
 import HostSelector from "@/common/HostSelector";
-import { fallbackHosts } from "@/data/hosts";
 
 export default function Edit() {
   const router = useRouter();
@@ -39,6 +38,7 @@ export default function Edit() {
     mimefield: "",
     duration: 0,
     durationInSec: 0,
+    publishedDate: "",
     size: 0,
     isSpotify: false,
     spotifyLink: "",
@@ -61,7 +61,7 @@ export default function Edit() {
   const [hosts, setHosts] = useState([]);
 
   useEffect(() => {
-    new Listing().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts(process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true" ? fallbackHosts : []));
+    new Listing().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts([]));
   }, []);
 
   const validateImageDimensions = (file, requiredWidth, requiredHeight) => {
@@ -422,6 +422,7 @@ export default function Edit() {
       payload.append("mimefield", formData.mimefield || "");
       payload.append("duration", formData.duration || 0);
       payload.append("durationInSec", formData.durationInSec || 0);
+      payload.append("publishedDate", formData.publishedDate);
       payload.append("size", formData.size || 0);
       const response = await main.EpisodeUpdate(id, payload);
 
@@ -473,6 +474,7 @@ export default function Edit() {
       mimefield: response?.data?.data?.mimefield || "",
       duration: response?.data?.data?.duration || 0,
       durationInSec: response?.data?.data?.durationInSec || 0,
+      publishedDate: response?.data?.data?.createdAt ? new Date(response.data.data.createdAt).toISOString().slice(0, 10) : "",
       size: response?.data?.data?.size || 0,
       isSpotify: !!response?.data?.data?.spotifyLink,
       spotifyLink: response?.data?.data?.spotifyLink || "",
@@ -540,7 +542,7 @@ export default function Edit() {
 
                 <div className="space-y-1">
                   <label className="block text-sm font-medium">
-                    Topic <span className="text-red-500">*</span>
+                    Category <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -550,6 +552,11 @@ export default function Edit() {
                     onChange={handleChange}
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1"><label className="block text-sm font-medium">Publication date</label><input type="date" name="publishedDate" value={formData.publishedDate} onChange={handleChange} className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700" /></div>
+                <div className="space-y-1"><label className="block text-sm font-medium">Duration (minutes)</label><input type="number" min="0" step="1" value={formData.duration || ""} onChange={(event) => setFormData((current) => ({ ...current, duration: Number(event.target.value), durationInSec: Number(event.target.value) * 60 }))} className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700" /></div>
               </div>
 
               <div className="space-y-1">

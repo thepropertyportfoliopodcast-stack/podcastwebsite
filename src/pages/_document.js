@@ -4,8 +4,10 @@ const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-PN33NMTB";
 
 export default function Document({ isAdminRoute }) {
   return (
-    <Html lang="en">
-      <Head />
+    <Html lang="en" data-theme="dark">
+      <Head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var admin=location.pathname.indexOf('/admin')===0;var saved=localStorage.getItem('site-theme');document.documentElement.dataset.theme=admin?'dark':(saved==='light'?'light':'dark')}catch(e){}})();` }} />
+      </Head>
       <body className="antialiased">
         {!isAdminRoute && (
           <noscript>

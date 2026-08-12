@@ -26,13 +26,13 @@
   --text-paragraph:  #999999;
   --linear-gradient :linear-gradient(to right, #f9a8d4, #f9a8d4, #f472b6);
   --theme: linear-gradient(90deg, #9747FF 0%, #FC18D8 100%);
-}body{background-color:#000000;color:white;font-family:Arial,Helvetica,sans-serif;}
+}body{background-color:var(--background);color:var(--foreground);font-family:Arial,Helvetica,sans-serif;}
 .hero_bg{background:var(--linear-gradient);}
 .detail_bg{background:var(--linear-gradient);}
 .button-bg{background:var(--pink);color:var(--white);font-weight:600;}
 .button-bg:hover{background:var(--white);color:var(--pink);}
 .paragraph{font-family:Poppins;color:var(--text-paragraph);}
-.heading{font-family:Inter;color:var(--white);}
+.heading{font-family:Inter;color:var(--foreground);}
 .sidebar{box-shadow:0px 4px 74px 0px #0000000D;}
 .bg-theme{background:var(--theme) !important;}
 .text-theme{@apply bg-[linear-gradient(270deg,#9747FF_0%,#FC18D8_97.09%)] bg-clip-text text-transparent}

@@ -3,14 +3,13 @@ import Image from "next/image";
 import AuthLayout from "@/layout/AuthLayout";
 import Listing from "@/pages/api/Listing";
 import SeoFields from "@/common/SeoFields";
-import { fallbackHosts } from "@/data/hosts";
 import toast from "react-hot-toast";
 
 const empty = { name: "", designation: "", shortBio: "", bio: "", email: "", linkedinUrl: "", instagramUrl: "", displayOrder: 0, seoTitle: "", seoDescription: "", primaryKeyword: "", secondaryKeywords: "", image: null };
 
 export default function HostAdmin() {
   const [hosts, setHosts] = useState([]); const [form, setForm] = useState(empty); const [editing, setEditing] = useState(null); const [loading, setLoading] = useState(false);
-  const load = async () => { try { const response = await new Listing().AdminHostGet(); setHosts(Array.isArray(response?.data?.data) ? response.data.data : []); } catch { setHosts(process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true" ? fallbackHosts : []); } };
+  const load = async () => { try { const response = await new Listing().AdminHostGet(); setHosts(Array.isArray(response?.data?.data) ? response.data.data : []); } catch { setHosts([]); } };
   useEffect(() => { load(); }, []);
   const change = (event) => { const { name, value, files } = event.target; setForm((current) => ({ ...current, [name]: files?.[0] || value })); };
   const edit = (host) => { setEditing(host); setForm({ ...empty, ...host, image: null }); window.scrollTo({ top: 0, behavior: "smooth" }); };

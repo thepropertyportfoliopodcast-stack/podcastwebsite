@@ -1,35 +1,23 @@
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { RiMenu3Line } from "react-icons/ri";
 import { IoCloseSharp } from "react-icons/io5";
 import Image from 'next/image';
-import { useRouter } from 'next/router';
+import { FaMoon, FaSun } from "react-icons/fa";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
-  // header fixed 
-  const [Scrolled, setScrolled] = useState();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 5);
-    }
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [])
-
-  const router = useRouter();
-
-  // console.log(router);
+  const { theme, toggleTheme } = useTheme();
 
   return (
-     <nav className={`fixed w-full top-0 z-50  transition-all duration-300 ease-in-out bg-black border-b-[1px] border-b-[#FFFFFF33] text-white py-4`}>
+     <header className="site-header fixed top-0 z-50 w-full border-b border-white/20 bg-black py-4 text-white transition-all duration-300 ease-in-out">
       <div className="mx-auto container sm:container md:container lg:container xl:max-w-[1310px] px-4">
         <div className="relative flex items-center justify-between">
           {/* Logo */}
-            <Link href="/">
+            <Link href="/" className="relative z-10 shrink-0">
               <Image
                 width={211}
                 height={52}
@@ -43,18 +31,26 @@ export default function Header() {
             </Link>
 
           {/* Desktop Links */}
-          <nav className="hidden lg:flex gap-x-10">
+          <div className="hidden items-center gap-x-8 lg:flex">
+          <nav aria-label="Primary navigation" className="flex gap-x-10">
             <Link href="/" className="text-sm font-semibold ">Home</Link>
             <Link href="/episode" className="text-sm font-semibold ">Episode</Link>
             <Link href="/about" className="text-sm font-semibold ">About</Link>
             <Link href="/contact" className="text-sm font-semibold ">Contact</Link>
           </nav>
+          <button type="button" onClick={toggleTheme} className="theme-toggle relative z-10 grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-[#c99cff] bg-[#211329] text-[#ffd65a] shadow-[0_0_18px_rgba(201,156,255,0.3)] transition hover:scale-105 hover:border-[#FC18D8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FC18D8] focus-visible:ring-offset-2 focus-visible:ring-offset-black" aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"} title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}>
+            {theme === "dark" ? <FaSun size={20} aria-hidden="true" /> : <FaMoon size={19} aria-hidden="true" />}
+          </button>
+          </div>
           {/* Mobile Menu Open Button */}
 
-          <div className="flex lg:hidden">
+          <div className="relative z-20 ml-auto flex shrink-0 items-center gap-2 lg:hidden">
+            <button type="button" onClick={toggleTheme} className="theme-toggle grid h-10 w-10 shrink-0 place-items-center rounded-full border-2 border-[#c99cff] bg-[#211329] text-[#ffd65a] shadow-[0_0_14px_rgba(201,156,255,0.28)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FC18D8]" aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"} title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}>
+              {theme === "dark" ? <FaSun size={18} aria-hidden="true" /> : <FaMoon size={17} aria-hidden="true" />}
+            </button>
             <button
               type="button"
-              className="absolute right-[0px] top-[1px] sm:top-[5px]  z-[1] border border-[#fff] inline-flex items-center justify-center rounded-[3px] w-[40px] h-[40px] focus:ring-2 focus:ring-inset focus:ring-white"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-white focus:ring-2 focus:ring-inset focus:ring-white"
               aria-controls="mobile-menu"
               aria-expanded={menuOpen}
               aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
@@ -68,9 +64,9 @@ export default function Header() {
             {menuOpen && (
               <div
                 id="mobile-menu"
-                className="absolute top-0 right-[0] 11h-full pt-[60px] "
+                className="absolute right-0 top-0 h-full pt-[60px]"
               >
-                <ul className="relative bg-[#161616]  w-[250px] z-[9] h-full flex flex-col  font-manrope font-[600] text-[15px] md:text-[18px] lg:text-[20px]  px-[20px] pt-[10px] pb-[20px] ">
+                <ul className="mobile-menu-panel relative z-[9] flex h-full w-[250px] flex-col bg-[#161616] px-[20px] pb-[20px] pt-[10px] font-manrope text-[15px] font-[600] md:text-[18px] lg:text-[20px]">
                   <li className='border-b border-b-[#323232]'>
                     <Link href="/" className="block text-sm font-semibold  py-[9px] ">Home </Link>
                   </li>
@@ -92,6 +88,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-    </nav>
+     </header>
   );
 }

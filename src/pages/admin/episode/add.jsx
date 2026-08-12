@@ -9,7 +9,6 @@ import { Api } from "../../api/Api";
 import SeoFields from "@/common/SeoFields";
 import EpisodeContentFields from "@/common/EpisodeContentFields";
 import HostSelector from "@/common/HostSelector";
-import { fallbackHosts } from "@/data/hosts";
 
 export default function Add() {
   const selectedEpisode=null;
@@ -41,6 +40,7 @@ export default function Add() {
     mimefield: "",
     duration: 0,
     durationInSec: 0,
+    publishedDate: "",
     size: 0,
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
@@ -55,7 +55,7 @@ export default function Add() {
   const [hosts, setHosts] = useState([]);
 
   useEffect(() => {
-    new Listing().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts(process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true" ? fallbackHosts : []));
+    new Listing().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts([]));
   }, []);
 
   const validateImageDimensions = (file, requiredWidth, requiredHeight) => {
@@ -501,6 +501,7 @@ export default function Add() {
       payload.append("mimefield", formData.mimefield || "");
       payload.append("duration", formData.duration || 0);
       payload.append("durationInSec", formData.durationInSec || 0);
+      payload.append("publishedDate", formData.publishedDate);
       payload.append("size", formData.size || 0);
 
       // Thumbnail still uploaded via backend
@@ -578,18 +579,27 @@ export default function Add() {
           />
         </div>
 
-        {/* Topic */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">
-            Topic <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="topic"
-            className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
-            value={formData.topic}
-            onChange={handleChange}
-          />
+        <div className="grid gap-5 md:grid-cols-3">
+          <div className="space-y-1">
+            <label className="block text-sm font-medium">
+              Category <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="topic"
+              className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white focus:outline-none focus:ring-2 focus:ring-white"
+              value={formData.topic}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium">Publication date</label>
+            <input type="date" name="publishedDate" value={formData.publishedDate} onChange={handleChange} className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white" />
+          </div>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium">Duration (minutes)</label>
+            <input type="number" min="0" step="1" value={formData.duration || ""} onChange={(event) => setFormData((current) => ({ ...current, duration: Number(event.target.value), durationInSec: Number(event.target.value) * 60 }))} className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white" />
+          </div>
         </div>
 
         <SeoFields formData={formData} onChange={handleChange} />

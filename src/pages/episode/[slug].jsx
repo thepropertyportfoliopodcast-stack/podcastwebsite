@@ -6,7 +6,6 @@ import Layout from "@/layout/Layout";
 import YouTubeChapterPlayer from "@/components/YouTubeChapterPlayer";
 import SpotifyEmbed from "@/components/SpotifyEmbed";
 import { contentPath, episodeKeywords, extractUuid, metaDescription, plainText, SITE_URL } from "@/utils/seo";
-import { getMockEpisode, mockDataEnabled } from "@/data/mockPodcast";
 import { fallbackHosts, fixedShowcaseHosts, resolveEpisodeHosts } from "@/data/hosts";
 
 const hostAccents = ["from-[#FC18D8] to-[#ff7ad9]", "from-[#9747FF] to-[#FC18D8]", "from-[#6f5cff] to-[#9747FF]"];
@@ -61,8 +60,7 @@ export default function EpisodePage({ initialData }) {
               <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority sizes="(max-width: 768px) 100vw, 430px" className="object-cover" />
             </div>
             <div className="flex min-w-0 flex-col justify-center py-1 md:py-2">
-              <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-white/50 sm:text-sm"><Link href="/" className="transition hover:text-[#c99cff]">Home</Link><FaChevronRight size={9} aria-hidden="true"/><Link href="/episode" className="transition hover:text-[#c99cff]">Episodes</Link><FaChevronRight size={9} aria-hidden="true"/><span className="text-white/75">{data.episodeNumber ? `Episode ${data.episodeNumber}` : "Episode"}</span></nav>
-              {data.episodeNumber && <div className="mb-4 w-fit rounded-lg bg-gradient-to-r from-[#9747FF] to-[#FC18D8] px-3 py-1.5 text-xs font-extrabold uppercase tracking-[.12em] text-white sm:text-sm">EP. {data.episodeNumber}</div>}
+              <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-white/50 sm:text-sm"><Link href="/" className="transition hover:text-[#c99cff]">Home</Link><FaChevronRight size={9} aria-hidden="true"/><Link href="/episode" className="transition hover:text-[#c99cff]">Episodes</Link><FaChevronRight size={9} aria-hidden="true"/><span className="rounded-lg bg-gradient-to-r from-[#9747FF] to-[#FC18D8] px-3 py-1.5 font-extrabold text-white">{data.episodeNumber ? `Episode ${data.episodeNumber}` : "Episode"}</span></nav>
               <h1 className="text-3xl font-extrabold leading-[1.08] text-white sm:text-4xl md:text-[42px] lg:text-[52px]">{data.title}</h1>
               <p className="mt-4 line-clamp-3 text-sm font-medium leading-6 text-white/65 sm:text-base sm:leading-7">{data.description}</p>
 
@@ -76,7 +74,7 @@ export default function EpisodePage({ initialData }) {
               </div>
 
               <div className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {data.youtubeUrl && <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Watch this episode on YouTube" className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#9747FF] to-[#7b22d3] px-4 py-3 text-sm font-bold transition hover:brightness-110"><FaYoutube aria-hidden="true" size={21} /><span>Watch on YouTube</span></a>}
+                {data.youtubeUrl && <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Watch this episode on YouTube" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/30 bg-black/30 px-4 py-3 text-sm font-bold transition hover:border-red-500 hover:text-red-400"><FaYoutube className="text-red-500" aria-hidden="true" size={21} /><span>Watch on YouTube</span></a>}
                 {data.spotifyLink && <a href={data.spotifyLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Spotify" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/30 bg-black/30 px-4 py-3 text-sm font-bold transition hover:border-[#1ed760] hover:text-[#1ed760]"><FaSpotify className="text-[#1ed760]" aria-hidden="true" size={21} /><span>Listen on Spotify</span></a>}
                 {data.appleLink && <a href={data.appleLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Apple Podcasts" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/30 bg-black/30 px-4 py-3 text-sm font-bold transition hover:border-[#c99cff] hover:text-[#c99cff] sm:col-span-2 xl:col-span-1"><FaApple className="text-[#c99cff]" aria-hidden="true" size={21} /><span>Apple Podcasts</span></a>}
               </div>
@@ -88,15 +86,15 @@ export default function EpisodePage({ initialData }) {
           <SpotifyEmbed url={data.spotifyLink} title={data.title} />
 
           <section className={`grid gap-6 lg:grid-cols-[330px_1fr] ${expanded ? "lg:items-start" : "lg:items-stretch"}`}>
-            <aside className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 ${expanded ? "lg:h-auto lg:self-start" : "lg:h-[370px]"}`}>
+            <aside className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 ${expanded ? "lg:h-auto lg:self-start" : "md:h-[370px]"}`}>
               <div className="shrink-0">
                 <h2 className="flex items-center gap-3 text-2xl font-bold text-[#c99cff]"><FaBookOpen aria-hidden="true" /><span>What you&apos;ll learn</span></h2>
               </div>
-              <ul className={`mt-5 space-y-3 pr-2 ${expanded ? "" : "lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:[scrollbar-color:#9747FF_#1b1b1b] lg:[scrollbar-width:thin]"}`}>{topics.map((topic, index) => <li key={`${topic}-${index}`} className="flex gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/85"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#c99cff]/15 text-[#c99cff]"><FaCheck size={12} aria-hidden="true" /></span><span>{topic}</span></li>)}</ul>
+              <ul className={`mt-5 space-y-3 pr-2 ${expanded ? "" : "md:min-h-0 md:flex-1 md:overflow-y-auto md:[scrollbar-color:#9747FF_#1b1b1b] md:[scrollbar-width:thin]"}`}>{topics.map((topic, index) => <li key={`${topic}-${index}`} className="flex gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/85"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#c99cff]/15 text-[#c99cff]"><FaCheck size={12} aria-hidden="true" /></span><span>{topic}</span></li>)}</ul>
             </aside>
-            <article className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 md:p-8 ${expanded ? "" : "lg:h-[370px]"}`}>
+            <article className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 md:p-8 ${expanded ? "" : "md:h-[370px]"}`}>
               <h2 className="flex items-center gap-3 text-2xl font-bold text-[#c99cff] md:text-3xl"><FaMicrophoneAlt aria-hidden="true" /><span>Episode transcript</span></h2>
-              <div className={`mt-5 whitespace-pre-wrap text-base leading-8 text-white/75 md:text-lg ${expanded ? "" : "line-clamp-4"}`}>{transcript}</div>
+              <div className={`mt-5 whitespace-pre-wrap text-base leading-8 text-white/75 md:text-lg ${expanded ? "" : "line-clamp-4 md:min-h-0 md:flex-1 md:overflow-hidden md:[display:block]"}`}>{transcript}</div>
               {transcript?.length > 350 && <button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={expanded} className={`w-fit font-bold text-[#c99cff] hover:text-white ${expanded ? "mt-5" : "mt-auto pt-5"}`}>{expanded ? "Read less" : "Read more"}</button>}
             </article>
           </section>
@@ -104,7 +102,7 @@ export default function EpisodePage({ initialData }) {
           <section className="grid items-stretch gap-7 lg:grid-cols-[1fr_2fr]">
             <div className="flex min-h-0 flex-col">
               <h2 className="mb-5 flex items-center gap-3 text-3xl font-bold text-[#c99cff]"><FaPlayCircle aria-hidden="true" /><span>Related episodes</span></h2>
-              <div className="grid flex-1 auto-rows-fr gap-4">{related.length ? related.map((episode) => <Link key={episode.uuid} href={contentPath("episode", episode)} className="group flex h-full min-h-[150px] gap-4 rounded-2xl border border-white/15 bg-[#111] p-4 transition hover:border-[#9747FF] hover:bg-[#151515]"><div className="relative h-full min-h-[118px] w-[118px] shrink-0 overflow-hidden rounded-xl"><Image src={episode.thumbnail} alt={`${episode.title} episode artwork`} fill sizes="118px" className="object-cover transition duration-300 group-hover:scale-105" /></div><h3 className="self-center text-lg font-bold leading-snug">{episode.title}</h3></Link>) : <div className="h-full min-h-[300px] rounded-2xl border border-white/15 bg-[#111] p-8 text-white/60">Related episodes will appear here.</div>}</div>
+              <div className="grid flex-1 auto-rows-fr gap-4">{related.length ? related.map((episode) => <Link key={episode.uuid} href={contentPath("episode", episode)} className="group flex h-full min-h-[150px] gap-4 rounded-2xl border border-white/15 bg-[#111] p-4 transition hover:border-[#9747FF] hover:bg-[#151515]"><div className="relative h-full min-h-[118px] w-[118px] shrink-0 overflow-hidden rounded-xl"><Image src={episode.thumbnail} alt={`${episode.title} episode artwork`} fill sizes="118px" className="object-cover transition duration-300 group-hover:scale-105" /></div><div className="flex min-w-0 flex-1 flex-col justify-center"><h3 className="text-lg font-bold leading-snug">{episode.title}</h3><div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-white/60"><span className="flex items-center gap-1.5"><FaClock className="text-[#c99cff]" aria-hidden="true" />{episodeDuration(episode.durationInSec, episode.duration)}</span>{episode.topic && <span className="flex items-center gap-1.5"><FaTag className="text-[#c99cff]" aria-hidden="true" />{episode.topic}</span>}</div></div></Link>) : <div className="h-full min-h-[300px] rounded-2xl border border-white/15 bg-[#111] p-8 text-white/60">Related episodes will appear here.</div>}</div>
             </div>
             <div className="flex min-h-0 flex-col">
               <h2 className="mb-5 flex items-center gap-3 text-3xl font-bold text-[#c99cff]"><FaInstagram aria-hidden="true" /><span>Episode reels</span></h2>
@@ -162,13 +160,6 @@ export default function EpisodePage({ initialData }) {
 
 export async function getServerSideProps({ params, res }) {
   const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
-  if (mockDataEnabled()) {
-    const episode = getMockEpisode(params.slug);
-    if (!episode) return { notFound: true };
-    const canonicalPath = contentPath("episode", episode);
-    if (`/episode/${params.slug}` !== canonicalPath) return { redirect: { destination: canonicalPath, permanent: false } };
-    return { props: { initialData: { ...episode, hostProfiles: fallbackHosts } } };
-  }
   try {
     const response = await fetch(`${apiUrl}/file/get/${encodeURIComponent(extractUuid(params.slug))}`);
     if (response.status === 404) return { notFound: true };

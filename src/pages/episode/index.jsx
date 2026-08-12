@@ -6,7 +6,6 @@ import Heading from "@/common/Heading";
 import Listing from "../api/Listing";
 import EpisodeCard from "@/common/EpisodeCard";
 import Loader from "@/common/Loader";
-import { mockDataEnabled, mockEpisodes } from "@/data/mockPodcast";
 
 export default function Index({ initialEpisodes = [], initialTopics = [], initialPagination = {} }) {
   const [data, setData] = useState(Array.isArray(initialEpisodes) ? initialEpisodes : []);
@@ -28,18 +27,6 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
       }
       else{
         setLoadingMore(true);
-      }
-      if (mockDataEnabled()) {
-        const searchValue = search.trim().toLowerCase();
-        const filtered = mockEpisodes.filter((episode) => {
-          const matchesSearch = !searchValue || episode.title?.toLowerCase().includes(searchValue) || episode.description?.toLowerCase().includes(searchValue);
-          const matchesTopic = !topic || episode.topic === topic;
-          return matchesSearch && matchesTopic;
-        });
-        setData(filtered);
-        setTopics(["Property market", "First-home buyers", "Investing"]);
-        setHasNextPage(false);
-        return;
       }
       const main = new Listing();
       const response = await main.EpisodeGetAll(search, topic, pageNumber, LIMIT);
@@ -222,15 +209,6 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
 
 export async function getServerSideProps({ res }) {
   const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
-  if (mockDataEnabled()) {
-    return {
-      props: {
-        initialEpisodes: mockEpisodes,
-        initialTopics: ["Property market", "First-home buyers", "Investing"],
-        initialPagination: { hasNextPage: false },
-      },
-    };
-  }
   try {
     const response = await fetch(`${apiUrl}/file/getAll?search=&topic=&page=1&limit=10`);
     if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
