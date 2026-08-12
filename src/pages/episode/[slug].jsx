@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaApple, FaInstagram, FaSpotify, FaYoutube } from "react-icons/fa";
+import { FaApple, FaBookOpen, FaCheck, FaInstagram, FaMicrophoneAlt, FaPlayCircle, FaSpotify, FaUsers, FaYoutube } from "react-icons/fa";
 import Layout from "@/layout/Layout";
 import YouTubeChapterPlayer from "@/components/YouTubeChapterPlayer";
 import SpotifyEmbed from "@/components/SpotifyEmbed";
@@ -48,7 +48,10 @@ export default function EpisodePage({ initialData }) {
             </div>
             <div className="flex min-w-0 flex-col justify-center py-1 md:py-4">
               <h1 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">{data.title}</h1>
-              <div className="mt-4 flex flex-wrap items-center gap-x-1.5 text-base text-white/70 md:text-lg"><span>Hosted by</span>{episodeHosts.map((host, index) => <span key={host.slug} className="contents"><Link href={`/host/${host.slug}`} className="font-bold text-[#c99cff] transition hover:text-[#FC18D8] hover:underline">{host.name}</Link>{index < episodeHosts.length - 1 && <span aria-hidden="true">{index === episodeHosts.length - 2 ? "and" : ","}</span>}</span>)}</div>
+              <div className="mt-5 rounded-2xl border border-[#c99cff]/25 bg-[#9747FF]/10 p-3 sm:p-4">
+                <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[.16em] text-[#c99cff]"><FaUsers aria-hidden="true" /><span>Meet your hosts</span></div>
+                <div className="flex flex-wrap gap-2">{episodeHosts.map((host) => <Link key={host.slug} href={`/host/${host.slug}`} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/25 px-3 py-2 text-sm font-bold text-[#c99cff] transition hover:border-[#FC18D8] hover:bg-[#FC18D8]/10 hover:text-white sm:px-4"><span className="grid h-6 w-6 place-items-center rounded-full bg-[#c99cff]/15"><FaUsers size={12} aria-hidden="true" /></span>{host.name}</Link>)}</div>
+              </div>
               <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
                 {data.youtubeUrl && <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Watch this episode on YouTube" className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 font-bold transition hover:border-red-500 hover:bg-red-600 sm:justify-start"><FaYoutube aria-hidden="true" size={22} /><span>YouTube</span></a>}
                 {data.spotifyLink && <a href={data.spotifyLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Spotify" className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 font-bold transition hover:border-[#1ed760] hover:bg-[#1ed760] hover:text-black sm:justify-start"><FaSpotify aria-hidden="true" size={22} /><span>Spotify</span></a>}
@@ -64,13 +67,12 @@ export default function EpisodePage({ initialData }) {
           <section className={`grid gap-6 lg:grid-cols-[330px_1fr] ${expanded ? "lg:items-start" : "lg:items-stretch"}`}>
             <aside className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 ${expanded ? "lg:h-auto lg:self-start" : "lg:h-[370px]"}`}>
               <div className="shrink-0">
-                <p className="mb-2 text-xs font-bold uppercase tracking-[0.22em] text-[#c99cff]">In this conversation</p>
-                <h2 className="text-2xl font-bold">Topics covered</h2>
+                <h2 className="flex items-center gap-3 text-2xl font-bold text-[#c99cff]"><FaBookOpen aria-hidden="true" /><span>What you&apos;ll learn</span></h2>
               </div>
-              <ul className={`mt-5 space-y-3 pr-2 ${expanded ? "" : "lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:[scrollbar-color:#9747FF_#1b1b1b] lg:[scrollbar-width:thin]"}`}>{topics.map((topic, index) => <li key={`${topic}-${index}`} className="flex gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/85"><span className="font-bold text-[#c99cff]">{String(index + 1).padStart(2, "0")}</span><span>{topic}</span></li>)}</ul>
+              <ul className={`mt-5 space-y-3 pr-2 ${expanded ? "" : "lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:[scrollbar-color:#9747FF_#1b1b1b] lg:[scrollbar-width:thin]"}`}>{topics.map((topic, index) => <li key={`${topic}-${index}`} className="flex gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/85"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#c99cff]/15 text-[#c99cff]"><FaCheck size={12} aria-hidden="true" /></span><span>{topic}</span></li>)}</ul>
             </aside>
             <article className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 md:p-8 ${expanded ? "" : "lg:h-[370px]"}`}>
-              <h2 className="text-2xl font-bold md:text-3xl">Episode transcript</h2>
+              <h2 className="flex items-center gap-3 text-2xl font-bold text-[#c99cff] md:text-3xl"><FaMicrophoneAlt aria-hidden="true" /><span>Episode transcript</span></h2>
               <div className={`mt-5 whitespace-pre-wrap text-base leading-8 text-white/75 md:text-lg ${expanded ? "" : "line-clamp-4"}`}>{transcript}</div>
               {transcript?.length > 350 && <button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={expanded} className={`w-fit font-bold text-[#c99cff] hover:text-white ${expanded ? "mt-5" : "mt-auto pt-5"}`}>{expanded ? "Read less" : "Read more"}</button>}
             </article>
@@ -78,11 +80,11 @@ export default function EpisodePage({ initialData }) {
 
           <section className="grid items-stretch gap-7 lg:grid-cols-[1fr_2fr]">
             <div className="flex min-h-0 flex-col">
-              <h2 className="mb-5 text-3xl font-bold">Related episodes</h2>
+              <h2 className="mb-5 flex items-center gap-3 text-3xl font-bold text-[#c99cff]"><FaPlayCircle aria-hidden="true" /><span>Related episodes</span></h2>
               <div className="grid flex-1 auto-rows-fr gap-4">{related.length ? related.map((episode) => <Link key={episode.uuid} href={contentPath("episode", episode)} className="group flex h-full min-h-[150px] gap-4 rounded-2xl border border-white/15 bg-[#111] p-4 transition hover:border-[#9747FF] hover:bg-[#151515]"><div className="relative h-full min-h-[118px] w-[118px] shrink-0 overflow-hidden rounded-xl"><Image src={episode.thumbnail} alt={`${episode.title} episode artwork`} fill sizes="118px" className="object-cover transition duration-300 group-hover:scale-105" /></div><h3 className="self-center text-lg font-bold leading-snug">{episode.title}</h3></Link>) : <div className="h-full min-h-[300px] rounded-2xl border border-white/15 bg-[#111] p-8 text-white/60">Related episodes will appear here.</div>}</div>
             </div>
             <div className="flex min-h-0 flex-col">
-              <h2 className="mb-5 text-3xl font-bold">Episode reels</h2>
+              <h2 className="mb-5 flex items-center gap-3 text-3xl font-bold text-[#c99cff]"><FaInstagram aria-hidden="true" /><span>Episode reels</span></h2>
               {reelLinks.length ? <div className="grid flex-1 items-stretch gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">{reelLinks.slice(0, 4).map((url, index) => <div key={url} className="relative aspect-[9/16] min-h-0 overflow-hidden rounded-2xl border border-white/15 bg-[#111]"><iframe title={`Instagram episode reel ${index + 1}`} src={instagramEmbed(url)} className="absolute inset-0 h-full w-full border-0" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen /></div>)}</div> : <div className="flex h-full min-h-[300px] flex-1 flex-col justify-center rounded-2xl border border-white/15 bg-[#111] p-8 text-white/60"><FaInstagram className="mb-3 text-[#c99cff]" size={32} aria-hidden="true" />Reels will appear here when their Instagram links are added.</div>}
             </div>
           </section>
@@ -94,18 +96,18 @@ export default function EpisodePage({ initialData }) {
             <div className="pointer-events-none absolute inset-x-10 top-[46%] hidden h-px bg-gradient-to-r from-transparent via-white/15 to-transparent md:block" aria-hidden="true" />
 
             <div className="relative mx-auto mb-12 max-w-2xl text-center md:mb-16">
-              <h2 className="text-3xl font-extrabold md:text-5xl">Meet the minds behind the mic</h2>
+              <h2 className="flex items-center justify-center gap-3 text-3xl font-extrabold text-[#c99cff] md:text-5xl"><FaUsers className="shrink-0" aria-hidden="true" /><span>Meet the minds behind the mic</span></h2>
               <p className="mt-4 text-white/60">Finance, acquisition and property strategy expertise brought together in one conversation.</p>
             </div>
 
-            <div className="relative overflow-x-auto pb-4">
-            <div className="grid min-w-[820px] grid-cols-3 items-end gap-6 px-1 pt-10">
+            <div className="relative">
+            <div className="grid grid-cols-1 items-end gap-6 px-1 pt-4 md:grid-cols-3 md:pt-10">
               {fixedShowcaseHosts.map((host, index) => (
                 <article
                   key={host.name}
-                  className={`group relative overflow-hidden rounded-[30px] border border-white/15 bg-[#111] shadow-2xl transition duration-500 hover:-translate-y-3 hover:border-white/40 hover:shadow-[#9747FF]/20 ${index === 1 ? "mb-10" : ""}`}
+                  className={`group relative overflow-hidden rounded-[24px] border border-white/15 bg-[#111] shadow-2xl transition duration-500 hover:-translate-y-2 hover:border-white/40 hover:shadow-[#9747FF]/20 md:rounded-[30px] md:hover:-translate-y-3 ${index === 1 ? "md:mb-10" : ""}`}
                 >
-                  <div className="relative aspect-[4/5] overflow-hidden">
+                  <div className="relative aspect-[16/10] overflow-hidden sm:aspect-[16/9] md:aspect-[4/5]">
                     <Image
                       src={host.image}
                       alt={host.name}
@@ -117,11 +119,11 @@ export default function EpisodePage({ initialData }) {
                     <div className={`absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t ${hostAccents[index]} opacity-25 blur-2xl transition duration-500 group-hover:opacity-45`} aria-hidden="true" />
                   </div>
 
-                  <div className="relative -mt-20 p-6 pt-0 md:p-7 md:pt-0">
+                  <div className="relative -mt-14 p-4 pt-0 sm:-mt-16 sm:p-5 sm:pt-0 md:-mt-20 md:p-7 md:pt-0">
                     <div className="rounded-2xl border border-white/15 bg-black/55 p-5 backdrop-blur-xl transition duration-500 group-hover:border-white/25 group-hover:bg-black/70">
                       <div className={`mb-4 h-1 w-12 rounded-full bg-gradient-to-r ${hostAccents[index]} transition-all duration-500 group-hover:w-20`} aria-hidden="true" />
-                      <h3 className="whitespace-nowrap text-xl font-extrabold lg:text-[26px]">{host.name}</h3>
-                      <p className="mt-3 min-h-[48px] text-sm font-semibold leading-6 text-white/65">{host.designation}</p>
+                      <h3 className="text-xl font-extrabold lg:whitespace-nowrap lg:text-[26px]">{host.name}</h3>
+                      <p className="mt-2 text-sm font-semibold leading-6 text-white/65 md:mt-3 md:min-h-[48px]">{host.designation}</p>
                     </div>
                   </div>
                 </article>

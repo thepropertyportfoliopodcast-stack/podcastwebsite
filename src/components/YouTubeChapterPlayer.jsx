@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FaClock } from "react-icons/fa";
 
 function youtubeId(url = "") {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^?&/]+)/i);
@@ -63,7 +64,7 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
         <div ref={mountRef} className="h-full w-full" />
       </div>
       <aside className="h-[300px] md:h-[440px] lg:h-[520px] overflow-y-auto rounded-2xl border border-white/20 bg-[#111] p-4 md:p-5" aria-label="Episode timestamps">
-        <h2 className="sticky top-0 bg-[#111] pb-4 text-xl font-bold">Timestamps</h2>
+        <h2 className="sticky top-0 flex items-center gap-3 bg-[#111] pb-4 text-xl font-bold text-[#c99cff]"><FaClock aria-hidden="true" /><span>Timestamps</span></h2>
         <div className="space-y-2">
           {chapters.map((chapter, index) => (
             <button key={`${chapter.time}-${chapter.label}`} type="button" onClick={() => seek(chapter.seconds)} className={`w-full rounded-xl border px-4 py-3 text-left transition ${index === activeIndex ? "border-[#9747FF] bg-[#9747FF]/20 text-[#cda7ff]" : "border-white/10 text-white hover:border-white/30"}`}>
