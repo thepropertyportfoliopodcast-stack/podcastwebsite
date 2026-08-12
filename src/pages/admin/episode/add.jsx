@@ -25,6 +25,7 @@ export default function Add() {
     seoDescription: "",
     primaryKeyword: "",
     secondaryKeywords: "",
+    spotifyLink: "",
     thumbnail: null,
     video: null,
     audio: null,
@@ -483,6 +484,7 @@ export default function Add() {
       payload.append("seoDescription", formData.seoDescription);
       payload.append("primaryKeyword", formData.primaryKeyword);
       payload.append("secondaryKeywords", formData.secondaryKeywords);
+      payload.append("spotifyLink", formData.spotifyLink);
 
       // Video now handled via chunk upload
       if (!uploadedFileUrl && !formData.youtubeUrl) {
@@ -593,6 +595,12 @@ export default function Add() {
         <SeoFields formData={formData} onChange={handleChange} />
 
         <HostSelector hosts={hosts} selected={formData.hostSlugs} onChange={(hostSlugs) => setFormData((current) => ({ ...current, hostSlugs }))} />
+
+        <div className="rounded-xl border border-gray-800 bg-[#111] p-4 md:p-6">
+          <label className="block text-sm font-medium">Spotify episode or show link</label>
+          <p className="mb-3 mt-1 text-xs text-gray-400">Paste an open.spotify.com episode, show, or track URL to display the embedded Spotify player.</p>
+          <input type="url" name="spotifyLink" value={formData.spotifyLink} onChange={handleChange} placeholder="https://open.spotify.com/episode/..." className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white" />
+        </div>
 
         {/* Thumbnail */}
         <div className="space-y-1">

@@ -48,7 +48,7 @@ export const mockEpisode = {
   reelLinks: [],
   hostSlugs: ["parag-dixit", "julius-dabre", "mudit-khandelwal"],
   topic: "Property market",
-  spotifyLink: "https://open.spotify.com/",
+  spotifyLink: "https://open.spotify.com/show/4rOoJ6Egrf8K2IrywzwOMk",
   appleLink: "https://podcasts.apple.com/",
   seoTitle: "Is Australia Raising a Generation of Renters?",
   seoDescription: "Explore Australian housing affordability, first-home buyer challenges and practical property strategies in this podcast episode.",
@@ -88,6 +88,18 @@ export const mockPodcast = {
 };
 
 export const mockEpisodes = mockPodcast.episodes;
+
+export function getMockEpisode(value = "") {
+  const requested = decodeURIComponent(value).toLowerCase();
+  const episode = mockEpisodes.find((item) => item.slug?.toLowerCase() === requested || item.uuid?.toLowerCase() === requested);
+  if (!episode) return null;
+  return {
+    ...mockEpisode,
+    ...episode,
+    podcast: { ...mockPodcast, episodes: mockEpisodes.filter((item) => item.uuid !== episode.uuid) },
+    hostSlugs: Array.isArray(episode.hostSlugs) ? episode.hostSlugs : mockEpisode.hostSlugs,
+  };
+}
 
 export function mockDataEnabled() {
   return process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";

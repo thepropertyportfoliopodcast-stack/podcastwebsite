@@ -44,8 +44,8 @@ export default function Login() {
         toast.success(response.data.message);
         localStorage &&
           localStorage.setItem("token", response?.data?.data?.token);
-        if (redirect) {
-          router.push(`${redirect}`);
+        if (redirect && redirect.startsWith("/admin") && !redirect.startsWith("//")) {
+          router.push(redirect);
           return;
         }
         router.push("/admin");

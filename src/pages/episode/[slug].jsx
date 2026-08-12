@@ -4,8 +4,9 @@ import Link from "next/link";
 import { FaApple, FaInstagram, FaSpotify, FaYoutube } from "react-icons/fa";
 import Layout from "@/layout/Layout";
 import YouTubeChapterPlayer from "@/components/YouTubeChapterPlayer";
+import SpotifyEmbed from "@/components/SpotifyEmbed";
 import { contentPath, episodeKeywords, extractUuid, metaDescription, plainText, SITE_URL } from "@/utils/seo";
-import { mockDataEnabled, mockEpisode } from "@/data/mockPodcast";
+import { getMockEpisode, mockDataEnabled } from "@/data/mockPodcast";
 import { fallbackHosts, fixedShowcaseHosts, resolveEpisodeHosts } from "@/data/hosts";
 
 const hostAccents = ["from-[#FC18D8] to-[#ff7ad9]", "from-[#9747FF] to-[#FC18D8]", "from-[#6f5cff] to-[#9747FF]"];
@@ -58,6 +59,7 @@ export default function EpisodePage({ initialData }) {
 
           {data.youtubeUrl && <YouTubeChapterPlayer url={data.youtubeUrl} timestamps={data.timestamps} />}
           {!data.youtubeUrl && data.link && <section className="overflow-hidden rounded-2xl border border-white/20 bg-black"><video src={data.link} poster={data.thumbnail} controls playsInline preload="metadata" className="mx-auto max-h-[75vh] w-full" /></section>}
+          <SpotifyEmbed url={data.spotifyLink} title={data.title} />
 
           <section className={`grid gap-6 lg:grid-cols-[330px_1fr] ${expanded ? "lg:items-start" : "lg:items-stretch"}`}>
             <aside className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 ${expanded ? "lg:h-auto lg:self-start" : "lg:h-[370px]"}`}>
@@ -142,7 +144,11 @@ export default function EpisodePage({ initialData }) {
 export async function getServerSideProps({ params, res }) {
   const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
   if (mockDataEnabled()) {
-    return { props: { initialData: { ...mockEpisode, hostProfiles: fallbackHosts } } };
+    const episode = getMockEpisode(params.slug);
+    if (!episode) return { notFound: true };
+    const canonicalPath = contentPath("episode", episode);
+    if (`/episode/${params.slug}` !== canonicalPath) return { redirect: { destination: canonicalPath, permanent: false } };
+    return { props: { initialData: { ...episode, hostProfiles: fallbackHosts } } };
   }
   try {
     const response = await fetch(`${apiUrl}/file/get/${encodeURIComponent(extractUuid(params.slug))}`);
