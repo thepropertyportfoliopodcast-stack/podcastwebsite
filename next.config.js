@@ -15,7 +15,7 @@ const nextConfig = {
     optimizePackageImports: ['react-icons'],
   },
   async headers() {
-    return [
+    const sharedHeaders = [
       {
         source: '/admin/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' }],
@@ -24,6 +24,20 @@ const nextConfig = {
         source: '/api/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' }],
       },
+    ];
+
+    if (process.env.NODE_ENV === 'development') {
+      return [
+        ...sharedHeaders,
+        {
+          source: '/_next/:path*',
+          headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }],
+        },
+      ];
+    }
+
+    return [
+      ...sharedHeaders,
       {
         source: '/_next/static/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
