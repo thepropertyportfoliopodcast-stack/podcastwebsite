@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaApple, FaBookOpen, FaCalendarAlt, FaCheck, FaChevronRight, FaClock, FaInstagram, FaMicrophoneAlt, FaPlayCircle, FaSpotify, FaTag, FaUser, FaUsers, FaYoutube } from "react-icons/fa";
+import { FaApple, FaBookOpen, FaCalendarAlt, FaCheck, FaChevronRight, FaClock, FaMicrophoneAlt, FaPlayCircle, FaSpotify, FaTag, FaUser, FaUsers, FaYoutube } from "react-icons/fa";
 import Layout from "@/layout/Layout";
 import YouTubeChapterPlayer from "@/components/YouTubeChapterPlayer";
 import SpotifyEmbed from "@/components/SpotifyEmbed";
@@ -10,9 +10,9 @@ import { fallbackHosts, fixedShowcaseHosts, resolveEpisodeHosts } from "@/data/h
 
 const hostAccents = ["from-[#FC18D8] to-[#ff7ad9]", "from-[#9747FF] to-[#FC18D8]", "from-[#6f5cff] to-[#9747FF]"];
 
-function instagramEmbed(url = "") {
-  const clean = url.split("?")[0].replace(/\/$/, "");
-  return clean ? `${clean}/embed` : "";
+function youtubeShortEmbed(url = "") {
+  const match = url.match(/(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/)|youtu\.be\/)([^?&/]+)/i);
+  return match?.[1] ? `https://www.youtube.com/embed/${match[1]}?rel=0` : "";
 }
 
 function episodeDuration(seconds, minutes) {
@@ -85,16 +85,16 @@ export default function EpisodePage({ initialData }) {
           {!data.youtubeUrl && data.link && <section className="overflow-hidden rounded-2xl border border-white/20 bg-black"><video src={data.link} poster={data.thumbnail} controls playsInline preload="metadata" className="mx-auto max-h-[75vh] w-full" /></section>}
           <SpotifyEmbed url={data.spotifyLink} title={data.title} />
 
-          <section className={`grid gap-6 lg:grid-cols-[330px_1fr] ${expanded ? "lg:items-start" : "lg:items-stretch"}`}>
-            <aside className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 ${expanded ? "lg:h-auto lg:self-start" : "md:h-[370px]"}`}>
+          <section className="grid items-stretch gap-6 lg:grid-cols-[330px_1fr]">
+            <aside className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 ${expanded ? "h-[520px]" : "md:h-[370px]"}`}>
               <div className="shrink-0">
                 <h2 className="flex items-center gap-3 text-2xl font-bold text-[#c99cff]"><FaBookOpen aria-hidden="true" /><span>What you&apos;ll learn</span></h2>
               </div>
-              <ul className={`mt-5 space-y-3 pr-2 ${expanded ? "" : "md:min-h-0 md:flex-1 md:overflow-y-auto md:[scrollbar-color:#9747FF_#1b1b1b] md:[scrollbar-width:thin]"}`}>{topics.map((topic, index) => <li key={`${topic}-${index}`} className="flex gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/85"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#c99cff]/15 text-[#c99cff]"><FaCheck size={12} aria-hidden="true" /></span><span>{topic}</span></li>)}</ul>
+              <ul className="mt-5 min-h-0 flex-1 space-y-3 overflow-y-auto pr-2 [scrollbar-color:#9747FF_#1b1b1b] [scrollbar-width:thin]">{topics.map((topic, index) => <li key={`${topic}-${index}`} className="flex gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/85"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#c99cff]/15 text-[#c99cff]"><FaCheck size={12} aria-hidden="true" /></span><span>{topic}</span></li>)}</ul>
             </aside>
-            <article className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 md:p-8 ${expanded ? "" : "md:h-[370px]"}`}>
+            <article className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 md:p-8 ${expanded ? "h-[520px]" : "md:h-[370px]"}`}>
               <h2 className="flex items-center gap-3 text-2xl font-bold text-[#c99cff] md:text-3xl"><FaMicrophoneAlt aria-hidden="true" /><span>Episode transcript</span></h2>
-              <div className={`mt-5 whitespace-pre-wrap text-base leading-8 text-white/75 md:text-lg ${expanded ? "" : "line-clamp-4 md:min-h-0 md:flex-1 md:overflow-hidden md:[display:block]"}`}>{transcript}</div>
+              <div className={`mt-5 whitespace-pre-wrap text-base leading-8 text-white/75 md:text-lg ${expanded ? "min-h-0 flex-1 overflow-y-auto pr-3 [scrollbar-color:#9747FF_#1b1b1b] [scrollbar-width:thin]" : "line-clamp-4 md:min-h-0 md:flex-1 md:overflow-hidden md:[display:block]"}`}>{transcript}</div>
               {transcript?.length > 350 && <button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={expanded} className={`w-fit font-bold text-[#c99cff] hover:text-white ${expanded ? "mt-5" : "mt-auto pt-5"}`}>{expanded ? "Read less" : "Read more"}</button>}
             </article>
           </section>
@@ -105,8 +105,8 @@ export default function EpisodePage({ initialData }) {
               <div className="grid flex-1 auto-rows-fr gap-4">{related.length ? related.map((episode) => <Link key={episode.uuid} href={contentPath("episode", episode)} className="group flex h-full min-h-[150px] gap-4 rounded-2xl border border-white/15 bg-[#111] p-4 transition hover:border-[#9747FF] hover:bg-[#151515]"><div className="relative h-full min-h-[118px] w-[118px] shrink-0 overflow-hidden rounded-xl"><Image src={episode.thumbnail} alt={`${episode.title} episode artwork`} fill sizes="118px" className="object-cover transition duration-300 group-hover:scale-105" /></div><div className="flex min-w-0 flex-1 flex-col justify-center"><h3 className="text-lg font-bold leading-snug">{episode.title}</h3><div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-white/60"><span className="flex items-center gap-1.5"><FaClock className="text-[#c99cff]" aria-hidden="true" />{episodeDuration(episode.durationInSec, episode.duration)}</span>{episode.topic && <span className="flex items-center gap-1.5"><FaTag className="text-[#c99cff]" aria-hidden="true" />{episode.topic}</span>}</div></div></Link>) : <div className="h-full min-h-[300px] rounded-2xl border border-white/15 bg-[#111] p-8 text-white/60">Related episodes will appear here.</div>}</div>
             </div>
             <div className="flex min-h-0 flex-col">
-              <h2 className="mb-5 flex items-center gap-3 text-3xl font-bold text-[#c99cff]"><FaInstagram aria-hidden="true" /><span>Episode reels</span></h2>
-              {reelLinks.length ? <div className="grid flex-1 items-stretch gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">{reelLinks.slice(0, 4).map((url, index) => <div key={url} className="relative aspect-[9/16] min-h-0 overflow-hidden rounded-2xl border border-white/15 bg-[#111]"><iframe title={`Instagram episode reel ${index + 1}`} src={instagramEmbed(url)} className="absolute inset-0 h-full w-full border-0" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen /></div>)}</div> : <div className="flex h-full min-h-[300px] flex-1 flex-col justify-center rounded-2xl border border-white/15 bg-[#111] p-8 text-white/60"><FaInstagram className="mb-3 text-[#c99cff]" size={32} aria-hidden="true" />Reels will appear here when their Instagram links are added.</div>}
+              <h2 className="mb-5 flex items-center gap-3 text-3xl font-bold text-[#c99cff]"><FaYoutube aria-hidden="true" /><span>YouTube Shorts</span></h2>
+              {reelLinks.length ? <div className={`grid flex-1 items-start justify-center gap-4 ${reelLinks.length === 1 ? "grid-cols-[minmax(220px,320px)]" : reelLinks.length === 2 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"}`}>{reelLinks.slice(0, 4).map((url, index) => { const embedUrl = youtubeShortEmbed(url); return embedUrl ? <div key={url} className="relative aspect-[9/16] w-full overflow-hidden rounded-2xl border border-white/15 bg-[#111]"><iframe title={`YouTube Short ${index + 1}`} src={embedUrl} className="absolute inset-0 h-full w-full border-0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /></div> : null; })}</div> : <div className="flex h-full min-h-[300px] flex-1 flex-col justify-center rounded-2xl border border-white/15 bg-[#111] p-8 text-white/60"><FaYoutube className="mb-3 text-[#c99cff]" size={32} aria-hidden="true" />YouTube Shorts will appear here when their links are added.</div>}
             </div>
           </section>
 

@@ -5,7 +5,7 @@ export default function EpisodeContentFields({ formData, onChange, onTranscriptC
     <section className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
       <div>
         <h4 className="text-lg font-semibold">Video and episode content</h4>
-        <p className="mt-1 text-sm text-gray-400">Add a YouTube URL, then enter one timestamp per line. Clicking a timestamp on the episode page will jump to that point and play the video.</p>
+        <p className="mt-1 text-sm text-gray-400">Add a YouTube URL, then enter one timestamp per line. Clicking a timestamp on the episode page will jump to that point and play the video. Add one YouTube Short URL per line below.</p>
       </div>
 
       <label className="block space-y-2">
@@ -30,8 +30,9 @@ export default function EpisodeContentFields({ formData, onChange, onTranscriptC
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium">Instagram Reel links</span>
-        <textarea className={fieldClass} rows="6" name="reelLinks" value={formData.reelLinks || ""} onChange={onChange} placeholder={"https://www.instagram.com/reel/.../\nhttps://www.instagram.com/reel/.../"} />
+        <span className="text-sm font-medium">YouTube Shorts links</span>
+        <textarea className={fieldClass} rows="6" name="reelLinks" value={formData.reelLinks || ""} onChange={onChange} placeholder={"https://www.youtube.com/shorts/...\nhttps://www.youtube.com/shorts/..."} />
+        <span className="block text-xs text-gray-400">Add up to four YouTube Shorts, one URL per line.</span>
       </label>
     </section>
   );
