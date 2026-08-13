@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import moment from "moment";
 import { BsThreeDots } from "react-icons/bs";
 import { FaPlay } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";

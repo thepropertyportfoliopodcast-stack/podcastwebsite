@@ -12,7 +12,7 @@ export async function getServerSideProps({ res }) {
   const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
   res.setHeader(
     "Cache-Control",
-    "private, no-cache, no-store, must-revalidate"
+    "public, s-maxage=60, stale-while-revalidate=300"
   );
 
   try {
