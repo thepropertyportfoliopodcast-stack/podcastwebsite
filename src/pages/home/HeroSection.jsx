@@ -1,63 +1,34 @@
-import React from "react";
-import Image from "next/image";
-import { MdOutlineHeadphones } from "react-icons/md";
 import Link from "next/link";
+import { MdArrowOutward, MdOutlineHeadphones, MdPlayArrow } from "react-icons/md";
 
-function HeroSection() {
+const highlights = [
+  ["Real voices", "Property, finance and investment experts"],
+  ["Practical ideas", "Insights you can apply to your portfolio"],
+  ["Australian focus", "Conversations grounded in our market"],
+];
+
+export default function HeroSection() {
   return (
-    <section className="relative isolate mt-[70px] flex min-h-[620px] items-center overflow-hidden md:mt-[80px] xl:min-h-[700px]">
-      <div className="absolute inset-0 -z-[1] bg-gradient-to-r from-black/85 via-black/55 to-black/25" aria-hidden="true" />
-      <div className="pointer-events-none absolute -left-48 top-1/2 -z-[1] h-[520px] w-[520px] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(252,24,216,.24),transparent_68%)] blur-3xl" aria-hidden="true" />
-      <div className="mx-auto container flex flex-col items-center justify-between gap-10 px-4 py-16 text-white xl:max-w-[1310px] lg:flex-row">
-        {/* Left Content */}
-        <div className="max-w-[760px] text-center lg:w-[58%] lg:text-left">
-          {/* <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight">
-             VOICE THAT
-            <span className="text-theme block lg:inline"> Matters </span>
-          </h1> */}
-          <h1 className="text-3xl font-black uppercase leading-[1.08] tracking-[-1px] sm:text-4xl md:text-5xl xl:text-[58px]">
-          Bringing Expert Property Conversations for Your Stronger Property 
-            <span className="text-theme inline"> Portfolios</span>
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-white/75 md:text-lg lg:mx-0 lg:text-left">
-            Step behind the scenes with the sharpest minds of the Australian property market revealing proven strategies, timing secrets, and calculated risks that turn good portfolios into great ones.
-          </p>
-           <Link
-              href={"/episode"} className="mt-8 flex w-fit items-center gap-2 rounded-xl bg-theme px-7 py-3.5 text-lg font-bold shadow-[0_14px_40px_rgba(151,71,255,.28)] transition hover:-translate-y-1 hover:brightness-110 mx-auto lg:mx-0">
-            <MdOutlineHeadphones size={30} />
-            Listen Now
-          </Link>
+    <section className="relative isolate flex min-h-[calc(100svh-72px)] items-center overflow-hidden pt-[72px] text-white sm:pt-[84px] lg:min-h-[min(900px,100svh)]">
+      <div className="absolute inset-0 -z-20 bg-[#050505]" aria-hidden="true" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_76%_28%,rgba(151,71,255,.32),transparent_30%),radial-gradient(circle_at_14%_76%,rgba(252,24,216,.2),transparent_28%),linear-gradient(135deg,rgba(151,71,255,.08),transparent_42%)]" aria-hidden="true" />
+      <div className="absolute inset-0 -z-10 opacity-30 [background-image:linear-gradient(rgba(255,255,255,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.055)_1px,transparent_1px)] [background-size:52px_52px] [mask-image:linear-gradient(to_bottom,black,transparent_90%)]" aria-hidden="true" />
+      <div className="mx-auto grid w-full max-w-[1310px] items-center gap-8 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,.85fr)] lg:gap-12 lg:px-8 lg:py-12">
+        <div className="max-w-[780px] text-center lg:text-left">
+          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-[#c99cff]/30 bg-[#9747FF]/10 px-4 py-2 text-xs font-bold uppercase tracking-[.17em] text-[#dabdff] lg:mx-0"><span className="h-2 w-2 rounded-full bg-[#FC18D8] shadow-[0_0_16px_#FC18D8]" />The Australian property conversation</div>
+          <h1 className="text-[clamp(2.35rem,6.3vw,5.35rem)] font-black uppercase leading-[.98] tracking-[-.045em]">Property insight for a<span className="block bg-gradient-to-r from-[#b780ff] via-[#e461ee] to-[#FC18D8] bg-clip-text pb-1 text-transparent">stronger portfolio.</span></h1>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/70 sm:text-lg sm:leading-8 lg:mx-0">Step behind the scenes with the sharpest minds of the Australian property market revealing proven strategies, timing secrets, and calculated risks that turn good portfolios into great ones.</p>
+          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start"><Link href="/episode" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#7d32df] to-[#d719bd] px-6 py-3 font-bold shadow-[0_16px_45px_rgba(151,71,255,.3)] transition hover:-translate-y-0.5 hover:brightness-110"><MdPlayArrow size={24} aria-hidden="true" /> Explore episodes</Link><Link href="/about" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/[.04] px-6 py-3 font-bold transition hover:border-[#c99cff]/70 hover:bg-white/[.08]">Meet the podcast <MdArrowOutward size={20} aria-hidden="true" /></Link></div>
         </div>
-        {/* Right Image */}
-        <div className="relative w-full max-w-xl lg:w-[42%]">
-          <div className="absolute -inset-3 rounded-[30px] bg-gradient-to-br from-[#9747FF]/50 to-[#FC18D8]/25 blur-xl" aria-hidden="true" />
-          <div className="relative aspect-[12/8] overflow-hidden rounded-[26px] border border-white/20 bg-[#111] p-2 shadow-2xl">
-            <Image
-              src="/heroimg01.jpg"
-              alt="The Property Portfolio Podcast hosts discussing Australian property investing"
-              fill
-              sizes="(max-width: 1024px) 100vw, 520px"
-              quality={85}
-              className="rounded-[20px] object-cover"
-            />
+        <div className="relative mx-auto w-full max-w-[520px] lg:max-w-none">
+          <div className="absolute -inset-10 -z-10 rounded-full bg-[#9747FF]/20 blur-3xl" aria-hidden="true" />
+          <div className="relative overflow-hidden rounded-[28px] border border-white/15 bg-gradient-to-br from-white/[.09] to-white/[.025] p-4 shadow-[0_30px_100px_rgba(0,0,0,.45)] backdrop-blur-xl sm:p-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4"><div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#9747FF] to-[#FC18D8]"><MdOutlineHeadphones size={25} aria-hidden="true" /></span><div><p className="text-xs uppercase tracking-[.18em] text-white/45">Listen. Learn. Grow.</p><p className="font-bold">The Property Portfolio Podcast</p></div></div><span className="hidden rounded-full border border-[#FC18D8]/30 bg-[#FC18D8]/10 px-3 py-1 text-xs font-bold text-[#ff83ec] sm:block">New episodes</span></div>
+            <div className="mt-4 grid gap-3">{highlights.map(([title, description], index) => <div key={title} className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-black/30 p-4 transition hover:border-[#b780ff]/40 hover:bg-[#9747FF]/10"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-sm font-black text-[#d6afff]">0{index + 1}</span><div><h2 className="font-bold text-white">{title}</h2><p className="mt-0.5 text-sm leading-5 text-white/55">{description}</p></div></div>)}</div>
+            <div className="mt-4 flex items-end justify-between rounded-2xl bg-gradient-to-r from-[#9747FF]/20 to-[#FC18D8]/10 p-4"><div><p className="text-xs uppercase tracking-wider text-white/50">Built for</p><p className="mt-1 text-lg font-extrabold">Smarter property decisions</p></div><div className="flex h-10 items-end gap-1" aria-hidden="true">{[45,75,55,95,68,86,50].map((height,index)=><span key={index} className="w-1.5 rounded-full bg-gradient-to-t from-[#9747FF] to-[#FC18D8]" style={{height:`${height}%`}} />)}</div></div>
           </div>
         </div>
       </div>
-      {/* Background */}
-      <Image
-        src="/herobanner.webp"
-        alt=""
-        fill
-        priority
-        fetchPriority="high"
-        loading="eager"
-        sizes="100vw"
-        quality={88}
-        className="-z-10 object-cover object-center"
-      />
     </section>
   );
 }
-
-export default HeroSection;

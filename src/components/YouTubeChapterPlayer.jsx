@@ -70,9 +70,9 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
       <div className="aspect-video md:h-[440px] md:aspect-auto lg:h-[520px] overflow-hidden rounded-2xl border border-white/20 bg-black">
         <div ref={mountRef} className="h-full w-full" />
       </div>
-      <aside className="h-[300px] md:h-[440px] lg:h-[520px] overflow-y-auto rounded-2xl border border-white/20 bg-[#111] p-4 md:p-5" aria-label="Episode timestamps">
-        <h2 className="sticky top-0 flex items-center gap-3 bg-[#111] pb-4 text-xl font-bold text-[#c99cff]"><FaClock aria-hidden="true" /><span>Timestamps</span></h2>
-        <div className="space-y-2">
+      <aside className="flex h-[300px] flex-col overflow-hidden rounded-2xl border border-white/20 bg-[#111] p-4 md:h-[440px] md:p-5 lg:h-[520px]" aria-label="Episode timestamps">
+        <h2 className="flex shrink-0 items-center gap-3 border-b border-white/10 bg-[#111] pb-4 text-xl font-bold text-[#c99cff]"><FaClock aria-hidden="true" /><span>Timestamps</span></h2>
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pt-3 pr-1">
           {chapters.map((chapter, index) => (
             <button key={`${chapter.time}-${chapter.label}`} type="button" onClick={() => seek(chapter.seconds)} disabled={!playerReady} aria-label={`Play ${chapter.label} at ${chapter.time}`} className={`w-full rounded-xl border px-4 py-3 text-left transition disabled:cursor-wait disabled:opacity-60 ${index === activeIndex ? "border-[#9747FF] bg-[#9747FF]/20 text-[#cda7ff]" : "border-white/10 text-white hover:border-white/30"}`}>
               <span className="mr-3 font-bold">{chapter.time}</span>{chapter.label}

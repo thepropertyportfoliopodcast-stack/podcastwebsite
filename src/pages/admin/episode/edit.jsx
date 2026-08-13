@@ -10,6 +10,7 @@ import Loader from "@/common/Loader";
 import SeoFields from "@/common/SeoFields";
 import EpisodeContentFields from "@/common/EpisodeContentFields";
 import HostSelector from "@/common/HostSelector";
+import EpisodeRelationsFields from "@/common/EpisodeRelationsFields";
 
 export default function Edit() {
   const router = useRouter();
@@ -49,6 +50,8 @@ export default function Edit() {
     seoDescription: "",
     primaryKeyword: "",
     secondaryKeywords: "",
+    isFeatured: false,
+    relatedEpisodeUuids: [],
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null); 
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -60,10 +63,12 @@ export default function Edit() {
   const [audioUploadProgress, setAudioUploadProgress] = useState(0);
   const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
   const [hosts, setHosts] = useState([]);
+  const [episodes, setEpisodes] = useState([]);
 
   useEffect(() => {
     new Listing().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts([]));
   }, []);
+  useEffect(() => { new Listing().AdminEpisodeGetAll().then((response) => setEpisodes(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setEpisodes([])); }, []);
 
   const validateImageDimensions = (file, requiredWidth, requiredHeight) => {
     return new Promise((resolve, reject) => {
@@ -402,6 +407,8 @@ export default function Edit() {
       payload.append("seoDescription", formData.seoDescription);
       payload.append("primaryKeyword", formData.primaryKeyword);
       payload.append("secondaryKeywords", formData.secondaryKeywords);
+      payload.append("isFeatured", String(formData.isFeatured));
+      payload.append("relatedEpisodeUuids", JSON.stringify(formData.relatedEpisodeUuids));
       if (formData.thumbnail instanceof File) { 
         payload.append("thumbnail", formData.thumbnail);
       }
@@ -487,6 +494,8 @@ export default function Edit() {
       seoDescription: response?.data?.data?.seoDescription || "",
       primaryKeyword: response?.data?.data?.primaryKeyword || "",
       secondaryKeywords: response?.data?.data?.secondaryKeywords || "",
+      isFeatured: Boolean(response?.data?.data?.isFeatured),
+      relatedEpisodeUuids: Array.isArray(response?.data?.data?.relatedEpisodeUuids) ? response.data.data.relatedEpisodeUuids : [],
     });
 
     if (response?.data?.data?.thumbnail) {
@@ -586,6 +595,7 @@ export default function Edit() {
             <SeoFields formData={formData} onChange={handleChange} />
 
             <HostSelector hosts={hosts} selected={formData.hostSlugs} onChange={(hostSlugs) => setFormData((current) => ({ ...current, hostSlugs }))} />
+            <EpisodeRelationsFields formData={formData} episodes={episodes} currentUuid={id} onChange={setFormData} />
 
             <div className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
               <h4 className="text-lg font-semibold">Media</h4>

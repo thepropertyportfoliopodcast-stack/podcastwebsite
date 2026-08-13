@@ -19,7 +19,7 @@ class Listing extends Component {
   }
 
   async EpisodeGetAll(search = "", topic = "", page = 1, limit = 10) {
-    return Api.get(`/file/getAll?search=${search}&topic=${topic}&page=${page}&limit=${limit}`);
+    return Api.get(`/file/getAll?search=${encodeURIComponent(search)}&topic=${encodeURIComponent(topic)}&page=${page}&limit=${limit}`);
   }
 
   async HomeEpisode() {
@@ -53,6 +53,8 @@ class Listing extends Component {
   async AdminPodcastDetail(data) {
     return Api.get(`/admin/podcast/get/${data}`);
   }
+
+  async AdminEpisodeGetAll() { return Api.get("/admin/file/getAll"); }
 
   async HostGet() { return Api.get("/host/get"); }
   async HostDetail(id) { return Api.get(`/host/get/${id}`); }

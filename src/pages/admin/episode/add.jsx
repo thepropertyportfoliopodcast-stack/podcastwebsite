@@ -9,6 +9,7 @@ import { Api } from "../../api/Api";
 import SeoFields from "@/common/SeoFields";
 import EpisodeContentFields from "@/common/EpisodeContentFields";
 import HostSelector from "@/common/HostSelector";
+import EpisodeRelationsFields from "@/common/EpisodeRelationsFields";
 
 export default function Add() {
   const selectedEpisode=null;
@@ -43,6 +44,8 @@ export default function Add() {
     episodeNumber: "",
     publishedDate: "",
     size: 0,
+    isFeatured: false,
+    relatedEpisodeUuids: [],
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -54,10 +57,12 @@ export default function Add() {
   const [audioUploadProgress, setAudioUploadProgress] = useState(0);
   const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
   const [hosts, setHosts] = useState([]);
+  const [episodes, setEpisodes] = useState([]);
 
   useEffect(() => {
     new Listing().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts([]));
   }, []);
+  useEffect(() => { new Listing().AdminEpisodeGetAll().then((response) => setEpisodes(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setEpisodes([])); }, []);
 
   const validateImageDimensions = (file, requiredWidth, requiredHeight) => {
     return new Promise((resolve, reject) => {
@@ -486,6 +491,8 @@ export default function Add() {
       payload.append("primaryKeyword", formData.primaryKeyword);
       payload.append("secondaryKeywords", formData.secondaryKeywords);
       payload.append("spotifyLink", formData.spotifyLink);
+      payload.append("isFeatured", String(formData.isFeatured));
+      payload.append("relatedEpisodeUuids", JSON.stringify(formData.relatedEpisodeUuids));
 
       // Video now handled via chunk upload
       if (!uploadedFileUrl && !formData.youtubeUrl) {
@@ -611,6 +618,7 @@ export default function Add() {
         <SeoFields formData={formData} onChange={handleChange} />
 
         <HostSelector hosts={hosts} selected={formData.hostSlugs} onChange={(hostSlugs) => setFormData((current) => ({ ...current, hostSlugs }))} />
+        <EpisodeRelationsFields formData={formData} episodes={episodes} onChange={setFormData} />
 
         <div className="rounded-xl border border-gray-800 bg-[#111] p-4 md:p-6">
           <label className="block text-sm font-medium">Spotify episode or show link</label>

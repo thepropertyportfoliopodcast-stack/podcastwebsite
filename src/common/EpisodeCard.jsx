@@ -85,7 +85,7 @@ export default function EpisodeCard({
   };
 
   return (
-    <div className={`group relative flex flex-col md:flex-row items-center gap-4 sm:gap-6 rounded-[10px] xl:rounded-2xl shadow-lg overflow-hidden p-[10px] md:p-[20px] bg-[#0F0F0F] border-[1px] border-[#FFFFFF66] hover:border-[#FC18D8]  
+    <div className={`group relative flex w-full min-w-0 flex-col items-stretch gap-4 overflow-hidden rounded-[10px] border border-white/40 bg-[#0F0F0F] p-3 shadow-lg transition-colors duration-200 hover:border-[#FC18D8] sm:p-4 md:flex-row md:items-center md:gap-6 md:p-5 xl:rounded-2xl
     ${episode?.isDeleted ? "opacity-50" : ""} transition-colors duration-200 cursor-pointer`}
   onClick={() => {
     if(isAdmin){
@@ -96,15 +96,15 @@ export default function EpisodeCard({
     }}
 >
   {/* Image */}
-  <div className="relative overflow-hidden w-[270px] min-w-[270px] md:w-[300px] h-[300px] aspect-video rounded-2xl flex-shrink-0">
+  <div className="relative aspect-square w-full overflow-hidden rounded-xl sm:aspect-[16/10] md:h-[300px] md:w-[300px] md:min-w-[300px] md:rounded-2xl">
     {episode?.thumbnail && (
       <Image
         src={episode.thumbnail}
         alt={episode?.title || "Podcast episode artwork"}
         fill
-        sizes="(max-width: 767px) 270px, 300px"
+        sizes="(max-width: 639px) calc(100vw - 48px), (max-width: 767px) 600px, 300px"
         quality={82}
-        className="object-contain rounded-[10px] transition-transform duration-300 group-hover:scale-105"
+        className="rounded-xl object-cover transition-transform duration-300 group-hover:scale-105 md:rounded-2xl md:object-contain"
       />
     )}
     {/* Hover Play Icon */}
@@ -116,13 +116,13 @@ export default function EpisodeCard({
   </div>
 
 {/* Content */}
-  <div className="flex-1 font-outfit text-white flex flex-col items-center md:items-start w-full">
-    <h3 className="text-center md:text-start  font-[700] text-lg sm:text-[18px] md:text-[20px] xl:text-[30px] mb-2 tracking-wide capitalize text-white">
+  <div className="flex w-full min-w-0 flex-1 flex-col items-center font-outfit text-white md:items-start">
+    <h3 className="mb-2 break-words text-center text-xl font-bold leading-snug text-white sm:text-2xl md:text-left xl:text-[30px]">
       {episode?.title}
     </h3>
 
     {/* Meta Info */}
-    <div className="w-full flex flex-wrap justify-center md:justify-start items-center text-[12px] text-[14px] lg:text-[16px] text-white gap-2 sm:gap-4 mb-3">
+    <div className="mb-3 flex w-full flex-wrap items-center justify-center gap-2 text-xs text-white/75 sm:gap-3 sm:text-sm md:justify-start lg:text-base">
       {/* <span className="">Episode: {episode?.episode?._count?.episodes || 11}</span> | */}
       <span className="flex items-center gap-1">
          <svg
@@ -142,7 +142,7 @@ export default function EpisodeCard({
          />
         </svg>
         <span>{episode?.podcast?.author || data?.author || "N/A"}</span>
-      </span> |
+      </span><span className="text-white/35" aria-hidden="true">|</span>
       <span className="flex items-center gap-1">
         <IoMdTime size={14} aria-hidden="true" /> {episode?.duration} mins
       </span>
@@ -150,7 +150,7 @@ export default function EpisodeCard({
 
     {/* Description */}
     <p
-      className={`text-center md:text-start  font-[600] text-[13px] text-[15px] lg:text-[20px] text-white transition-all duration-300 ${isOpen ? "" : "line-clamp-2"}`}>
+      className={`break-words text-center text-sm font-semibold leading-6 text-white transition-all duration-300 sm:text-base md:text-left lg:text-xl ${isOpen ? "" : "line-clamp-2"}`}>
       {episode?.description}
     </p>
 
@@ -165,7 +165,7 @@ export default function EpisodeCard({
     </button> */}
 
     {/* Listen Button */}
-    <button className="mt-[25px] flex items-center gap-2 px-6 py-[10px] rounded-full text-[20px] font-semibold bg-theme lg:mx-0 cursor-pointer w-fit cursor-pointer">
+    <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-theme px-5 py-2.5 text-base font-semibold sm:w-fit sm:text-lg">
      <MdOutlineHeadphones size={23} aria-hidden="true" /> Listen Now
     </button>
   </div>

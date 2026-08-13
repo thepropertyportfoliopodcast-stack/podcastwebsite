@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaApple, FaBookOpen, FaCalendarAlt, FaCheck, FaChevronRight, FaClock, FaMicrophoneAlt, FaPlayCircle, FaSpotify, FaTag, FaUser, FaUsers, FaYoutube } from "react-icons/fa";
+import { FaApple, FaCalendarAlt, FaChevronRight, FaClock, FaMicrophoneAlt, FaPlayCircle, FaSpotify, FaTag, FaUser, FaYoutube } from "react-icons/fa";
 import Layout from "@/layout/Layout";
 import YouTubeChapterPlayer from "@/components/YouTubeChapterPlayer";
 import SpotifyEmbed from "@/components/SpotifyEmbed";
+import SyncedTranscript from "@/components/SyncedTranscript";
+import TopicSuggestion from "@/components/TopicSuggestion";
 import { contentPath, episodeKeywords, extractUuid, metaDescription, plainText, SITE_URL } from "@/utils/seo";
-import { fallbackHosts, fixedShowcaseHosts, resolveEpisodeHosts } from "@/data/hosts";
-
-const hostAccents = ["from-[#FC18D8] to-[#ff7ad9]", "from-[#9747FF] to-[#FC18D8]", "from-[#6f5cff] to-[#9747FF]"];
+import { fallbackHosts, resolveEpisodeHosts } from "@/data/hosts";
 
 function youtubeShortEmbed(url = "") {
   const match = url.match(/(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/)|youtu\.be\/)([^?&/]+)/i);
@@ -31,16 +31,15 @@ function episodeDate(value) {
 
 export default function EpisodePage({ initialData }) {
   const [expanded, setExpanded] = useState(false);
+  const [spotifyPlayback, setSpotifyPlayback] = useState({ position: 0, duration: 0, isPaused: true });
   const data = initialData;
   const transcript = data.transcript || plainText(data.detail) || data.description;
-  const topics = Array.isArray(data.topicsCovered) && data.topicsCovered.length
-    ? data.topicsCovered
-    : [data.topic].filter(Boolean);
-  const related = (Array.isArray(data.podcast?.episodes) ? data.podcast.episodes : [])
-    .filter((episode) => episode.uuid !== data.uuid)
-    .slice(0, 2);
+  const related = Array.isArray(data.relatedEpisodes) ? data.relatedEpisodes.slice(0, 3) : [];
   const reelLinks = Array.isArray(data.reelLinks) ? data.reelLinks : [];
   const episodeHosts = resolveEpisodeHosts(data, Array.isArray(data.hostProfiles) ? data.hostProfiles : fallbackHosts);
+  useEffect(() => {
+    if (!spotifyPlayback.isPaused && spotifyPlayback.position > 0) setExpanded(true);
+  }, [spotifyPlayback.isPaused, spotifyPlayback.position]);
 
   return (
     <Layout seo={{
@@ -55,13 +54,13 @@ export default function EpisodePage({ initialData }) {
         <div className="pointer-events-none absolute -left-[22rem] top-44 h-[720px] w-[720px] rounded-full bg-[radial-gradient(circle,#fc18d8_0%,#9747ff_38%,transparent_70%)] opacity-35 blur-3xl" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-[24rem] top-[58rem] h-[760px] w-[760px] rounded-full bg-[radial-gradient(circle,#9747ff_0%,#fc18d8_40%,transparent_72%)] opacity-30 blur-3xl" aria-hidden="true" />
         <div className="relative mx-auto max-w-[1310px] space-y-12 px-4">
-          <section className="grid items-stretch gap-7 rounded-3xl border border-white/15 bg-[#111] p-5 md:grid-cols-[minmax(280px,360px)_1fr] md:p-8 lg:grid-cols-[minmax(360px,430px)_1fr]">
-            <div className="relative aspect-square overflow-hidden rounded-2xl md:aspect-auto md:h-full md:min-h-[360px] lg:min-h-[430px]">
+          <section className="episode-hero grid items-stretch gap-5 rounded-3xl border border-white/15 bg-[#111] p-4 md:grid-cols-[minmax(220px,32%)_1fr] md:p-6">
+            <div className="episode-hero-art relative aspect-square overflow-hidden rounded-2xl md:aspect-auto md:h-full">
               <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority sizes="(max-width: 768px) 100vw, 430px" className="object-cover" />
             </div>
             <div className="flex min-w-0 flex-col justify-center py-1 md:py-2">
               <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-white/50 sm:text-sm"><Link href="/" className="transition hover:text-[#c99cff]">Home</Link><FaChevronRight size={9} aria-hidden="true"/><Link href="/episode" className="transition hover:text-[#c99cff]">Episodes</Link><FaChevronRight size={9} aria-hidden="true"/><span className="rounded-lg bg-gradient-to-r from-[#9747FF] to-[#FC18D8] px-3 py-1.5 font-extrabold text-white">{data.episodeNumber ? `Episode ${data.episodeNumber}` : "Episode"}</span></nav>
-              <h1 className="text-3xl font-extrabold leading-[1.08] text-white sm:text-4xl md:text-[42px] lg:text-[52px]">{data.title}</h1>
+              <h1 className="episode-hero-title font-extrabold leading-[1.05] text-white">{data.title}</h1>
               <p className="mt-4 line-clamp-3 text-sm font-medium leading-6 text-white/65 sm:text-base sm:leading-7">{data.description}</p>
 
               <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-3">{episodeHosts.map((host, index) => <span key={host.slug} className="flex items-center gap-3"><Link href={`/host/${host.slug}`} className="inline-flex items-center gap-2 font-bold text-[#c99cff] transition hover:text-[#FC18D8] hover:underline"><FaUser aria-hidden="true" />{host.name}</Link>{index < episodeHosts.length - 1 && <span className="text-[#c99cff]" aria-hidden="true">♦</span>}</span>)}</div>
@@ -83,18 +82,12 @@ export default function EpisodePage({ initialData }) {
 
           {data.youtubeUrl && <YouTubeChapterPlayer url={data.youtubeUrl} timestamps={data.timestamps} />}
           {!data.youtubeUrl && data.link && <section className="overflow-hidden rounded-2xl border border-white/20 bg-black"><video src={data.link} poster={data.thumbnail} controls playsInline preload="metadata" className="mx-auto max-h-[75vh] w-full" /></section>}
-          <SpotifyEmbed url={data.spotifyLink} title={data.title} />
+          <SpotifyEmbed url={data.spotifyLink} title={data.title} onPlaybackUpdate={setSpotifyPlayback} />
 
-          <section className="grid items-stretch gap-6 lg:grid-cols-[330px_1fr]">
-            <aside className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 ${expanded ? "h-[520px]" : "md:h-[370px]"}`}>
-              <div className="shrink-0">
-                <h2 className="flex items-center gap-3 text-2xl font-bold text-[#c99cff]"><FaBookOpen aria-hidden="true" /><span>What you&apos;ll learn</span></h2>
-              </div>
-              <ul className="mt-5 min-h-0 flex-1 space-y-3 overflow-y-auto pr-2 [scrollbar-color:#9747FF_#1b1b1b] [scrollbar-width:thin]">{topics.map((topic, index) => <li key={`${topic}-${index}`} className="flex gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/85"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#c99cff]/15 text-[#c99cff]"><FaCheck size={12} aria-hidden="true" /></span><span>{topic}</span></li>)}</ul>
-            </aside>
+          <section>
             <article className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 md:p-8 ${expanded ? "h-[520px]" : "md:h-[370px]"}`}>
               <h2 className="flex items-center gap-3 text-2xl font-bold text-[#c99cff] md:text-3xl"><FaMicrophoneAlt aria-hidden="true" /><span>Episode transcript</span></h2>
-              <div className={`mt-5 whitespace-pre-wrap text-base leading-8 text-white/75 md:text-lg ${expanded ? "min-h-0 flex-1 overflow-y-auto pr-3 [scrollbar-color:#9747FF_#1b1b1b] [scrollbar-width:thin]" : "line-clamp-4 md:min-h-0 md:flex-1 md:overflow-hidden md:[display:block]"}`}>{transcript}</div>
+              <div className={`mt-5 text-base leading-8 text-white/75 md:text-lg ${expanded ? "min-h-0 flex-1 overflow-y-auto pr-3 [scrollbar-color:#9747FF_#1b1b1b] [scrollbar-width:thin]" : "line-clamp-4 md:min-h-0 md:flex-1 md:overflow-hidden md:[display:block]"}`}><SyncedTranscript transcript={transcript} timestamps={data.timestamps} positionMs={spotifyPlayback.position} expanded={expanded}/></div>
               {transcript?.length > 350 && <button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={expanded} className={`w-fit font-bold text-[#c99cff] hover:text-white ${expanded ? "mt-5" : "mt-auto pt-5"}`}>{expanded ? "Read less" : "Read more"}</button>}
             </article>
           </section>
@@ -110,48 +103,8 @@ export default function EpisodePage({ initialData }) {
             </div>
           </section>
 
-          <section className="relative isolate overflow-hidden rounded-[36px] border border-white/10 bg-[#090909] px-5 py-12 md:px-10 md:py-16 lg:px-14">
-            <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#9747FF]/25 blur-[100px]" aria-hidden="true" />
-            <div className="pointer-events-none absolute -bottom-40 -left-20 h-80 w-80 rounded-full bg-[#FC18D8]/15 blur-[90px]" aria-hidden="true" />
-            <div className="pointer-events-none absolute -bottom-44 -right-20 h-80 w-80 rounded-full bg-[#6f5cff]/15 blur-[90px]" aria-hidden="true" />
-            <div className="pointer-events-none absolute inset-x-10 top-[46%] hidden h-px bg-gradient-to-r from-transparent via-white/15 to-transparent md:block" aria-hidden="true" />
+          <TopicSuggestion episodeTitle={data.title} />
 
-            <div className="relative mx-auto mb-12 max-w-2xl text-center md:mb-16">
-              <h2 className="flex items-center justify-center gap-3 text-3xl font-extrabold text-[#c99cff] md:text-5xl"><FaUsers className="shrink-0" aria-hidden="true" /><span>Meet the minds behind the mic</span></h2>
-              <p className="mt-4 text-white/60">Finance, acquisition and property strategy expertise brought together in one conversation.</p>
-            </div>
-
-            <div className="relative">
-            <div className="grid grid-cols-1 items-end gap-6 px-1 pt-4 md:grid-cols-3 md:pt-10">
-              {fixedShowcaseHosts.map((host, index) => (
-                <article
-                  key={host.name}
-                  className={`group relative overflow-hidden rounded-[24px] border border-white/15 bg-[#111] shadow-2xl transition duration-500 hover:-translate-y-2 hover:border-white/40 hover:shadow-[#9747FF]/20 md:rounded-[30px] md:hover:-translate-y-3 ${index === 1 ? "md:mb-10" : ""}`}
-                >
-                  <div className="relative aspect-[16/10] overflow-hidden sm:aspect-[16/9] md:aspect-[4/5]">
-                    <Image
-                      src={host.image}
-                      alt={host.name}
-                      fill
-                      sizes="(max-width: 767px) 100vw, 33vw"
-                      className="object-cover object-top transition duration-700 ease-out group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/5 to-transparent" aria-hidden="true" />
-                    <div className={`absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t ${hostAccents[index]} opacity-25 blur-2xl transition duration-500 group-hover:opacity-45`} aria-hidden="true" />
-                  </div>
-
-                  <div className="relative -mt-14 p-4 pt-0 sm:-mt-16 sm:p-5 sm:pt-0 md:-mt-20 md:p-7 md:pt-0">
-                    <div className="rounded-2xl border border-white/15 bg-black/55 p-5 backdrop-blur-xl transition duration-500 group-hover:border-white/25 group-hover:bg-black/70">
-                      <div className={`mb-4 h-1 w-12 rounded-full bg-gradient-to-r ${hostAccents[index]} transition-all duration-500 group-hover:w-20`} aria-hidden="true" />
-                      <h3 className="text-xl font-extrabold lg:whitespace-nowrap lg:text-[26px]">{host.name}</h3>
-                      <p className="mt-2 text-sm font-semibold leading-6 text-white/65 md:mt-3 md:min-h-[48px]">{host.designation}</p>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-            </div>
-          </section>
         </div>
       </div>
     </Layout>

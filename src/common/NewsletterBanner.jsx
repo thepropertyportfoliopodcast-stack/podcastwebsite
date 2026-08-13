@@ -1,90 +1,30 @@
 import React, { useState } from "react";
-import news from "../assets/episode.png";
 import Image from "next/image";
 import Listing from "@/pages/api/Listing";
 import toast from "react-hot-toast";
 
-const NewsletterBanner = () => {
+export default function NewsletterBanner() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-
   const handleSubmit = async () => {
     if (loading) return;
-    if (!email || !email.includes("@")) {
-      toast.error("Please enter a valid email.");
-      return;
-    }
-
+    if (!email || !email.includes("@")) { toast.error("Please enter a valid email."); return; }
     setLoading(true);
-    try {
-      const main = new Listing();
-      const response = await main.AddSubscriber({ email: email });
-      toast.success("Thank you for subscribing!");
-      setEmail(""); // clear field
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error(error?.response?.data?.errors);
-    } finally {
-      setLoading(false);
-    }
+    try { const main = new Listing(); await main.AddSubscriber({ email }); toast.success("Thank you for subscribing!"); setEmail(""); }
+    catch (error) { console.error("Error:", error); toast.error(error?.response?.data?.errors); }
+    finally { setLoading(false); }
   };
-
   return (
-    <section className="container xl:max-w-[1310px] px-4 mx-auto mb-[40px] lg:mb-[80px] xl:mb-[100px]">
-      <div className="relative subscribebanner rounded-[10px] md:rounded-[20px] border border-[rgba(255, 255, 255, 1)] overflow-hidden flex flex-col lg:flex-row items-center lg:items-stretch">
-        <div className="block xl:hidden absolute top-0 bottom-0 left-0 right-0 w-full h-full bg-[#000000bd] z-1"></div>
-        {/* Left Content */}
-        <div className="absolute right-0 bottom-0 w-full h-full">
-           <Image
-             src="/subscribebanner.png"
-             fill
-             sizes="(max-width: 1310px) 100vw, 1310px"
-             alt=""
-             className="object-cover w-full h-full"
-           />
+    <section className="container mx-auto mb-[40px] px-4 lg:mb-[80px] xl:mb-[100px] xl:max-w-[1310px]">
+      <div className="subscribebanner relative flex flex-col items-center overflow-hidden rounded-[10px] border border-white md:rounded-[20px] lg:flex-row lg:items-stretch">
+        <div className="absolute inset-0 z-[1] block bg-black/75 xl:hidden" />
+        <div className="absolute inset-0"><Image src="/subscribebanner.png" fill sizes="(max-width:1310px) 100vw,1310px" alt="" className="h-full w-full object-cover" /></div>
+        <div className="z-[2] flex w-full flex-col justify-center p-4 md:p-6 lg:w-[54%] lg:p-8 xl:p-12">
+          <h2 className="mb-5 font-work text-[25px] font-[800] uppercase leading-[1.15] text-white md:mb-6 md:text-[35px] lg:mb-10 xl:text-[40px]">Subscribe to our newsletter for the <span className="text-theme">latest updates</span></h2>
+          <div className="mb-5 flex items-center overflow-hidden rounded-full border bg-transparent"><input type="email" placeholder="Email" value={email} required name="email" onChange={(event) => setEmail(event.target.value)} className="min-w-0 flex-1 bg-transparent px-5 py-3 text-white placeholder-gray-400 outline-none" /><button className={`m-1 rounded-full bg-white px-4 py-2.5 font-bold text-black transition hover:bg-gradient-to-r hover:from-[#9747FF] hover:to-[#FC18D8] hover:text-white sm:px-6 ${loading ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`} onClick={handleSubmit} disabled={loading}>{loading ? "Subscribing..." : "Subscribe"}</button></div>
+          <p className="text-base text-white sm:text-lg">Subscribe to our newsletter for the latest updates</p>
         </div>
-        <div className="w-full lg:w-[54%] p-4 md:p-6 lg:p-8 xl:p-12 flex flex-col justify-center z-1">
-          <h2 className="text-[25px] md:text-[35px] xl:text-[40px] font-work font-[800] leading-[1.15] uppercase text-white mb-[20px] md:mb-[25px] lg:mb-[45px] xl:mb-[50px]">
-            Subscribe to our newsletter for the <span className="text-theme">latest updates</span>
-          </h2>
-          {/* Input Box */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center mb-[22px] bg-transparent border rounded-full overflow-hidden">
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              required
-              name="email"
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 px-4 py-3 ps-[25px] bg-transparent text-white placeholder-gray-400 outline-none"
-            />
-            <button
-              className={`hidden sm:block mt-2 sm:mt-0 sm:ml-2 px-6 py-3 bg-white hover:bg-gradient-to-r hover:from-[#9747FF] hover:to-[#FC18D8] transition text-[18px] text-black hover:text-white font-bold rounded-full ${loading ? "opacity-50 cursor-not-allowed" : " cursor-pointer"
-                }`}
-              onClick={handleSubmit}
-              disabled={loading}
-            >
-              {loading ? "Subscribing..." : "Subscribe"}
-            </button>
-          </div>
-          <button
-            className={`block sm:hidden mt-2 sm:mt-0 mb-3 sm:ml-2 px-6 py-3 bg-white hover:bg-gradient-to-r hover:from-[#9747FF] hover:to-[#FC18D8] transition text-[18px] text-black hover:text-white font-bold rounded-full ${loading ? "opacity-50 cursor-not-allowed" : " cursor-pointer"
-              }`}
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? "Subscribing..." : "Subscribe"}
-          </button>
-          <p className="text-[#FFFFFF] text-base sm:text-lg">
-           Subscribe to our newsletter for the latest updates
-          </p>
-        </div>
-
-        {/* Right Image */}
-        
       </div>
     </section>
   );
-};
-
-export default NewsletterBanner;
+}
