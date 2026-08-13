@@ -50,16 +50,17 @@ export default function EpisodePage({ initialData }) {
       type: "article", publishedTime: data.createdAt,
       jsonLd: { "@context": "https://schema.org", "@type": "PodcastEpisode", name: data.title, description: data.seoDescription || plainText(data.description || data.detail), datePublished: data.createdAt, duration: data.durationInSec ? `PT${data.durationInSec}S` : undefined, associatedMedia: data.youtubeUrl ? { "@type": "VideoObject", embedUrl: data.youtubeUrl } : undefined, partOfSeries: { "@type": "PodcastSeries", name: data.podcast?.name }, image: data.thumbnail, url: `${SITE_URL}${contentPath("episode", data)}` },
     }}>
-      <div className="relative isolate overflow-hidden bg-[#070707] pb-16 pt-[110px] text-white md:pt-[125px]">
+      <div className="relative isolate overflow-hidden bg-[#070707] pb-10 pt-[110px] text-white md:pb-12 md:pt-[125px]">
         <div className="pointer-events-none absolute -left-[22rem] top-44 h-[720px] w-[720px] rounded-full bg-[radial-gradient(circle,#fc18d8_0%,#9747ff_38%,transparent_70%)] opacity-35 blur-3xl" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-[24rem] top-[58rem] h-[760px] w-[760px] rounded-full bg-[radial-gradient(circle,#9747ff_0%,#fc18d8_40%,transparent_72%)] opacity-30 blur-3xl" aria-hidden="true" />
         <div className="relative mx-auto max-w-[1310px] space-y-12 px-4">
-          <section className="episode-hero grid items-stretch gap-5 rounded-3xl border border-white/15 bg-[#111] p-4 md:grid-cols-[minmax(220px,32%)_1fr] md:p-6">
-            <div className="episode-hero-art relative aspect-square overflow-hidden rounded-2xl md:aspect-auto md:h-full">
-              <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority sizes="(max-width: 768px) 100vw, 430px" className="object-cover" />
-            </div>
-            <div className="flex min-w-0 flex-col justify-center py-1 md:py-2">
-              <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-white/50 sm:text-sm"><Link href="/" className="transition hover:text-[#c99cff]">Home</Link><FaChevronRight size={9} aria-hidden="true"/><Link href="/episode" className="transition hover:text-[#c99cff]">Episodes</Link><FaChevronRight size={9} aria-hidden="true"/><span className="rounded-lg bg-gradient-to-r from-[#9747FF] to-[#FC18D8] px-3 py-1.5 font-extrabold text-white">{data.episodeNumber ? `Episode ${data.episodeNumber}` : "Episode"}</span></nav>
+          <section className="episode-hero rounded-3xl border border-white/15 bg-[#111] p-4 md:p-6 xl:p-7">
+            <nav aria-label="Breadcrumb" className="mb-5 flex flex-wrap items-center gap-2 text-xs font-bold text-white/60 sm:text-sm"><Link href="/" className="transition hover:text-[#c99cff]">Home</Link><FaChevronRight size={8} aria-hidden="true"/><Link href="/episode" className="transition hover:text-[#c99cff]">Episodes</Link><FaChevronRight size={8} aria-hidden="true"/><span className="rounded-md bg-gradient-to-r from-[#9747FF] to-[#FC18D8] px-2.5 py-1.5 text-white">{data.episodeNumber ? `Episode ${data.episodeNumber}` : "Episode"}</span></nav>
+            <div className="grid items-center gap-7 md:grid-cols-[minmax(230px,30%)_1fr] lg:gap-10 xl:grid-cols-[340px_1fr] xl:gap-12">
+              <div className="episode-hero-art relative mx-auto aspect-square w-full max-w-[440px] overflow-hidden rounded-2xl md:mx-0 md:max-w-none">
+                <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority sizes="(max-width: 768px) calc(100vw - 32px), (max-width: 1280px) 30vw, 340px" className="object-cover" />
+              </div>
+              <div className="flex min-w-0 flex-col justify-center py-1 md:py-3">
               <h1 className="episode-hero-title font-extrabold leading-[1.05] text-white">{data.title}</h1>
               <p className="mt-4 line-clamp-3 text-sm font-medium leading-6 text-white/65 sm:text-base sm:leading-7">{data.description}</p>
 
@@ -72,10 +73,11 @@ export default function EpisodePage({ initialData }) {
                 {data.topic && <><span className="hidden text-[#c99cff] sm:inline" aria-hidden="true">|</span><span className="inline-flex items-center gap-2"><FaTag className="text-[#c99cff]" aria-hidden="true" />{data.topic}</span></>}
               </div>
 
-              <div className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {data.youtubeUrl && <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Watch this episode on YouTube" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/30 bg-black/30 px-4 py-3 text-sm font-bold transition hover:border-red-500 hover:text-red-400"><FaYoutube className="text-red-500" aria-hidden="true" size={21} /><span>Watch on YouTube</span></a>}
-                {data.spotifyLink && <a href={data.spotifyLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Spotify" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/30 bg-black/30 px-4 py-3 text-sm font-bold transition hover:border-[#1ed760] hover:text-[#1ed760]"><FaSpotify className="text-[#1ed760]" aria-hidden="true" size={21} /><span>Listen on Spotify</span></a>}
-                {data.appleLink && <a href={data.appleLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Apple Podcasts" className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/30 bg-black/30 px-4 py-3 text-sm font-bold transition hover:border-[#c99cff] hover:text-[#c99cff] sm:col-span-2 xl:col-span-1"><FaApple className="text-[#c99cff]" aria-hidden="true" size={21} /><span>Apple Podcasts</span></a>}
+              <div className="mt-7 flex flex-wrap gap-3">
+                {data.youtubeUrl && <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" aria-label="Watch this episode on YouTube" className="group flex min-h-14 flex-1 basis-[210px] items-center justify-center gap-3 rounded-xl border border-white/20 bg-white/[.025] px-5 py-3 text-sm font-bold transition hover:border-red-500/80 hover:bg-red-500/[.06]"><FaYoutube className="text-red-500 transition group-hover:scale-110" aria-hidden="true" size={30} /><span>Watch on YouTube</span></a>}
+                {data.spotifyLink && <a href={data.spotifyLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Spotify" className="group flex min-h-14 flex-1 basis-[210px] items-center justify-center gap-3 rounded-xl border border-white/20 bg-white/[.025] px-5 py-3 text-sm font-bold transition hover:border-[#1ed760]/80 hover:bg-[#1ed760]/[.06]"><FaSpotify className="text-[#1ed760] transition group-hover:scale-110" aria-hidden="true" size={30} /><span>Listen on Spotify</span></a>}
+                {data.appleLink && <a href={data.appleLink} target="_blank" rel="noopener noreferrer" aria-label="Listen to this episode on Apple Podcasts" className="group flex min-h-14 flex-1 basis-[210px] items-center justify-center gap-3 rounded-xl border border-white/20 bg-white/[.025] px-5 py-3 text-sm font-bold transition hover:border-[#c99cff]/80 hover:bg-[#c99cff]/[.06]"><FaApple className="text-[#c99cff] transition group-hover:scale-110" aria-hidden="true" size={30} /><span>Apple Podcasts</span></a>}
+              </div>
               </div>
             </div>
           </section>
