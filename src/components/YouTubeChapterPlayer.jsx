@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FaClock } from "react-icons/fa";
+import YouTubeFacade from "@/components/YouTubeFacade";
 
 function youtubeId(url = "") {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^?&/]+)/i);
@@ -25,12 +26,13 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
   const playerRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [playerReady, setPlayerReady] = useState(false);
+  const [activated, setActivated] = useState(false);
   const id = youtubeId(url);
   const chapters = useMemo(() => parseChapters(timestamps), [timestamps]);
   const activeIndex = chapters.reduce((active, chapter, index) => currentTime >= chapter.seconds ? index : active, 0);
 
   useEffect(() => {
-    if (!id) return undefined;
+    if (!id || !activated) return undefined;
     const initialise = () => {
       if (!mountRef.current || playerRef.current) return;
       playerRef.current = new window.YT.Player(mountRef.current, {
@@ -55,7 +57,7 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
       if (Number.isFinite(time)) setCurrentTime(time);
     }, 750);
     return () => { window.clearInterval(timer); playerRef.current?.destroy?.(); playerRef.current = null; };
-  }, [id]);
+  }, [id, activated]);
 
   const seek = (seconds) => {
     if (!playerReady || !playerRef.current) return;
@@ -68,7 +70,7 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
   return (
     <section className="grid md:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-5">
       <div className="aspect-video md:h-[440px] md:aspect-auto lg:h-[520px] overflow-hidden rounded-2xl border border-white/20 bg-black">
-        <div ref={mountRef} className="h-full w-full" />
+        {!activated ? <YouTubeFacade url={url} title="Play podcast video" onActivate={() => setActivated(true)} /> : <div ref={mountRef} className="h-full w-full" />}
       </div>
       <aside className="flex h-[300px] flex-col overflow-hidden rounded-2xl border border-white/20 bg-[#111] p-4 md:h-[440px] md:p-5 lg:h-[520px]" aria-label="Episode timestamps">
         <h2 className="flex shrink-0 items-center gap-3 border-b border-white/10 bg-[#111] pb-4 text-xl font-bold text-[#c99cff]"><FaClock aria-hidden="true" /><span>Timestamps</span></h2>

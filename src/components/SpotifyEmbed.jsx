@@ -19,11 +19,12 @@ export default function SpotifyEmbed({ url, title, onPlaybackUpdate }) {
   const controllerRef = useRef(null);
   const callbackRef = useRef(onPlaybackUpdate);
   const [ready, setReady] = useState(false);
+  const [activated, setActivated] = useState(false);
   const entity = spotifyEntity(url);
 
   useEffect(() => { callbackRef.current = onPlaybackUpdate; }, [onPlaybackUpdate]);
   useEffect(() => {
-    if (!entity || !mountRef.current) return undefined;
+    if (!entity || !activated || !mountRef.current) return undefined;
     let cancelled = false;
     const initialise = (IFrameAPI) => {
       if (cancelled || controllerRef.current || !mountRef.current) return;
@@ -49,7 +50,7 @@ export default function SpotifyEmbed({ url, title, onPlaybackUpdate }) {
       document.body.appendChild(script);
     }
     return () => { cancelled = true; controllerRef.current?.destroy?.(); controllerRef.current = null; };
-  }, [entity?.url]);
+  }, [entity?.url, activated]);
 
   if (!entity) return null;
   return <section className="overflow-hidden rounded-2xl border border-[#c99cff]/25 bg-[#111] p-4 sm:p-5 md:p-6">
@@ -57,6 +58,6 @@ export default function SpotifyEmbed({ url, title, onPlaybackUpdate }) {
       <div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#1ed760]">Listen on Spotify</p><h2 className="mt-1 flex items-center gap-3 text-xl font-bold text-[#c99cff] sm:text-2xl"><FaSpotify aria-hidden="true"/><span>Full podcast episode</span></h2></div>
       <a href={url} target="_blank" rel="noopener noreferrer" className="shrink-0 rounded-full border border-[#1ed760]/50 px-4 py-2 text-sm font-bold text-[#1ed760] transition hover:bg-[#1ed760] hover:text-black">Open Spotify</a>
     </div>
-    <div ref={mountRef} className="spotify-episode-controller h-[152px] overflow-hidden rounded-xl sm:h-[232px]" aria-busy={!ready}/>
+    {!activated ? <button type="button" onClick={() => setActivated(true)} className="flex h-[152px] w-full items-center justify-center rounded-xl border border-[#1ed760]/25 bg-[radial-gradient(circle_at_center,rgba(30,215,96,.12),transparent_60%),#18005a] text-white transition hover:border-[#1ed760]/60 sm:h-[232px]" aria-label={`Load ${title} Spotify player`}><span className="flex flex-col items-center gap-3"><FaSpotify className="text-[#1ed760]" size={48} aria-hidden="true"/><strong className="text-lg">Play on Spotify</strong><small className="text-white/65">Load the full episode player</small></span></button> : <div ref={mountRef} className="spotify-episode-controller h-[152px] overflow-hidden rounded-xl sm:h-[232px]" aria-busy={!ready}/>} 
   </section>;
 }
