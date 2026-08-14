@@ -167,7 +167,7 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
         <div role="button" tabIndex={index === active ? 0 : -1} key={episode.uuid} data-hero-phone={episode.uuid} onClick={() => openViewer(episode)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openViewer(episode); } }} className={`tppp-hero-phone ${position(index)}`} aria-label={`Play ${episode.title}`}>
           <span className="tppp-phone-frame">
             <span className="tppp-phone-notch" aria-hidden="true" />
-            <Image src={imageFor(episode)} alt={episode.title} fill priority={index === 0} fetchPriority={index === 0 ? "high" : "auto"} sizes="(max-width:620px) 188px, 300px" quality={88} className="object-cover" />
+            <Image src={imageFor(episode)} alt={episode.title} fill priority={index === 0} fetchPriority={index === 0 ? "high" : "auto"} sizes="(max-width:620px) 188px, 270px" quality={74} className="object-cover" />
             {mounted && !viewer && index === active && episode.shortVideo ? <video key={`${episode.uuid}-${active}`} src={episode.shortVideo} muted autoPlay playsInline preload="metadata" onEnded={advancePhone} className="absolute inset-0 z-[2] h-full w-full object-cover" /> : null}
             {mounted && !viewer && index === active && !episode.shortVideo && episode.youtubeShortUrl ? <YouTubeShortPreview key={`${episode.uuid}-${active}`} url={episode.youtubeShortUrl} title={episode.title} onEnded={advancePhone} /> : null}
             <span className="tppp-phone-overlay">
