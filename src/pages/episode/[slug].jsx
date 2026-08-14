@@ -68,11 +68,11 @@ export default function EpisodePage({ initialData }) {
             <div className="pointer-events-none absolute -right-28 -top-24 h-72 w-72 rotate-45 rounded-[64px] border border-[#9747FF]/40 bg-[#9747FF]/10" aria-hidden="true" />
             <div className="pointer-events-none absolute bottom-0 left-0 h-24 w-52 bg-[radial-gradient(circle,#c99cff_1px,transparent_1.5px)] bg-[size:12px_12px] opacity-25" aria-hidden="true" />
             <nav aria-label="Breadcrumb" className="relative z-10 mb-7 flex flex-wrap items-center gap-2.5 text-xs font-semibold text-white/75 sm:text-sm"><Link href="/" className="transition hover:text-[#c99cff]">Home</Link><FaChevronRight size={8} aria-hidden="true"/><Link href="/episode" className="transition hover:text-[#c99cff]">Episodes</Link><FaChevronRight size={8} aria-hidden="true"/><span className="rounded-lg bg-gradient-to-r from-[#9747FF] to-[#FC18D8] px-3 py-1.5 font-extrabold text-white shadow-[0_0_20px_rgba(252,24,216,.22)]">{data.episodeNumber ? `Episode ${data.episodeNumber}` : "Episode"}</span></nav>
-            <div className="relative z-10 grid items-center gap-9 md:grid-cols-[minmax(250px,38%)_1fr] lg:gap-12 xl:grid-cols-[390px_1fr] xl:gap-14 min-[1800px]:grid-cols-[500px_1fr] min-[1800px]:gap-20">
-              <div className="relative mx-auto w-full max-w-[440px] md:mx-0 md:max-w-none">
+            <div className="relative z-10 grid items-center gap-9 md:grid-cols-[minmax(250px,38%)_1fr] lg:gap-12 xl:grid-cols-[384px_1fr] xl:gap-14 min-[1800px]:grid-cols-[384px_1fr] min-[1800px]:gap-20">
+              <div className="relative mx-auto w-full max-w-[384px] md:mx-0 md:max-w-[384px]">
                 <div className="absolute -inset-3 -rotate-3 rounded-[28px] border-[9px] border-[#6f3aa4]/55 bg-[#261540] shadow-[0_0_34px_rgba(252,24,216,.22)]" aria-hidden="true" />
                 <div className="episode-hero-art relative aspect-square overflow-hidden rounded-2xl border border-white/10 shadow-[0_22px_55px_rgba(0,0,0,.5),0_0_35px_rgba(151,71,255,.14)]">
-                  <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority fetchPriority="high" quality={78} sizes="(max-width: 768px) calc(100vw - 48px), (max-width: 1280px) 38vw, 390px" className="object-cover" />
+                  <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority fetchPriority="high" quality={78} sizes="(max-width: 432px) calc(100vw - 48px), 384px" className="object-cover" />
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/45 to-transparent" aria-hidden="true" />
                 </div>
               </div>
