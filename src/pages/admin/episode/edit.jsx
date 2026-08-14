@@ -25,6 +25,7 @@ export default function Edit() {
     description: "",
     topic: "",
     thumbnail: null,
+    homepageThumbnail: null,
     video: null,
     audio: null,
     audioUrl: "",
@@ -54,6 +55,7 @@ export default function Edit() {
     relatedEpisodeUuids: [],
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null); 
+  const [homepageThumbnailPreview, setHomepageThumbnailPreview] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const [uploadingVideo, setUploadingVideo] = useState(false);
@@ -114,21 +116,26 @@ export default function Edit() {
         return;
       }
 
-      if (name === "thumbnail" && files?.[0]) {
+      if ((name === "thumbnail" || name === "homepageThumbnail") && files?.[0]) {
         const file = files[0];
         if (!file.type.startsWith("image/")) {
           toast.error("Only image files allowed");
           return;
         }
         try {
-          await validateImageDimensions(file, 3000, 3000);
-          setFormData((prev) => ({ ...prev, thumbnail: file }));
-          setThumbnailPreview(URL.createObjectURL(file));
+          if (name === "thumbnail") {
+            await validateImageDimensions(file, 3000, 3000);
+          }
+          setFormData((prev) => ({ ...prev, [name]: file }));
+          const preview = URL.createObjectURL(file);
+          if (name === "thumbnail") setThumbnailPreview(preview);
+          else setHomepageThumbnailPreview(preview);
         } catch (err) {
           toast.error(err);
           e.target.value = ""; // reset file input
-          setFormData((prev) => ({ ...prev, thumbnail: null }));
-          setThumbnailPreview(null);
+          setFormData((prev) => ({ ...prev, [name]: null }));
+          if (name === "thumbnail") setThumbnailPreview(null);
+          else setHomepageThumbnailPreview(null);
         }
         return;
       }
@@ -412,6 +419,9 @@ export default function Edit() {
       if (formData.thumbnail instanceof File) { 
         payload.append("thumbnail", formData.thumbnail);
       }
+      if (formData.homepageThumbnail instanceof File) {
+        payload.append("homepageThumbnail", formData.homepageThumbnail);
+      }
       if (formData.isSpotify && formData.spotifyLink) {
         payload.append("spotifyLink", formData.spotifyLink);
       }
@@ -442,9 +452,11 @@ export default function Edit() {
           description: "",
           topic: "",
           thumbnail: null,
+          homepageThumbnail: null,
           video: null,
         });
         setThumbnailPreview(null);
+        setHomepageThumbnailPreview(null);
         router.push(`/admin/podcast/${data?.podcast?.uuid}`);
       } else {
         toast.error(response.data.message);
@@ -470,6 +482,7 @@ export default function Edit() {
       topic: response?.data?.data?.topic || "",
       description: (response?.data?.data?.description || "").slice(0, DESCRIPTION_LIMIT),
       thumbnail: response?.data?.data?.thumbnail || null,
+      homepageThumbnail: response?.data?.data?.homepageThumbnail || null,
       video: response?.data?.data?.link || null,
       audioUrl: response?.data?.data?.audio || "",
       audioSize: response?.data?.data?.audioSize || 0,
@@ -498,11 +511,8 @@ export default function Edit() {
       relatedEpisodeUuids: Array.isArray(response?.data?.data?.relatedEpisodeUuids) ? response.data.data.relatedEpisodeUuids : [],
     });
 
-    if (response?.data?.data?.thumbnail) {
-      setThumbnailPreview(response?.data?.data.thumbnail);
-      return;
-    }
-    setThumbnailPreview(null);
+    setThumbnailPreview(response?.data?.data?.thumbnail || null);
+    setHomepageThumbnailPreview(response?.data?.data?.homepageThumbnail || null);
     } catch (error) {
       console.log("error", error);
       setData(null);
@@ -631,6 +641,19 @@ export default function Edit() {
                       onChange={handleChange}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                     />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">Homepage hero image <span className="text-gray-400">(optional)</span></label>
+                  <p className="text-xs text-gray-400">Used only when this is the latest episode in the homepage hero. A 16:9 image (for example 1920 × 1080 px) is recommended. The regular thumbnail is the fallback.</p>
+                  <div className="relative flex h-[320px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white">
+                    {homepageThumbnailPreview ? (
+                      <img src={homepageThumbnailPreview} alt="Homepage hero preview" className="h-full w-full rounded object-contain" />
+                    ) : (
+                      <p className="px-4 text-center text-sm">Click to upload a separate homepage hero image</p>
+                    )}
+                    <input type="file" name="homepageThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
                   </div>
                 </div>
 

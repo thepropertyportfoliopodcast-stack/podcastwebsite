@@ -61,6 +61,11 @@ class Listing extends Component {
   async AdminHostGet() { return Api.get("/admin/host/get"); }
   async HostAdd(data) { return Api.post("/admin/host/add", data); }
   async HostUpdate(id, data) { return Api.post(`/admin/host/update/${id}`, data); }
+  async HeroPhoneGet() { return Api.get("/hero-phone/get"); }
+  async AdminHeroPhoneGet() { return Api.get("/admin/hero-phone/get"); }
+  async HeroPhoneAdd(data) { return Api.post("/admin/hero-phone/add", data); }
+  async HeroPhoneUpdate(id, data) { return Api.post(`/admin/hero-phone/update/${id}`, data); }
+  async HeroPhoneDelete(id) { return Api.delete(`/admin/hero-phone/delete/${id}`); }
   
   async PodcastAdd(data) {
     return Api.post("/admin/podcast/add", data);

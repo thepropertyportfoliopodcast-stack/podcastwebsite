@@ -2,9 +2,9 @@ import Main from "./home/Main";
 import { getCachedValue } from "@/utils/serverCache";
 
 
-export default function Home({ initialEpisodes = [], latestEpisode = null }) {
+export default function Home({ initialEpisodes = [], latestEpisode = null, initialHeroPhones = [] }) {
   return (
-    <Main initialEpisodes={initialEpisodes} latestEpisode={latestEpisode} />
+    <Main initialEpisodes={initialEpisodes} latestEpisode={latestEpisode} initialHeroPhones={initialHeroPhones} />
   );
 }
 
@@ -16,7 +16,7 @@ export async function getServerSideProps({ res }) {
   );
 
   try {
-    const [episodes, latestEpisode] = await Promise.all([
+    const [episodes, latestEpisode, heroPhones] = await Promise.all([
       fetch(`${apiUrl}/home/file/getAll`, { cache: "no-store" }).then(async (response) => {
         if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
         const payload = await response.json();
@@ -29,10 +29,15 @@ export async function getServerSideProps({ res }) {
         const rows = payload?.data?.episodes;
         return Array.isArray(rows) && rows.length ? rows[0] : null;
       }),
+      fetch(`${apiUrl}/hero-phone/get`).then(async (response) => {
+        if (!response.ok) throw new Error(`Hero phone API returned ${response.status}`);
+        const payload = await response.json();
+        return Array.isArray(payload?.data) ? payload.data : [];
+      }),
     ]);
-    return { props: { initialEpisodes: episodes, latestEpisode } };
+    return { props: { initialEpisodes: episodes, latestEpisode, initialHeroPhones: heroPhones } };
   } catch (error) {
     console.error("Home SSR fetch failed:", error.message);
-    return { props: { initialEpisodes: [], latestEpisode: null } };
+    return { props: { initialEpisodes: [], latestEpisode: null, initialHeroPhones: [] } };
   }
 }

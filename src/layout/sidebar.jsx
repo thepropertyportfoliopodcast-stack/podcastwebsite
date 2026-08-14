@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FaRegUser } from "react-icons/fa";
 import { MdSupportAgent } from "react-icons/md";
 import { BsFileEarmarkPdf } from "react-icons/bs";
+import { MdOutlinePhoneIphone } from "react-icons/md";
 import { usePathname } from "next/navigation";
 
 export default function Sidebar({ toggle, handleLogout }) {
@@ -31,6 +32,15 @@ export default function Sidebar({ toggle, handleLogout }) {
           </div>
         </div>
         <ul>
+          <li>
+            <Link
+              className={`hover:opacity-[0.7] hover:text-white focus:!text-white bg-dark text-gray-200 mb-2 py-[13px] px-[13px] ${pathname === "/admin/hero-phones" ? "bg-theme" : ""} border border-gray-700 rounded-2xl flex items-center`}
+              href="/admin/hero-phones"
+            >
+              <MdOutlinePhoneIphone className="me-2" size="1.4rem" /> Hero Phones
+            </Link>
+          </li>
+
           <li>
             <Link
               className={`hover:opacity-[0.7] hover:text-white focus:!text-white bg-dark text-gray-200 mb-2 py-[13px] px-[13px] ${pathname?.startsWith("/admin/host") ? "bg-theme" : ""} border border-gray-700 rounded-2xl flex items-center`}

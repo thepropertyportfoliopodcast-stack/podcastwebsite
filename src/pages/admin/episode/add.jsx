@@ -27,6 +27,7 @@ export default function Add() {
     secondaryKeywords: "",
     spotifyLink: "",
     thumbnail: null,
+    homepageThumbnail: null,
     video: null,
     audio: null,
     audioUrl: "",
@@ -48,6 +49,7 @@ export default function Add() {
     relatedEpisodeUuids: [],
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const [homepageThumbnailPreview, setHomepageThumbnailPreview] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const [uploadingVideo, setUploadingVideo] = useState(false);
@@ -98,21 +100,26 @@ export default function Add() {
   const handleChange = async(e) => {
     const { name, value, files } = e.target;
 
-    if (name === "thumbnail" && files?.[0]) {
+    if ((name === "thumbnail" || name === "homepageThumbnail") && files?.[0]) {
       const file = files[0];
       if (!file.type.startsWith("image/")) {
         toast.error("Only image files allowed");
         return;
       }
       try {
-        await validateImageDimensions(file, 3000, 3000);
-        setFormData((prev) => ({ ...prev, thumbnail: file }));
-        setThumbnailPreview(URL.createObjectURL(file));
+        if (name === "thumbnail") {
+          await validateImageDimensions(file, 3000, 3000);
+        }
+        setFormData((prev) => ({ ...prev, [name]: file }));
+        const preview = URL.createObjectURL(file);
+        if (name === "thumbnail") setThumbnailPreview(preview);
+        else setHomepageThumbnailPreview(preview);
       } catch (err) {
         toast.error(err);
         e.target.value = ""; // reset file input
-        setFormData((prev) => ({ ...prev, thumbnail: null }));
-        setThumbnailPreview(null);
+        setFormData((prev) => ({ ...prev, [name]: null }));
+        if (name === "thumbnail") setThumbnailPreview(null);
+        else setHomepageThumbnailPreview(null);
       }
       return;
     } else if (name === "video" && files?.[0]) {
@@ -517,6 +524,9 @@ export default function Add() {
       if (formData.thumbnail) {
         payload.append("thumbnail", formData.thumbnail);
       }
+      if (formData.homepageThumbnail) {
+        payload.append("homepageThumbnail", formData.homepageThumbnail);
+      }
 
       const response = await main.EpisodeAdd(payload);
 
@@ -532,6 +542,7 @@ export default function Add() {
           secondaryKeywords: "",
           details: "",
           thumbnail: null,
+          homepageThumbnail: null,
           videoUrl: "",
           thumbnailPreview: "",
           duration: 0,
@@ -542,6 +553,8 @@ export default function Add() {
           audioUrl: "",
           audioSize: 0,
         });
+        setThumbnailPreview(null);
+        setHomepageThumbnailPreview(null);
 
         router.push("/admin/podcast");
       } else {
@@ -657,6 +670,20 @@ export default function Add() {
               onChange={handleChange}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
+          </div>
+        </div>
+
+        {/* Optional homepage hero artwork */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">Homepage hero image <span className="text-gray-400">(optional)</span></label>
+          <p className="text-xs text-gray-400">Used only for this episode when it is the latest episode in the homepage hero. A 16:9 image (for example 1920 × 1080 px) is recommended. The regular thumbnail is used when this is empty.</p>
+          <div className="relative flex h-64 w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white">
+            {homepageThumbnailPreview ? (
+              <img src={homepageThumbnailPreview} alt="Homepage hero preview" className="h-full w-full rounded object-contain" />
+            ) : (
+              <p className="px-4 text-center text-sm">Click to upload a separate homepage hero image</p>
+            )}
+            <input type="file" name="homepageThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
           </div>
         </div>
 
