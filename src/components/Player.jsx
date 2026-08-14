@@ -1,5 +1,4 @@
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
-import MiniPlayer from "./MiniPlayer";
 import FullPlayer from "./FullPlayer";
 import VideoPlayer from "./VideoPlayer";
 import AudioPlyr from "./AudioPlyr";
@@ -32,8 +31,6 @@ export default function Player() {
         {isMinimized ? <></> : <FullPlayer />}
       <AudioPlyr/> 
       </div>
-      {/* <div className={`${isMinimized ? "hidden" : "block z-[51] relative bottom-[0px]"}`}> */}
-      {/* </div> */}
     </>
   );
 }

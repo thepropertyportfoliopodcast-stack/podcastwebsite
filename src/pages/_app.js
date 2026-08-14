@@ -8,8 +8,6 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
-// import AudioPlayerWrapper from "@/components/AudioPlayerWrapper";
-
 const AudioPlyr = dynamic(() => import("@/components/AudioPlyrWrapper"), { ssr: false });
 const GlobalSpotifyPlaylist = dynamic(() => import("@/components/GlobalSpotifyPlaylist"), { ssr: false });
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-PN33NMTB";

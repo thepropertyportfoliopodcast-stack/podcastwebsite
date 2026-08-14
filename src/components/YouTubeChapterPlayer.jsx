@@ -37,8 +37,8 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
       if (!mountRef.current || playerRef.current) return;
       playerRef.current = new window.YT.Player(mountRef.current, {
         videoId: id,
-        playerVars: { rel: 0 },
-        events: { onReady: () => setPlayerReady(true) },
+        playerVars: { autoplay: 1, playsinline: 1, rel: 0 },
+        events: { onReady: (event) => { setPlayerReady(true); event.target.playVideo(); } },
       });
     };
     if (window.YT?.Player) initialise();
