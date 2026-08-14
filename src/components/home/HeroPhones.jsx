@@ -82,7 +82,7 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
   const closeViewer = useCallback(() => {
     clearTimers();
     setViewer((current) => current ? { ...current, phase: "closing" } : null);
-    timers.current.push(setTimeout(() => setViewer(null), 650));
+    timers.current.push(setTimeout(() => setViewer(null), 400));
   }, [clearTimers]);
 
   useEffect(() => {
@@ -109,8 +109,8 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
       sy: rect.height / (mobile ? 650 : 557),
     });
     timers.current = [
-      setTimeout(() => setViewer((current) => current ? { ...current, phase: mobile ? "open" : "rotating" } : null), 650),
-      ...(!mobile ? [setTimeout(() => setViewer((current) => current ? { ...current, phase: "open" } : null), 1500)] : []),
+      setTimeout(() => setViewer((current) => current ? { ...current, phase: mobile ? "open" : "rotating" } : null), 280),
+      ...(!mobile ? [setTimeout(() => setViewer((current) => current ? { ...current, phase: "open" } : null), 700)] : []),
     ];
   };
 
@@ -140,7 +140,7 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
           <div className="tppp-viewer-backdrop" style={{ backgroundImage: `url(${imageFor(viewer.episode)})` }} />
           {viewer.youtubeId && viewer.phase === "open" ? (
             <div className="tppp-viewer-screen">
-              <iframe className="tppp-viewer-video" src={`https://www.youtube.com/embed/${viewer.youtubeId}?autoplay=1&rel=0&playsinline=1`} title={viewer.episode.title} allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowFullScreen />
+              <iframe className="tppp-viewer-video" src={`https://www.youtube.com/embed/${viewer.youtubeId}?autoplay=1&controls=1&rel=0&playsinline=1`} title={viewer.episode.title} allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowFullScreen />
               <span className="tppp-landscape-island" aria-hidden="true" />
             </div>
           ) : (
