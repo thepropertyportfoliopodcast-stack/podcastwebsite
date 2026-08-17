@@ -20,6 +20,31 @@ export default function GlobalSpotifyPlaylist() {
   const playlistUrl = process.env.NEXT_PUBLIC_SPOTIFY_PLAYLIST_URL || "";
   const src = embedUrl(playlistUrl);
   useEffect(() => {
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+    let aboutObserver;
+
+    const revealPlayer = () => {
+      setScrolledPastHero(true);
+      setShouldLoad(true);
+    };
+
+    if (mobileQuery.matches) {
+      const aboutSection = document.getElementById("home-about-podcast");
+      if (aboutSection) {
+        aboutObserver = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              revealPlayer();
+              aboutObserver?.disconnect();
+            }
+          },
+          { rootMargin: "0px 0px -35% 0px", threshold: 0.05 },
+        );
+        aboutObserver.observe(aboutSection);
+      }
+      return () => aboutObserver?.disconnect();
+    }
+
     const updateVisibility = () => {
       const visible = window.scrollY >= Math.max(180, window.innerHeight * .62);
       setScrolledPastHero(visible);
@@ -28,7 +53,7 @@ export default function GlobalSpotifyPlaylist() {
     updateVisibility();
     window.addEventListener("scroll", updateVisibility, { passive: true });
     window.addEventListener("resize", updateVisibility);
-    return () => { window.removeEventListener("scroll", updateVisibility); window.removeEventListener("resize", updateVisibility); };
+    return () => { window.removeEventListener("scroll", updateVisibility); window.removeEventListener("resize", updateVisibility); aboutObserver?.disconnect(); };
   }, []);
   if (!src) return null;
   return <aside className={`global-spotify-player ${scrolledPastHero ? "is-scroll-visible" : ""}`} aria-label="The Property Portfolio Podcast on Spotify">
