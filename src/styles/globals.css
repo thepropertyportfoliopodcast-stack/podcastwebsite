@@ -348,10 +348,11 @@ main > div, main > section { max-width:100%; }
 }
 @media (max-width:767px) {
   .home-hero { padding-top:6.25rem; }
-  .global-spotify-player { bottom:max(6px,env(safe-area-inset-bottom)); width:calc(100vw - 12px); max-width:calc(100vw - 12px); padding:3px; border-radius:18px; transform:translate(-50%,calc(100% + 24px)); opacity:0; visibility:hidden; }
+  .global-spotify-player { bottom:max(6px,env(safe-area-inset-bottom)); width:calc(100vw - 12px); max-width:calc(100vw - 12px); padding:3px 3px 0; border-bottom:0; border-radius:18px; transform:translate(-50%,calc(100% + 24px)); opacity:0; visibility:hidden; }
   .global-spotify-player.is-scroll-visible { transform:translate(-50%,0); opacity:1; visibility:visible; }
-  .global-spotify-embed { height:71px; border-radius:14px; clip-path:inset(0 0 1px 0 round 14px); }
-  .global-spotify-player iframe { height:80px; transform:translateY(-1px); }
+  .global-spotify-embed { position:relative; height:70px; border-radius:14px 14px 17px 17px; clip-path:inset(0 0 3px 0 round 14px); }
+  .global-spotify-embed::after { content:""; position:absolute; z-index:2; right:0; bottom:0; left:0; height:4px; pointer-events:none; background:#18151c; }
+  .global-spotify-player iframe { height:80px; transform:translateY(-2px); }
   .episode-hero { min-height:calc(100svh - 130px); max-height:none; }
   .episode-hero-art { max-height:min(38svh,350px); }
   .episode-hero-title { font-size:clamp(1.75rem,8vw,2.55rem); }
