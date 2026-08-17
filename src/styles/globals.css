@@ -350,7 +350,7 @@ main > div, main > section { max-width:100%; }
   .home-hero { padding-top:6.25rem; }
   .global-spotify-player { bottom:max(6px,env(safe-area-inset-bottom)); width:calc(100vw - 12px); max-width:calc(100vw - 12px); padding:3px; border-radius:18px; transform:translate(-50%,calc(100% + 24px)); opacity:0; visibility:hidden; }
   .global-spotify-player.is-scroll-visible { transform:translate(-50%,0); opacity:1; visibility:visible; }
-  .global-spotify-embed { height:76px; border-radius:14px; }
+  .global-spotify-embed { height:71px; border-radius:14px; clip-path:inset(0 0 1px 0 round 14px); }
   .global-spotify-player iframe { height:80px; transform:translateY(-1px); }
   .episode-hero { min-height:calc(100svh - 130px); max-height:none; }
   .episode-hero-art { max-height:min(38svh,350px); }
