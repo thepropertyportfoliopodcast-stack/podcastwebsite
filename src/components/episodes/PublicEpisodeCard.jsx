@@ -28,7 +28,7 @@ export default function PublicEpisodeCard({ episode }) {
       aria-label={`Open episode: ${episode?.title || "Podcast episode"}`}
     >
       <article className="episode-card-surface flex h-full flex-col">
-        <div className="episode-grid-image relative aspect-square overflow-visible rounded-[22px]">
+        <div className="episode-grid-image relative overflow-visible rounded-[22px]">
           <div className="absolute inset-0 overflow-hidden rounded-[22px]">
             {episode?.thumbnail && (
               <Image

@@ -1188,6 +1188,10 @@ body :where(a, button).bg-theme {
   background: #160622;
 }
 
+.episode-grid-image {
+  aspect-ratio: 4 / 3;
+}
+
 .episode-card-artwork {
   width: 100% !important;
   height: 100% !important;

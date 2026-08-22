@@ -1,5 +1,6 @@
 import HomePage from "@/components/home/HomePage";
 import { getCachedValue } from "@/utils/serverCache";
+import { previewEpisodes } from "@/data/previewEpisodes";
 
 
 export default function Home({ initialEpisodes = [], latestEpisode = null, initialHeroPhones = [] }) {
@@ -37,9 +38,22 @@ export async function getServerSideProps({ res }) {
         return Array.isArray(payload?.data) ? payload.data : [];
       }),
     ]);
-    return { props: { initialEpisodes: episodes, latestEpisode, initialHeroPhones: heroPhones } };
+    const homepageEpisodes = episodes.length ? episodes : previewEpisodes.slice(0, 6);
+    return {
+      props: {
+        initialEpisodes: homepageEpisodes,
+        latestEpisode: latestEpisode || homepageEpisodes[0] || null,
+        initialHeroPhones: heroPhones,
+      },
+    };
   } catch (error) {
     console.error("Home SSR fetch failed:", error.message);
-    return { props: { initialEpisodes: [], latestEpisode: null, initialHeroPhones: [] } };
+    return {
+      props: {
+        initialEpisodes: previewEpisodes.slice(0, 6),
+        latestEpisode: previewEpisodes[0],
+        initialHeroPhones: [],
+      },
+    };
   }
 }
