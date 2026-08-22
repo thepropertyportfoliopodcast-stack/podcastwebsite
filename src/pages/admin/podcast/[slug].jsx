@@ -80,7 +80,7 @@ export default function Detail() {
           </p>
         </div>
       </div> */}
-      {loading ? <Loader/> : 
+      {loading ? <PageLoader /> : 
       <>
       <PodcastDetails podcast={data}/>
         {/* 🔗 RSS Feed Links */}

@@ -106,7 +106,7 @@ class PodcastApi {
     return Api.post("/subscriber/add" , data);
   }
 async enquiryGet(page, limit) {
-    return Api.get(`contact/get?page=${page}&limit=${limit}`);
+    return Api.get(`/contact/get?page=${page}&limit=${limit}`);
   }
   async enquiryDelete(id) {
     return Api.delete(`/contact/delete/${id}`);

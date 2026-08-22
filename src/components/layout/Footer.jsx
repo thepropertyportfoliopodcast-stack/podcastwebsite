@@ -80,7 +80,7 @@ export default function Footer() {
           <div className="grid grid-cols-2 gap-8 sm:contents">
             {/* Navigation Section */}
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-wider text-white/90">Navigation</h2>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-white/90">Navigation</h2>
               <ul className="mt-4 space-y-3 text-sm text-white/60">
                 {[
                   ["/", "Home"],
@@ -102,7 +102,7 @@ export default function Footer() {
 
             {/* Legal Section */}
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-wider text-white/90">Legal</h2>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-white/90">Legal</h2>
               <ul className="mt-4 space-y-3 text-sm text-white/60">
                 {[
                   ["/access", "Terms of Access"],
@@ -125,7 +125,7 @@ export default function Footer() {
           {/* Newsletter Section */}
           <div className="flex flex-col justify-between">
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-wider text-white/90">Newsletter</h2>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-white/90">Newsletter</h2>
               <p className="mt-4 text-sm leading-relaxed text-white/60">
                 Get the latest episodes and market discussions in your inbox.
               </p>
@@ -146,7 +146,7 @@ export default function Footer() {
               <button
                 type="submit"
                 disabled={loading}
-                className="min-h-11 rounded-lg bg-[#A837F4] px-4 text-xs font-bold tracking-wide text-white transition-all duration-200 hover:bg-[#b842ff] hover:shadow-lg hover:shadow-[#A837F4]/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="min-h-11 rounded-lg bg-[#A837F4] px-4 text-sm font-bold tracking-wide text-white transition-all duration-200 hover:bg-[#b842ff] hover:shadow-lg hover:shadow-[#A837F4]/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "…" : "Subscribe"}
               </button>
@@ -156,7 +156,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Copyright */}
-        <div className="mt-12 border-t border-white/10 pt-6 text-center text-xs text-white/40 sm:mt-16">
+        <div className="mt-12 border-t border-white/10 pt-6 text-center text-sm text-white/40 sm:mt-16">
           <p>© {new Date().getFullYear()} The Property Portfolio Podcast. All rights reserved.</p>
         </div>
       </div>
