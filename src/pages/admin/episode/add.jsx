@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import AuthLayout from "@/layout/AuthLayout";
+import AdminLayout from "@/components/layout/AdminLayout";
 import toast from "react-hot-toast";
-import Listing from "@/pages/api/Listing";
+import PodcastApi from "@/services/podcastApi";
 import { useRouter } from "next/router";
-import ReactQuillEditor from "./ReactQuillEditor";
+import RichTextEditor from "@/components/admin/episodes/RichTextEditor";
 import axios from "axios";
-import { Api } from "../../api/Api";
-import SeoFields from "@/common/SeoFields";
-import EpisodeContentFields from "@/common/EpisodeContentFields";
-import HostSelector from "@/common/HostSelector";
-import EpisodeRelationsFields from "@/common/EpisodeRelationsFields";
+import { Api } from "@/services/apiClient";
+import SeoFields from "@/components/admin/forms/SeoFields";
+import EpisodeContentFields from "@/components/admin/episodes/EpisodeContentFields";
+import HostSelector from "@/components/admin/episodes/HostSelector";
+import EpisodeRelationsFields from "@/components/admin/episodes/EpisodeRelationsFields";
 
 export default function Add() {
   const selectedEpisode=null;
@@ -39,6 +39,7 @@ export default function Add() {
     topicsCovered: "",
     reelLinks: "",
     hostSlugs: [],
+    guestHostSlugs: [],
     mimefield: "",
     duration: 0,
     durationInSec: 0,
@@ -62,9 +63,9 @@ export default function Add() {
   const [episodes, setEpisodes] = useState([]);
 
   useEffect(() => {
-    new Listing().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts([]));
+    new PodcastApi().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts([]));
   }, []);
-  useEffect(() => { new Listing().AdminEpisodeGetAll().then((response) => setEpisodes(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setEpisodes([])); }, []);
+  useEffect(() => { new PodcastApi().AdminEpisodeGetAll().then((response) => setEpisodes(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setEpisodes([])); }, []);
 
   const validateImageDimensions = (file, requiredWidth, requiredHeight) => {
     return new Promise((resolve, reject) => {
@@ -479,7 +480,7 @@ export default function Add() {
     setLoading(true);
 
     try {
-      const main = new Listing();
+      const main = new PodcastApi();
 
       const payload = new FormData();
       payload.append("title", formData.title);
@@ -493,6 +494,7 @@ export default function Add() {
       payload.append("topicsCovered", formData.topicsCovered);
       payload.append("reelLinks", formData.reelLinks);
       payload.append("hostSlugs", JSON.stringify(formData.hostSlugs));
+      payload.append("guestHostSlugs", JSON.stringify(formData.guestHostSlugs));
       payload.append("seoTitle", formData.seoTitle);
       payload.append("seoDescription", formData.seoDescription);
       payload.append("primaryKeyword", formData.primaryKeyword);
@@ -569,7 +571,7 @@ export default function Add() {
   };
 
   return (
-    <AuthLayout>
+    <AdminLayout>
       <form onSubmit={handleSubmit} className="w-full text-white space-y-6 mx-auto">
         <h3 className="text-3xl font-bold text-center heading">
           {selectedEpisode ? "Edit Episode" : "Add Episode"}
@@ -630,7 +632,7 @@ export default function Add() {
 
         <SeoFields formData={formData} onChange={handleChange} />
 
-        <HostSelector hosts={hosts} selected={formData.hostSlugs} onChange={(hostSlugs) => setFormData((current) => ({ ...current, hostSlugs }))} />
+        <HostSelector hosts={hosts} selected={formData.hostSlugs} onChange={(hostSlugs) => setFormData((current) => ({ ...current, hostSlugs }))} guestSelected={formData.guestHostSlugs} onGuestChange={(guestHostSlugs) => setFormData((current) => ({ ...current, guestHostSlugs }))} />
         <EpisodeRelationsFields formData={formData} episodes={episodes} onChange={setFormData} />
 
         <div className="rounded-xl border border-gray-800 bg-[#111] p-4 md:p-6">
@@ -752,7 +754,7 @@ export default function Add() {
           <label className="block text-sm font-medium">
             Details
           </label>
-          <ReactQuillEditor
+          <RichTextEditor
             label="details"
             desc={formData?.details}
             handleBioChange={(val) => handleQuillChange('details', val)}
@@ -776,6 +778,6 @@ export default function Add() {
           </button>
         </div>
       </form>
-    </AuthLayout>
+    </AdminLayout>
   );
 }

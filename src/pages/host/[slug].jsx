@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import Layout from "@/layout/Layout";
-import EpisodeCard from "@/common/EpisodeCard";
+import PublicLayout from "@/components/layout/PublicLayout";
+import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
 import { fallbackHosts } from "@/data/hosts";
 import { metaDescription } from "@/utils/seo";
 
@@ -21,7 +21,7 @@ export default function HostProfile({ host }) {
   const biography = paragraphs(host.bio);
 
   return (
-    <Layout seo={{
+    <PublicLayout seo={{
       title: host.seoTitle || `${host.name} | Podcast Host`,
       description: host.seoDescription || metaDescription(host.bio),
       keywords: [host.primaryKeyword, host.secondaryKeywords, host.designation, "Australian property podcast host"].filter(Boolean).join(", "),
@@ -54,12 +54,12 @@ export default function HostProfile({ host }) {
           {Array.isArray(host.episodes) && host.episodes.length > 0 && (
             <section className="mt-14 sm:mt-16">
               <h2 className="mb-7 text-3xl font-extrabold sm:text-4xl">Episodes featuring {host.name}</h2>
-              <div className="space-y-7">{host.episodes.map((episode) => <EpisodeCard key={episode.uuid} episode={episode} />)}</div>
+              <div className="space-y-7">{host.episodes.map((episode) => <PublicEpisodeCard key={episode.uuid} episode={episode} />)}</div>
             </section>
           )}
         </div>
       </main>
-    </Layout>
+    </PublicLayout>
   );
 }
 

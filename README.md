@@ -1,40 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Frontend architecture
 
-## Getting Started
+The website uses the Next.js Pages Router. Files inside `src/pages` are URLs; reusable code must not be placed there.
 
-First, run the development server:
+## Where to make changes
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- `src/pages` — route entry points and server-side data loading only.
+- `src/components/home` — homepage sections and hero-phone experience.
+- `src/components/episodes` — public episode UI, transcript, and topic form.
+- `src/components/podcasts` — public podcast-series UI.
+- `src/components/contact` — contact-page sections.
+- `src/components/layout` — public/admin shells, navigation, and footer.
+- `src/components/media` — audio, Spotify, video, and YouTube players.
+- `src/components/seo` — document metadata.
+- `src/components/ui` — generic reusable UI primitives.
+- `src/components/admin` — dashboard-only components, grouped by feature.
+- `src/services` — browser/API communication. `apiClient.js` configures Axios; `podcastApi.js` exposes application requests.
+- `src/context` — application-wide React providers.
+- `src/data` — static content and development-only preview fixtures.
+- `src/styles` — global, theme, legacy, and CSS-module styles.
+- `src/utils` — framework-independent helpers.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Episode cards
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+- Public cards: `src/components/episodes/PublicEpisodeCard.jsx`
+- Dashboard cards: `src/components/admin/episodes/AdminEpisodeCard.jsx`
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+They are deliberately separate because the public card controls SEO/navigation presentation, while the dashboard card controls playback, edit, disable, and delete actions.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## Route examples
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Homepage: `src/pages/index.js` → `src/components/home/HomePage.jsx`
+- Episode archive: `src/pages/episode/index.jsx`
+- Episode detail: `src/pages/episode/[slug].jsx`
+- Dashboard episode editor: `src/pages/admin/episode/edit.jsx`
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.

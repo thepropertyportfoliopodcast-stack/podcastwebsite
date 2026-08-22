@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import AuthLayout from "@/layout/AuthLayout";
-import AddGuide from "./AddGuide";
-import Listing from "@/pages/api/Listing";
-import GuideCard from "@/common/GuideCard";
-import Loader from "@/common/Loader";
+import AdminLayout from "@/components/layout/AdminLayout";
+import GuideFormModal from "@/components/admin/guides/GuideFormModal";
+import PodcastApi from "@/services/podcastApi";
+import GuideCard from "@/components/admin/guides/GuideCard";
+import PageLoader from "@/components/ui/PageLoader";
 
 export default function index() {
   const [loading, setLoading] = useState(false);
@@ -13,7 +13,7 @@ export default function index() {
   const fetchGuides = async () => {
     try {
       setLoading(true);
-      const main = new Listing();
+      const main = new PodcastApi();
       const response = await main.AdminGuideGet();
       setData(Array.isArray(response?.data?.data) ? response.data.data : []);
     } catch (error) {
@@ -30,7 +30,7 @@ export default function index() {
   // console.log("data",data);
 
   return (
-    <AuthLayout>
+    <AdminLayout>
       <div className="flex items-center justify-between tracking-tight border-b border-[#2a2a2a] pb-4 mb-6 w-full">
         <h1 className="text-3xl lg:text-4xl font-bold">
           Property Investing Guides
@@ -45,7 +45,7 @@ export default function index() {
         </button>
       </div>
       {loading ? (
-        <Loader />
+        <PageLoader />
       ) : (
         <div className="grid gap-8 md:grid-cols-2">
           {data &&
@@ -54,12 +54,12 @@ export default function index() {
             ))}
         </div>
       )}
-      <AddGuide
+      <GuideFormModal
         isOpen={isGuidePopupOpen}
         onClose={() => {
           setIsGuidePopupOpen(false);
         }}
       />
-    </AuthLayout>
+    </AdminLayout>
   );
 }

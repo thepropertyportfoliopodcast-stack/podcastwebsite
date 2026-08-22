@@ -26,6 +26,8 @@ function YouTubeShortPreview({ url, title, onEnded }) {
     if (!videoId || !mountRef.current) return undefined;
     let player;
     let cancelled = false;
+    let idleId;
+    let timerId;
     const createPlayer = () => {
       if (cancelled || !mountRef.current || !window.YT?.Player) return;
       player = new window.YT.Player(mountRef.current, {
@@ -37,18 +39,34 @@ function YouTubeShortPreview({ url, title, onEnded }) {
         },
       });
     };
-    if (window.YT?.Player) createPlayer();
-    else {
-      const previousReady = window.onYouTubeIframeAPIReady;
-      window.onYouTubeIframeAPIReady = () => { previousReady?.(); createPlayer(); };
-      if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
-        const script = document.createElement("script");
-        script.src = "https://www.youtube.com/iframe_api";
-        script.async = true;
-        document.head.appendChild(script);
+    const loadPlayer = () => {
+      if (cancelled) return;
+      if (window.YT?.Player) createPlayer();
+      else {
+        const previousReady = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = () => { previousReady?.(); createPlayer(); };
+        if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+          const script = document.createElement("script");
+          script.src = "https://www.youtube.com/iframe_api";
+          script.async = true;
+          document.head.appendChild(script);
+        }
       }
-    }
-    return () => { cancelled = true; try { player?.destroy(); } catch {} };
+    };
+    const schedulePlayer = () => {
+      if ("requestIdleCallback" in window) idleId = window.requestIdleCallback(loadPlayer, { timeout: 1500 });
+      else timerId = window.setTimeout(loadPlayer, 600);
+    };
+    if (document.readyState === "complete") schedulePlayer();
+    else window.addEventListener("load", schedulePlayer, { once: true });
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("load", schedulePlayer);
+      if (idleId && "cancelIdleCallback" in window) window.cancelIdleCallback(idleId);
+      if (timerId) window.clearTimeout(timerId);
+      try { player?.destroy(); } catch {}
+    };
   }, [url]);
 
   return <div className="tppp-phone-short" aria-label={`${title} short preview`}><div ref={mountRef} /></div>;

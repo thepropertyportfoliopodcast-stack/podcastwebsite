@@ -1,10 +1,10 @@
-import Main from "./home/Main";
+import HomePage from "@/components/home/HomePage";
 import { getCachedValue } from "@/utils/serverCache";
 
 
 export default function Home({ initialEpisodes = [], latestEpisode = null, initialHeroPhones = [] }) {
   return (
-    <Main initialEpisodes={initialEpisodes} latestEpisode={latestEpisode} initialHeroPhones={initialHeroPhones} />
+    <HomePage initialEpisodes={initialEpisodes} latestEpisode={latestEpisode} initialHeroPhones={initialHeroPhones} />
   );
 }
 
@@ -17,7 +17,8 @@ export async function getServerSideProps({ res }) {
 
   try {
     const [episodes, latestEpisode, heroPhones] = await Promise.all([
-      fetch(`${apiUrl}/home/file/getAll`, { cache: "no-store" }).then(async (response) => {
+      getCachedValue("homepage-featured-episodes-v1", async () => {
+        const response = await fetch(`${apiUrl}/home/file/getAll`);
         if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
         const payload = await response.json();
         return Array.isArray(payload?.data) ? payload.data : [];
@@ -29,7 +30,8 @@ export async function getServerSideProps({ res }) {
         const rows = payload?.data?.episodes;
         return Array.isArray(rows) && rows.length ? rows[0] : null;
       }),
-      fetch(`${apiUrl}/hero-phone/get`).then(async (response) => {
+      getCachedValue("homepage-hero-phones-v1", async () => {
+        const response = await fetch(`${apiUrl}/hero-phone/get`);
         if (!response.ok) throw new Error(`Hero phone API returned ${response.status}`);
         const payload = await response.json();
         return Array.isArray(payload?.data) ? payload.data : [];

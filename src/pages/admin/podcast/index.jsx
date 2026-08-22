@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import AuthLayout from "@/layout/AuthLayout";
-import Listing from "@/pages/api/Listing";
+import AdminLayout from "@/components/layout/AdminLayout";
+import PodcastApi from "@/services/podcastApi";
 import { FaChevronDown } from "react-icons/fa";
-import AddPodcast from "./AddPodcast";
+import PodcastFormModal from "@/components/admin/podcasts/PodcastFormModal";
 import Image from "next/image";
 import Link from "next/link";
 import { BsThreeDots } from "react-icons/bs";
 import { MdEdit } from "react-icons/md";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import toast from "react-hot-toast";
-import Loader from "@/common/Loader";
+import PageLoader from "@/components/ui/PageLoader";
 
 export default function Index() {
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ export default function Index() {
   const fetchPodcasts = async () => {
     try {
       setLoading(true);
-      const main = new Listing();
+      const main = new PodcastApi();
       const response = await main.AdminPodcastGet();
       setData(Array.isArray(response?.data?.data) ? response.data.data : []);
     } catch (error) {
@@ -41,7 +41,7 @@ export default function Index() {
     if (deleteLoading) return;
     setDeleteLoading(true);
     try {
-      const main = new Listing();
+      const main = new PodcastApi();
       const response = await main.PodcastDelete(id);
       if (response?.data?.status) {
         toast.success(response.data.message);
@@ -58,7 +58,7 @@ export default function Index() {
   };
 
   return (
-    <AuthLayout>
+    <AdminLayout>
       <div className="bg-[#0a0a0a] text-white min-h-screen py-8 px-4 lg:px-12 space-y-8">
         <div className="flex items-center justify-between tracking-tight border-b border-[#2a2a2a] pb-4 mb-6 w-full">
           <h1 className="text-3xl lg:text-4xl font-bold">🎙️ Latest Podcasts</h1>
@@ -73,7 +73,7 @@ export default function Index() {
           </button>
         </div>
         {loading ? (
-          <Loader />
+          <PageLoader />
         ) : data?.length === 0 ? (
           <p className="text-gray-500 text-center mt-20">No podcasts found.</p>
         ) : (
@@ -171,7 +171,7 @@ export default function Index() {
           ))
         )}
       </div>
-      <AddPodcast
+      <PodcastFormModal
         isOpen={isPodcastPopupOpen}
         onClose={() => {
           setIsPodcastPopupOpen(false);
@@ -179,6 +179,6 @@ export default function Index() {
         fetchPodcasts={fetchPodcasts}
         selectedPodcast={selectedPodcast}
       />
-    </AuthLayout>
+    </AdminLayout>
   );
 }

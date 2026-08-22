@@ -1,9 +1,9 @@
-import Layout from "@/layout/Layout";
+import PublicLayout from "@/components/layout/PublicLayout";
 import Image from "next/image";
-import PodcastDetails from "@/common/PodcastDetails";
+import PodcastDetails from "@/components/podcasts/PodcastDetails";
 import { useEffect, useState } from "react";
-import Listing from "../api/Listing";
-import EpisodeCard from "@/common/EpisodeCard";
+import PodcastApi from "@/services/podcastApi";
+import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
 import { useRouter } from "next/router";
 import { contentPath, extractUuid, metaDescription, plainText, podcastKeywords, SITE_URL } from "@/utils/seo";
 
@@ -16,7 +16,7 @@ export default function Index({ initialData = null }) {
   const fetchDetails = async (slug) => {
     try {
       setLoading(true);
-      const main = new Listing();
+      const main = new PodcastApi();
       const response = await main.PodcastDetail(extractUuid(slug));
       const podcast = response?.data?.data && typeof response.data.data === "object" && !Array.isArray(response.data.data)
         ? response.data.data
@@ -71,7 +71,7 @@ export default function Index({ initialData = null }) {
   // ];
 
   return (
-    <Layout seo={data?.uuid ? {
+    <PublicLayout seo={data?.uuid ? {
       title: data.seoTitle || data.name,
       appendSiteName: !data.seoTitle,
       description: data.seoDescription || metaDescription(data.description),
@@ -122,11 +122,11 @@ export default function Index({ initialData = null }) {
             ))}
           </div> */}
            {(Array.isArray(data?.episodes) ? data.episodes : []).map((item,index)=>(
-              <EpisodeCard episode={item} key={index} setIsEpisodePopupOpen={false} setSelectedEpisode={null} fetchDetails={fetchDetails} isAdmin={false}/>
+              <PublicEpisodeCard episode={item} key={index}/>
             ))}
         </div>
       </div>
-    </Layout>
+    </PublicLayout>
   );
 }
 

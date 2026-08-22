@@ -2,8 +2,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { MdArrowBack, MdRefresh } from "react-icons/md";
-import SEO from "@/common/SEO";
-import styles from "@/styles/NotFound.module.css";
+import SEO from "@/components/seo/SeoHead";
 
 export default function NotFound() {
   const router = useRouter();
@@ -28,39 +27,39 @@ export default function NotFound() {
       />
       <section
         ref={stageRef}
-        className={styles.stage}
+        className={"notfound-stage"}
         onPointerMove={handlePointerMove}
         onPointerLeave={() => setTilt({ x: 0, y: 0 })}
       >
-        <div className={styles.glowOne} aria-hidden="true" />
-        <div className={styles.glowTwo} aria-hidden="true" />
-        <div className={styles.grid} aria-hidden="true" />
+        <div className={"notfound-glowOne"} aria-hidden="true" />
+        <div className={"notfound-glowTwo"} aria-hidden="true" />
+        <div className={"notfound-grid"} aria-hidden="true" />
 
-        <div className={styles.content}>
+        <div className={"notfound-content"}>
           <div
-            className={styles.errorArt}
+            className={"notfound-errorArt"}
             style={{ transform: `perspective(800px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)` }}
             aria-hidden="true"
           >
             <span>4</span>
-            <span className={styles.record}>
+            <span className={"notfound-record"}>
               <i />
             </span>
             <span>4</span>
           </div>
 
-          <p className={styles.eyebrow}>Signal lost</p>
+          <p className={"notfound-eyebrow"}>Signal lost</p>
           <h1>This page has left the airwaves.</h1>
-          <p className={styles.copy}>
+          <p className={"notfound-copy"}>
             The link may be outdated, or the page may have moved. Let&apos;s get you back to the conversation.
           </p>
 
-          <div className={styles.actions}>
-            <Link href="/" className={styles.primaryAction}>
+          <div className={"notfound-actions"}>
+            <Link href="/" className={"notfound-primaryAction"}>
               <MdArrowBack aria-hidden="true" />
               Back to home
             </Link>
-            <button type="button" className={styles.retryAction} onClick={() => router.reload()}>
+            <button type="button" className={"notfound-retryAction"} onClick={() => router.reload()}>
               <MdRefresh aria-hidden="true" />
               Try again
             </button>

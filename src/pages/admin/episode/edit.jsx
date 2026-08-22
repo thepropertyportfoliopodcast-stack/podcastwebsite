@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import AuthLayout from "@/layout/AuthLayout";
+import AdminLayout from "@/components/layout/AdminLayout";
 import toast from "react-hot-toast";
-import Listing from "@/pages/api/Listing";
+import PodcastApi from "@/services/podcastApi";
 import { useRouter } from "next/router";
-import ReactQuillEditor from "./ReactQuillEditor";
+import RichTextEditor from "@/components/admin/episodes/RichTextEditor";
 import axios from "axios";
-import { Api } from "../../api/Api";
-import Loader from "@/common/Loader";
-import SeoFields from "@/common/SeoFields";
-import EpisodeContentFields from "@/common/EpisodeContentFields";
-import HostSelector from "@/common/HostSelector";
-import EpisodeRelationsFields from "@/common/EpisodeRelationsFields";
+import { Api } from "@/services/apiClient";
+import PageLoader from "@/components/ui/PageLoader";
+import SeoFields from "@/components/admin/forms/SeoFields";
+import EpisodeContentFields from "@/components/admin/episodes/EpisodeContentFields";
+import HostSelector from "@/components/admin/episodes/HostSelector";
+import EpisodeRelationsFields from "@/components/admin/episodes/EpisodeRelationsFields";
 
 export default function Edit() {
   const router = useRouter();
@@ -37,6 +37,7 @@ export default function Edit() {
     topicsCovered: "",
     reelLinks: "",
     hostSlugs: [],
+    guestHostSlugs: [],
     mimefield: "",
     duration: 0,
     durationInSec: 0,
@@ -68,9 +69,9 @@ export default function Edit() {
   const [episodes, setEpisodes] = useState([]);
 
   useEffect(() => {
-    new Listing().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts([]));
+    new PodcastApi().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts([]));
   }, []);
-  useEffect(() => { new Listing().AdminEpisodeGetAll().then((response) => setEpisodes(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setEpisodes([])); }, []);
+  useEffect(() => { new PodcastApi().AdminEpisodeGetAll().then((response) => setEpisodes(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setEpisodes([])); }, []);
 
   const validateImageDimensions = (file, requiredWidth, requiredHeight) => {
     return new Promise((resolve, reject) => {
@@ -397,7 +398,7 @@ export default function Edit() {
     if (loading) return;
     setLoading(true);
     try {
-      const main = new Listing();
+      const main = new PodcastApi();
       const payload = new FormData();
       payload.append("title", formData.title);
       payload.append("topic", formData.topic);
@@ -410,6 +411,7 @@ export default function Edit() {
       payload.append("topicsCovered", formData.topicsCovered);
       payload.append("reelLinks", formData.reelLinks);
       payload.append("hostSlugs", JSON.stringify(formData.hostSlugs));
+      payload.append("guestHostSlugs", JSON.stringify(formData.guestHostSlugs));
       payload.append("seoTitle", formData.seoTitle);
       payload.append("seoDescription", formData.seoDescription);
       payload.append("primaryKeyword", formData.primaryKeyword);
@@ -472,7 +474,7 @@ export default function Edit() {
   const fetchDetails = async (id) => {
     try {
       setFetchLoading(true);
-      const main = new Listing();
+      const main = new PodcastApi();
       const response = await main.AdminEpisodeByUUID(id);
       setData(response?.data?.data && typeof response.data.data === "object" ? response.data.data : null);
     //   console.log("response?.data?.data?.detail",response?.data?.data?.detail);
@@ -493,6 +495,7 @@ export default function Edit() {
       topicsCovered: (response?.data?.data?.topicsCovered || []).join("\n"),
       reelLinks: (response?.data?.data?.reelLinks || []).join("\n"),
       hostSlugs: Array.isArray(response?.data?.data?.hostSlugs) ? response.data.data.hostSlugs : [],
+      guestHostSlugs: Array.isArray(response?.data?.data?.guestHostSlugs) ? response.data.data.guestHostSlugs : [],
       mimefield: response?.data?.data?.mimefield || "",
       duration: response?.data?.data?.duration || 0,
       durationInSec: response?.data?.data?.durationInSec || 0,
@@ -531,9 +534,9 @@ export default function Edit() {
   // console.log("formData", formData);
 
   return (
-    <AuthLayout>
+    <AdminLayout>
       {fetchLoading || !id ? (
-        <Loader />
+        <PageLoader />
       ) : (
       <div className="max-w-5xl mx-auto">
         <div className="">
@@ -604,7 +607,7 @@ export default function Edit() {
 
             <SeoFields formData={formData} onChange={handleChange} />
 
-            <HostSelector hosts={hosts} selected={formData.hostSlugs} onChange={(hostSlugs) => setFormData((current) => ({ ...current, hostSlugs }))} />
+            <HostSelector hosts={hosts} selected={formData.hostSlugs} onChange={(hostSlugs) => setFormData((current) => ({ ...current, hostSlugs }))} guestSelected={formData.guestHostSlugs} onGuestChange={(guestHostSlugs) => setFormData((current) => ({ ...current, guestHostSlugs }))} />
             <EpisodeRelationsFields formData={formData} episodes={episodes} currentUuid={id} onChange={setFormData} />
 
             <div className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
@@ -745,7 +748,7 @@ export default function Edit() {
                 <label className="block text-sm font-medium">
                   Details
                 </label>
-                <ReactQuillEditor
+                <RichTextEditor
                   label="details"
                   desc={formData?.details}
                   handleBioChange={(val) => handleQuillChange('details', val)}
@@ -825,6 +828,6 @@ export default function Edit() {
         </div>
       </div>
       )}
-    </AuthLayout>
+    </AdminLayout>
   );
 }

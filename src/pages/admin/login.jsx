@@ -4,7 +4,7 @@ import Link from "next/link";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
-import Listing from "@/pages/api/Listing";
+import PodcastApi from "@/services/podcastApi";
 import { useSearchParams } from "next/navigation";
 
 export default function Login() {
@@ -34,7 +34,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const main = new Listing();
+      const main = new PodcastApi();
       const response = await main.Login({
         email: data?.email,
         password: data?.password,
@@ -58,7 +58,12 @@ export default function Login() {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error(error?.response?.data?.message || "Something went wrong!");
+      const isNetworkError = error?.code === "ERR_NETWORK" || !error?.response;
+      toast.error(
+        isNetworkError
+          ? `Cannot reach the backend at ${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api"}. Check that the backend is running, then restart the frontend.`
+          : error?.response?.data?.message || "Unable to log in. Please try again."
+      );
       setLoading(false);
     }
     setLoading(false);
@@ -83,7 +88,7 @@ export default function Login() {
             <div className="flex items-center justify-center lg:justify-start mb-6">
               <Link href="/">
                 <Image
-                  src="/logo.webp"
+                  src="/logo.png"
                   width={2110}
                   height={520}
                   alt="logo"
@@ -153,7 +158,7 @@ export default function Login() {
                 {/* Login Button */}
                 <div className="mt-2 flex justify-center lg:justify-start">
                   <button
-                    className="cursor-pointer bg-main text-sm  text-[16px] py-3 text-center mt-6 px-[50px] w-full lg:w-auto main-btn text-black font-bold bg-white rounded-[10px] hover:bg-gray-200 transition"
+                    className="admin-login-submit mt-6 w-full cursor-pointer rounded-[10px] border-2 px-[50px] py-3 text-center text-[16px] font-bold transition lg:w-auto"
                     type="submit"
                     disabled={loading}
                   >

@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
-import AuthLayout from "@/layout/AuthLayout";
-import Listing from "@/pages/api/Listing";
+import AdminLayout from "@/components/layout/AdminLayout";
+import PodcastApi from "@/services/podcastApi";
 
 const emptyForm = { title: "", description: "", youtubeShortUrl: "", youtubeVideoUrl: "", displayOrder: 0, isActive: true, thumbnail: null, shortVideo: null, removeShortVideo: false };
 
@@ -16,7 +16,7 @@ export default function HeroPhonesAdmin() {
 
   const loadPhones = useCallback(async () => {
     try {
-      const response = await new Listing().AdminHeroPhoneGet();
+      const response = await new PodcastApi().AdminHeroPhoneGet();
       setPhones(Array.isArray(response?.data?.data) ? response.data.data : []);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Unable to load hero phones");
@@ -42,8 +42,8 @@ export default function HeroPhonesAdmin() {
     if (form.shortVideo) data.append("shortVideo", form.shortVideo);
     setSaving(true);
     try {
-      if (editing) await new Listing().HeroPhoneUpdate(editing.uuid, data);
-      else await new Listing().HeroPhoneAdd(data);
+      if (editing) await new PodcastApi().HeroPhoneUpdate(editing.uuid, data);
+      else await new PodcastApi().HeroPhoneAdd(data);
       toast.success(editing ? "Hero phone updated" : "Hero phone added");
       reset(); await loadPhones();
     } catch (error) { toast.error(error?.response?.data?.message || "Unable to save hero phone"); }
@@ -52,11 +52,11 @@ export default function HeroPhonesAdmin() {
 
   const remove = async (phone) => {
     if (!window.confirm(`Delete “${phone.title}”?`)) return;
-    try { await new Listing().HeroPhoneDelete(phone.uuid); toast.success("Hero phone deleted"); await loadPhones(); }
+    try { await new PodcastApi().HeroPhoneDelete(phone.uuid); toast.success("Hero phone deleted"); await loadPhones(); }
     catch (error) { toast.error(error?.response?.data?.message || "Unable to delete hero phone"); }
   };
 
-  return <AuthLayout><div className="mx-auto max-w-6xl text-white">
+  return <AdminLayout><div className="mx-auto max-w-6xl text-white">
     <div className="mb-8"><p className="text-sm font-bold uppercase tracking-[.18em] text-[#c347ff]">Homepage content</p><h1 className="mt-2 text-3xl font-black">Hero Phones</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Create as many independent phones as you need. Lower display-order numbers appear first. An uploaded short video is used as the phone preview; otherwise its thumbnail is displayed.</p></div>
     <form onSubmit={submit} className="mb-10 rounded-2xl border border-gray-700 bg-[#121212] p-5 md:p-7">
       <div className="mb-6 flex items-center justify-between"><h2 className="text-xl font-bold">{editing ? "Edit phone" : "Add a phone"}</h2>{editing && <button type="button" onClick={reset} className="rounded-lg border border-gray-600 px-4 py-2 text-sm">Cancel edit</button>}</div>
@@ -76,5 +76,5 @@ export default function HeroPhonesAdmin() {
       <button disabled={saving} className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-gradient-to-r from-[#8c2ed3] to-[#c347ff] px-7 font-bold disabled:opacity-60"><FaPlus/>{saving?"Saving…":editing?"Save changes":"Add phone"}</button>
     </form>
     <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{loading?<p className="text-gray-400">Loading phones…</p>:phones.length?phones.map((phone)=><article key={phone.uuid} className={`overflow-hidden rounded-2xl border bg-[#121212] ${phone.isActive?"border-[#c347ff]/50":"border-gray-700 opacity-65"}`}><div className="relative aspect-[9/13]"><Image src={phone.thumbnail} alt={phone.title} fill sizes="(max-width:640px) 100vw, 360px" className="object-cover"/><span className="absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1 text-xs font-bold">Order {phone.displayOrder}</span></div><div className="p-5"><h2 className="line-clamp-2 text-lg font-bold">{phone.title}</h2><p className="mt-2 text-xs text-gray-400">{phone.shortVideo?"Uploaded video preview":phone.youtubeShortUrl?"YouTube Short preview":"Thumbnail preview"} · {phone.isActive?"Active":"Hidden"}</p><div className="mt-5 flex gap-3"><button type="button" onClick={()=>edit(phone)} className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-600 px-3 py-2"><FaEdit/> Edit</button><button type="button" onClick={()=>remove(phone)} className="inline-flex items-center justify-center rounded-lg border border-red-800 px-4 text-red-400" aria-label={`Delete ${phone.title}`}><FaTrash/></button></div></div></article>):<p className="text-gray-400">No hero phones yet. Add your first phone above.</p>}</div>
-  </div></AuthLayout>;
+  </div></AdminLayout>;
 }

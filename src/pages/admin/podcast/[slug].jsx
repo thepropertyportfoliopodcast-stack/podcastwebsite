@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import AuthLayout from "@/layout/AuthLayout";
+import AdminLayout from "@/components/layout/AdminLayout";
 import { MdVerified } from "react-icons/md";
 import Image from "next/image";
-import Listing from "@/pages/api/Listing";
+import PodcastApi from "@/services/podcastApi";
 import { useRouter } from "next/router";
 import moment from "moment";
-import EpisodeCard from "../../../common/EpisodeCard";
-import AddEpisode from "./AddEpisode";
-import PodcastDetails from "@/common/PodcastDetails";
+import AdminEpisodeCard from "@/components/admin/episodes/AdminEpisodeCard";
+import EpisodeFormModal from "@/components/admin/podcasts/EpisodeFormModal";
+import PodcastDetails from "@/components/podcasts/PodcastDetails";
 import Link from "next/link";
-import Loader from "@/common/Loader";
+import PageLoader from "@/components/ui/PageLoader";
 import toast from "react-hot-toast";
 
 export default function Detail() {
@@ -23,7 +23,7 @@ export default function Detail() {
   const fetchDetails = async (slug) => {
     try {
       setLoading(true);
-      const main = new Listing();
+      const main = new PodcastApi();
       const response = await main.AdminPodcastDetail(slug);
       setData(response?.data?.data && typeof response.data.data === "object" ? response.data.data : null);
     } catch (error) {
@@ -53,7 +53,7 @@ export default function Detail() {
   // console.log("data", data);
 
   return (
-    <AuthLayout>
+    <AdminLayout>
       {/* <div className="rounded-xl w-full mx-auto bg-[#e65b96] text-white p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center sm:gap-8">
         <div className="w-44 h-44 min-w-44 md:w-44 md:h-44 md:min-w-44 relative rounded-full overflow-hidden border-4 border-white shadow-md mx-auto sm:mx-0">
           <Image
@@ -144,11 +144,11 @@ export default function Detail() {
         </div>
          <div className="space-y-8 mt-6">
           {(Array.isArray(data?.episodes) ? data.episodes : []).map((item,index)=>(
-            <EpisodeCard episode={item} key={index} setIsEpisodePopupOpen={setIsEpisodePopupOpen} setSelectedEpisode={setSelectedEpisode} fetchDetails={fetchDetails} isAdmin={true} slug={slug} data={data}/>
+            <AdminEpisodeCard episode={item} key={index} fetchDetails={fetchDetails} slug={slug} data={data}/>
           ))}
          </div>
       </div>
-      <AddEpisode
+      <EpisodeFormModal
         isOpen={isEpisodePopupOpen}
         onClose={()=>{setIsEpisodePopupOpen(false);}}
         podcast={data}
@@ -156,6 +156,6 @@ export default function Detail() {
         selectedEpisode={selectedEpisode}
       />
       </>}
-    </AuthLayout>
+    </AdminLayout>
   );
 }

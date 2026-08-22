@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import moment from "moment";
 import * as XLSX from 'xlsx';
-import Listing from "@/pages/api/Listing";
-import NoData from "@/common/NoDataFound";
-import { TableLoader } from "@/common/LoadingSpinner";
-import AuthLayout from "@/layout/AuthLayout";
+import PodcastApi from "@/services/podcastApi";
+import EmptyState from "@/components/ui/EmptyState";
+import { TableLoader } from "@/components/ui/LoadingSpinner";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 export default function SubscriberList() {
   const [listing, setListing] = useState([]);
@@ -19,7 +19,7 @@ export default function SubscriberList() {
       if (pg === 1) setLoading(true);
       setLoadingButton(true);
 
-      const main = new Listing();
+      const main = new PodcastApi();
       const response = await main.GetSubscriber(pg, limit, { signal });
 
       const records = Array.isArray(response?.data?.data?.records)
@@ -71,7 +71,7 @@ export default function SubscriberList() {
   };
 
   return (
-    <AuthLayout>
+    <AdminLayout>
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[#2a2a2a] pb-4 mb-6">
         <h1 className="text-3xl lg:text-4xl font-bold">Subscription List</h1>
@@ -88,7 +88,7 @@ export default function SubscriberList() {
         {loading ? (
           <TableLoader length={2} />
         ) : listing?.length === 0 ? (
-          <NoData />
+          <EmptyState />
         ) : (
           <table className="w-full table-auto whitespace-nowrap border-collapse">
             <thead>
@@ -140,6 +140,6 @@ export default function SubscriberList() {
           </button>
         </div>
       )}
-    </AuthLayout>
+    </AdminLayout>
   );
 }

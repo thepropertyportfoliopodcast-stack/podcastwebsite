@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
-import AuthLayout from "@/layout/AuthLayout";
+import AdminLayout from "@/components/layout/AdminLayout";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { MdPaid, MdWallet } from "react-icons/md";
 import { MdRequestQuote } from "react-icons/md";
-import Listing from "../api/Listing";
-import Loader from "@/common/Loader";
+import PodcastApi from "@/services/podcastApi";
+import PageLoader from "@/components/ui/PageLoader";
 import Link from "next/link";
 import Image from "next/image";
-import EpisodeCard from "@/common/EpisodeCard";
+import AdminEpisodeCard from "@/components/admin/episodes/AdminEpisodeCard";
 
 export default function Index() {
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ export default function Index() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const main = new Listing();
+      const main = new PodcastApi();
       const response = await main.Dashboard();
       setData(response?.data?.data && typeof response.data.data === "object" ? response.data.data : {});
     } catch (error) {
@@ -36,64 +36,63 @@ export default function Index() {
       {
         label: "Total Podcasts",
         value: data?.podcastCount || "N/A",
-        icon: <FaMoneyBillWave className="w-6 h-6 text-white" />,
+        icon: <FaMoneyBillWave className="w-6 h-6" />,
       },
       {
         label: "Total Episodes",
         value: data?.fileCount || "N/A",
-        icon: <MdWallet className="w-6 h-6 text-white" />,
+        icon: <MdWallet className="w-6 h-6" />,
       },
       {
         label: "Average Episode Duration",
         value: data?.averageDuration || "N/A",
-        icon: <MdRequestQuote className="w-6 h-6 text-white" />,
+        icon: <MdRequestQuote className="w-6 h-6" />,
       },
       {
         label: "Total Guides",
         value: "N/A",
-        icon: <MdPaid className="w-6 h-6 text-white" />,
+        icon: <MdPaid className="w-6 h-6" />,
       },
     ],
     [data]
   );
 
   return (
-    <AuthLayout>
+    <AdminLayout>
       {loading ? (
-        <Loader />
+        <PageLoader />
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
             {stats &&
               stats?.map((item, idx) => (
                 <div
-                  className="flex justify-between py-4 lg:py-6 px-4 xl:px-5 rounded-xl shadow-sm border border-[#333] text-white bg-[#1e1e1e]"
+                  className="admin-stat-card flex justify-between py-4 lg:py-6 px-4 xl:px-5 rounded-2xl"
                   key={idx}
                 >
                   <div>
-                    <p className="text-[#888888] text-lg xl:text-lg font-medium tracking-[-0.04em]">
+                    <p className="admin-stat-label text-lg xl:text-lg font-medium">
                       {item?.label}
                     </p>
-                    <p className="text-white text-xl lg:text-[30px] font-bold mt-3 tracking-[-0.04em]">
+                    <p className="admin-stat-value text-xl lg:text-[30px] font-bold mt-3">
                       {item?.value === "N/A" ? "N/A" : `${item?.value}`}
                     </p>
                   </div>
-                  <div className="flex items-center justify-center p-2 rounded-md w-[60px] h-[60px] border border-[#555]">
+                  <div className="admin-stat-icon flex items-center justify-center p-2 rounded-xl w-[60px] h-[60px]">
                     {item?.icon}
                   </div>
                 </div>
               ))}
           </div>
-          <div className="mt-12 flex items-center justify-between tracking-tight border-b border-[#2a2a2a] w-full">
-            <h1 className="mb-3 text-3xl lg:text-4xl font-bold text-white">
+          <div className="admin-section-heading mt-12 flex items-center justify-between w-full">
+            <h1 className="mb-3 text-3xl lg:text-4xl font-bold">
               Latest Episodes
             </h1>
           </div>
           {(Array.isArray(data?.latestEpisodes) ? data.latestEpisodes : []).map((episode) => (
             <div className="mt-3" key={episode.uuid}>
-              <EpisodeCard
+              <AdminEpisodeCard
                 episode={episode}
-                isAdmin={true}     // dashboard/admin context
                 fetchDetails={() => {}} // noop since dashboard doesn’t refetch list
               />
             </div>
@@ -101,6 +100,6 @@ export default function Index() {
 
         </>
       )}
-    </AuthLayout>
+    </AdminLayout>
   );
 }
