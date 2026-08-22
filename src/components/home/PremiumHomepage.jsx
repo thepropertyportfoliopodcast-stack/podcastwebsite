@@ -131,7 +131,7 @@ function Episodes({episodes}){
           <h2 className="home-title">Latest Episodes</h2>
         </div>
         <Link href="/episode" className={`premium-desktopViewAll text-[#C347FF] mb-1 inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-[#C347FF] px-5 text-sm font-bold`}>View all episodes <MdArrowOutward aria-hidden="true" /></Link>
-      </div>{items.length?<div className="mt-10 grid items-stretch gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">{items.map(episode=><PublicEpisodeCard key={episode.uuid||episode.id} episode={episode} />)}</div>:<p className="mt-8 text-center text-[#8F879B]">Featured episodes will appear here when selected in the dashboard.</p>}
+      </div>{items.length?<div className="home-episode-grid mt-8 grid items-stretch gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{items.map(episode=><PublicEpisodeCard key={episode.uuid||episode.id} episode={episode} />)}</div>:<p className="mt-8 text-center text-[#8F879B]">Featured episodes will appear here when selected in the dashboard.</p>}
       <div className={"premium-mobileViewAllWrap"}><Link href="/episode" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#C347FF] px-5 text-sm font-bold text-[#C347FF]">View all episodes <MdArrowOutward aria-hidden="true" /></Link></div>
     </div></section>}
 

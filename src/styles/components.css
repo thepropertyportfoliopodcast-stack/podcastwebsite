@@ -1947,7 +1947,32 @@ body :where(a, button).bg-theme {
     position: sticky;
     top: 0;
     align-self: flex-start;
+    width: 232px !important;
+    min-width: 232px !important;
+    max-width: 232px !important;
+    padding-inline: 1rem !important;
   }
+
+  .admin-sidebar-link {
+    margin-bottom: 0.5rem;
+    border-radius: 0.9rem;
+    padding: 0.72rem 0.8rem;
+  }
+}
+
+.admin-analytics-page {
+  color: #18111f;
+}
+
+.admin-analytics-page .analytics-panel {
+  background: rgba(255, 255, 255, 0.94);
+  color: #18111f;
+}
+
+.admin-analytics-page table th,
+.admin-analytics-page table td {
+  padding-top: 0.58rem !important;
+  padding-bottom: 0.58rem !important;
 }
 @media (min-width: 768px) and (max-height: 760px) {
   .admin-sidebar { padding-top: 7rem !important; }
@@ -1977,8 +2002,13 @@ body :where(a, button).bg-theme {
 
   .public-site .home-episodes .episode-grid-card {
     width: 100%;
-    max-width: 300px;
+    max-width: 380px;
     justify-self: center;
+  }
+
+  .public-site .home-episodes .home-episode-grid {
+    column-gap: clamp(1rem, 1.6vw, 1.5rem);
+    row-gap: clamp(2rem, 3vw, 2.75rem);
   }
 
   .public-site .home-episodes .home-container > div:nth-of-type(2),
@@ -2016,7 +2046,8 @@ body :where(a, button).bg-theme {
 
   .about-modern .about-hero-shell {
     gap: clamp(1.75rem, 3.5vw, 3.5rem);
-    padding-block: clamp(1.25rem, 3svh, 2.5rem) !important;
+    padding-top: clamp(2.25rem, 4.5svh, 3.75rem) !important;
+    padding-bottom: clamp(2rem, 4svh, 3rem) !important;
   }
 
   .about-modern .about-hero-copy h1 {
@@ -2047,7 +2078,8 @@ body :where(a, button).bg-theme {
   }
 
   .about-modern .about-hero-shell {
-    padding-block: 1rem !important;
+    padding-top: 2rem !important;
+    padding-bottom: 1.75rem !important;
   }
 
   .about-modern .about-hero-media {

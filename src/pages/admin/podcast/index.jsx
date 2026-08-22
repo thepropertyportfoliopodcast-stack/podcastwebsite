@@ -59,8 +59,8 @@ export default function Index() {
 
   return (
     <AdminLayout>
-      <div className="bg-[#0a0a0a] text-white min-h-screen py-8 px-4 lg:px-12 space-y-8">
-        <div className="flex items-center justify-between tracking-tight border-b border-[#2a2a2a] pb-4 mb-6 w-full">
+      <div className="admin-podcast-page min-h-screen space-y-6 px-1 py-2 text-slate-900 md:px-3">
+        <div className="flex items-center justify-between border-b border-violet-200 pb-4 w-full">
           <h1 className="text-3xl lg:text-4xl font-bold">🎙️ Latest Podcasts</h1>
           <button
             onClick={() => {
@@ -80,7 +80,7 @@ export default function Index() {
           (Array.isArray(data) ? data : []).map((podcast) => (
             <div
               key={podcast.id}
-              className={`bg-[#1a1a1a] rounded-2xl shadow-xl overflow-hidden w-full relative`}
+              className="admin-podcast-card relative w-full overflow-hidden rounded-xl border border-violet-200 bg-white shadow-sm"
             >
               {/* 3 Dots Dropdown in top-right corner */}
               <div
@@ -88,7 +88,7 @@ export default function Index() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <BsThreeDots
-                  className="text-gray-400 text-xl cursor-pointer"
+                  className="cursor-pointer text-xl text-slate-600"
                   onClick={() => {
                     setSelectedPodcast(podcast);
                     setShowMenu((prev) => !prev);
@@ -97,14 +97,14 @@ export default function Index() {
                 {showMenu && selectedPodcast?.id === podcast?.id && (
                   <div
                     ref={menuRef}
-                    className="absolute right-0 mt-2 w-32 bg-[#1c1c1c] border border-gray-700 rounded-md shadow-lg z-30"
+                    className="absolute right-0 z-30 mt-2 w-32 rounded-md border border-violet-200 bg-white shadow-lg"
                   >
                     <button
                       onClick={() => {
                         setIsPodcastPopupOpen(true);
                         setShowMenu(false);
                       }}
-                      className="flex gap-2 items-center w-full px-4 py-2 text-sm text-white hover:bg-white/10 text-left border-b border-gray-700 cursor-pointer"
+                      className="flex w-full cursor-pointer items-center gap-2 border-b border-violet-100 px-4 py-2 text-left text-sm text-slate-900 hover:bg-violet-50"
                     >
                       Edit <MdEdit size={16} />
                     </button>
@@ -113,7 +113,7 @@ export default function Index() {
                         setShowMenu(false);
                         handleDelete(podcast?.uuid);
                       }}
-                      className="flex gap-2 items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-white/10 text-left cursor-pointer"
+                      className="flex w-full cursor-pointer items-center gap-2 px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50"
                     >
                       {podcast?.isDeleted ? (
                         <>Enable</>
@@ -129,7 +129,7 @@ export default function Index() {
 
               {/* Main Link Content */}
               <Link
-                className={`flex flex-col md:flex-row justify-between md:items-center p-6 gap-6 cursor-pointer hover:bg-[#232323] transition 
+                className={`flex cursor-pointer flex-col justify-between gap-5 p-5 transition hover:bg-violet-50 md:flex-row md:items-center
                 ${podcast?.isDeleted ? "opacity-50" : ""}`}
                 href={`/admin/podcast/${podcast?.uuid}`}
               >
@@ -146,22 +146,22 @@ export default function Index() {
 
                   <div>
                     <h2 className="text-2xl font-bold mb-1">{podcast?.name}</h2>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-slate-600">
                       By {podcast?.author}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-slate-500">
                       Created: {new Date(podcast?.createdAt).toLocaleString()}
                     </p>
-                    <p className="text-sm mt-2 text-gray-300">
+                    <p className="mt-2 text-sm text-slate-700">
                       <span className="font-semibold">Language:</span>{" "}
                       {podcast?.language.join(", ") || ""}
                     </p>
-                    <p className="text-sm mt-2 text-gray-300">
+                    <p className="mt-2 text-sm text-slate-700">
                       <span className="font-semibold">Cast:</span>{" "}
                       {podcast?.cast.join(", ") || ""}
                     </p>
 
-                    <p className="text-sm mt-6 text-gray-200 line-clamp-2">
+                    <p className="mt-4 line-clamp-2 text-sm text-slate-600">
                       {podcast?.description}
                     </p>
                   </div>

@@ -99,7 +99,7 @@ export default function AdminLayout({ children }) {
           </header>
           <div className="flex w-screen overflow-hidden">
             <AdminSidebar toggle={toggle} handleLogout={handleLogout}/>
-            <div className="admin-content content md:max-h-[100vh] overflow-y-auto lg:w-[calc(100%-300px)] p-6 md:p-8 !pt-[120px] lg:!pt-[150px] w-full">
+            <div className="admin-content content min-w-0 flex-1 md:max-h-[100vh] overflow-y-auto p-4 md:p-6 !pt-[105px] lg:!pt-[112px] w-full">
               {children}
             </div>
           </div>

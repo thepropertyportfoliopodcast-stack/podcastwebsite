@@ -15,7 +15,7 @@ export default function AdminSidebar({ toggle, handleLogout }) {
     <>
       <div
         id="sidebar"
-        className={`admin-sidebar mobilesidebar fixed top-0 z-[49] h-screen overflow-hidden border-r pb-6 w-full max-w-[300px] min-w-[300px] transition-transform duration-300 ease-in-out transform ${toggle ? "translate-x-0 p-4 pt-[30px]" : "-translate-x-full p-8 pt-[140px]"
+        className={`admin-sidebar mobilesidebar fixed top-0 z-[49] h-screen overflow-hidden border-r pb-6 transition-transform duration-300 ease-in-out transform ${toggle ? "translate-x-0 p-4 pt-[30px]" : "-translate-x-full p-4 pt-[112px]"
           } md:sticky md:translate-x-0`}
       >
         <div className="admin-sidebar-menu">
