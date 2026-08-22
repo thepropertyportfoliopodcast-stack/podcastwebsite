@@ -1078,6 +1078,21 @@ body :where(a, button).bg-theme {
   box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7),
               0 0 0 1px rgba(151, 71, 255, 0.1);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  container-type: inline-size;
+}
+
+/* Episode artwork is supplied as a square asset. Keep the complete artwork in
+   view at every responsive breakpoint instead of cropping it into a landscape
+   frame. The surrounding colour prevents empty image pixels from flashing. */
+.episode-grid-image > div:first-child {
+  background: #160622;
+}
+
+.episode-card-artwork {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center;
 }
 
 .episode-grid-card:hover {

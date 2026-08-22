@@ -56,7 +56,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     {!isAdminRoute && <FirstPartyAnalytics />}
     <Toaster
       toastOptions={{
-        position: "top-right",
+        duration: 3000,
+        success: { duration: 3000 },
         className: "",
         style: {
           fontSize: "14px", // Corrected "font-size" to camelCase as required in JSX styles
