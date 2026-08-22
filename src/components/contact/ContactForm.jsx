@@ -7,20 +7,28 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/f
 
 const initial = { name: "", email: "", subject: "Suggest a Topic", message: "" };
 const subjects = ["Suggest a Topic", "Ask a Question", "Guest Opportunity", "Give Feedback"];
+const countWords = (value = "") => value.trim().split(/\s+/).filter(Boolean).length;
 
 export default function ContactForm() {
   const [form, setForm] = useState(initial);
   const [loading, setLoading] = useState(false);
+  const messageWordCount = countWords(form.message);
   const update = ({ target }) => setForm((current) => ({ ...current, [target.name]: target.value }));
   const submit = async (event) => {
     event.preventDefault();
     if (loading) return;
-    if (!form.name.trim() || !/^\S+@\S+\.\S+$/.test(form.email) || form.message.trim().length < 5) return toast.error("Please complete every field with a valid email.");
+    if (!form.name.trim()) return toast.error("Please enter your name.");
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) return toast.error("Please enter a valid email address.");
+    if (messageWordCount < 30) return toast.error(`Your message must contain at least 30 words. Please add ${30 - messageWordCount} more.`);
     setLoading(true);
     try {
-      await new PodcastApi().AddContact({ ...form, source: "contact_page" });
+      const response = await new PodcastApi().AddContact({ ...form, source: "contact_page" });
       setForm(initial);
-      toast.success("Thanks — your message is safely with our team.");
+      if (response?.data?.data?.sheetSyncError) {
+        toast.success("Thanks — your message is saved. Our team will sync it to the enquiry sheet.");
+      } else {
+        toast.success("Thanks — your message is safely with our team and enquiry sheet.");
+      }
     } catch (error) { toast.error(error?.response?.data?.message || error?.response?.data?.errors || "We could not send your message. Please try again."); }
     finally { setLoading(false); }
   };
@@ -46,7 +54,7 @@ export default function ContactForm() {
       <form onSubmit={submit} className={"contact-form"}>
         <div className={"contact-twoColumns"}><label><span>Your name</span><div><FiUser/><input name="name" value={form.name} onChange={update} placeholder="Enter your name" autoComplete="name" required/></div></label><label><span>Email address</span><div><FiMail/><input type="email" name="email" value={form.email} onChange={update} placeholder="you@example.com" autoComplete="email" required/></div></label></div>
         <fieldset><legend>I’d like to</legend><div className={"contact-subjects"}>{subjects.map((subject)=><button type="button" key={subject} onClick={()=>setForm((current)=>({...current,subject}))} aria-pressed={form.subject===subject} className={form.subject===subject?"selected":""}>{subject}</button>)}</div></fieldset>
-        <label className={"contact-message"}><span>Your message</span><textarea name="message" value={form.message} onChange={update} maxLength={1500} rows={6} placeholder="Share the question, idea or opportunity you would like our hosts to unpack…" required/><small>{form.message.length}/1500</small></label>
+        <label className={"contact-message"}><span>Your message</span><textarea name="message" value={form.message} onChange={update} maxLength={1500} rows={6} placeholder="Share the question, idea or opportunity you would like our hosts to unpack…" aria-describedby="contact-message-requirement" required/><small id="contact-message-requirement">{messageWordCount}/30 words minimum · {form.message.length}/1500 characters</small></label>
         <button className={"contact-submit"} disabled={loading}>{loading ? "Sending securely…" : "Send my message"}<FiArrowUpRight/></button>
         <p className={"contact-privacy"}>Your details are used only to respond to your enquiry. Read our <Link href="/privacy">privacy policy</Link>.</p>
       </form>

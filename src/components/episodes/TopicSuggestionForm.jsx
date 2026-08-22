@@ -4,6 +4,7 @@ import { FaArrowRight, FaLightbulb, FaMicrophoneAlt, FaRegPaperPlane, FaStar } f
 import PodcastApi from "@/services/podcastApi";
 
 const initialForm = { name: "", email: "", topic: "" };
+const countWords = (value = "") => value.trim().split(/\s+/).filter(Boolean).length;
 
 export default function TopicSuggestionForm({ episodeTitle = "" }) {
   const [form, setForm] = useState(initialForm);
@@ -13,6 +14,10 @@ export default function TopicSuggestionForm({ episodeTitle = "" }) {
   const submit = async event => {
     event.preventDefault();
     if (loading) return;
+    const wordCount = countWords(form.topic);
+    if (!form.name.trim()) return toast.error("Please enter your name.");
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) return toast.error("Please enter a valid email address.");
+    if (wordCount < 30) return toast.error(`Your topic must contain at least 30 words. Please add ${30 - wordCount} more.`);
     setLoading(true);
     try {
       const response = await new PodcastApi().AddContact({
