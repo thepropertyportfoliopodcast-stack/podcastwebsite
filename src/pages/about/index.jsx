@@ -53,8 +53,8 @@ export default function About() {
       <main className="about-modern overflow-hidden pt-[80px] sm:pt-[40px]">
         
         {/* Hero Section */}
-        <section className="relative mx-auto grid max-w-[1310px] items-center gap-10 px-4 py-6 sm:px-6 md:py-16 lg:grid-cols-[.95fr_1.05fr] lg:px-8">
-          <div className="relative z-10 text-center sm:text-left w-full">
+        <section className="about-hero-shell relative grid items-center gap-10 py-6 md:py-16">
+          <div className="about-hero-copy relative z-10 w-full text-center sm:text-left">
             <p className="mb-5 inline-flex items-center gap-3 text-xs font-black uppercase tracking-[.22em] text-[#76239e]">
               <span className="h-px w-8 bg-[#76239e]" /> Our story
             </p>
@@ -83,7 +83,7 @@ export default function About() {
               ))}
             </dl>
           </div>
-          <div className="relative">
+          <div className="about-hero-media relative">
             <div className="absolute -inset-8 rounded-full bg-[radial-gradient(circle,rgba(151,71,255,.2),transparent_68%)] blur-2xl" aria-hidden="true" />
             <div className="relative aspect-[6/5] overflow-hidden rounded-[32px] border border-[#dac8e4] bg-white p-2 shadow-[0_30px_80px_rgba(77,33,95,.18)]">
               <Image src="/aboutimg.jpg" alt="The Property Portfolio Podcast team" fill priority sizes="(max-width:1023px) calc(100vw - 32px), 650px" className="rounded-[25px] object-cover" />
@@ -92,7 +92,7 @@ export default function About() {
         </section>
 
         {/* Meet Hosts Section */}
-        <section className="mx-auto max-w-[1310px] px-4 py-14 sm:px-6 lg:px-8">
+        <section className="about-hosts-shell mx-auto max-w-[1310px] px-4 py-14 sm:px-6 lg:px-8">
           <div className="mb-10 w-full text-center sm:text-left">
             <p className="text-xs font-black text-center tracking-[.22em] text-[#76239e]">MEET YOUR HOSTS</p>
             <h2 className="mt-3 text-3xl font-black text-center text-[#211628] sm:text-4xl">Three Perspectives. One Complete Property Conversation.</h2>
@@ -131,7 +131,7 @@ export default function About() {
             <div className="absolute inset-0 bg-[radial-gradient(#e0d4e7_1px,transparent_1px)] [background-size:24px_24px] opacity-40 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]"></div>
           </div>
 
-          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+          <div className="about-framework-shell mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
             {/* items-stretch ensures both columns are exactly the same height */}
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12 items-stretch">
               

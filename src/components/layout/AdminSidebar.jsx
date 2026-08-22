@@ -5,7 +5,6 @@ import { HiOutlineUserCircle } from "react-icons/hi2";
 import Link from "next/link";
 import { FaRegUser } from "react-icons/fa";
 import { MdSupportAgent } from "react-icons/md";
-import { BsFileEarmarkPdf } from "react-icons/bs";
 import { MdOutlinePhoneIphone } from "react-icons/md";
 import { MdOutlineAnalytics } from "react-icons/md";
 import { usePathname } from "next/navigation";
@@ -16,10 +15,10 @@ export default function AdminSidebar({ toggle, handleLogout }) {
     <>
       <div
         id="sidebar"
-        className={`admin-sidebar mobilesidebar fixed top-0 z-[49] max-h-[100vh] overflow-hidden border-r pb-22 w-full max-w-[300px] min-w-[300px] transition-transform duration-300 ease-in-out transform ${toggle ? "translate-x-0 min-h-screen p-4 pt-[30px]" : "-translate-x-full p-8 pt-[140px]"
+        className={`admin-sidebar mobilesidebar fixed top-0 z-[49] h-screen overflow-hidden border-r pb-6 w-full max-w-[300px] min-w-[300px] transition-transform duration-300 ease-in-out transform ${toggle ? "translate-x-0 p-4 pt-[30px]" : "-translate-x-full p-8 pt-[140px]"
           } md:sticky md:translate-x-0`}
       >
-        <div className="max-h-[76vh] overflow-auto hidescroll">
+        <div className="admin-sidebar-menu">
 
         <div className=" flex md:hidden items-center mb-8 ">
           <div>
