@@ -233,7 +233,7 @@ function Hosts({ hosts: suppliedHosts = [] }) {
                 <h3 className="text-lg font-black">{host.name}</h3>
                 <p className="mt-1 text-sm">{host.designation}</p>
                 <p className="mt-3 line-clamp-3 text-sm leading-6 text-[#8F879B]">{host.shortBio}</p>
-                {host.linkedinUrl && (
+                {/* {host.linkedinUrl && (
                   <button
                     type="button"
                     className="home-host-social"
@@ -246,7 +246,7 @@ function Hosts({ hosts: suppliedHosts = [] }) {
                   >
                     <FaLinkedin />
                   </button>
-                )}
+                )} */}
               </div>
             </Link>
           ))}
