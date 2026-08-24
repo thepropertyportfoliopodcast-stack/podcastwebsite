@@ -6,7 +6,6 @@ import { FaApple, FaBinoculars, FaBuilding, FaComments, FaLinkedin, FaPiggyBank,
 import { HiOutlineCalculator, HiOutlineSearch } from "react-icons/hi";
 import { MdArrowOutward, MdMic } from "react-icons/md";
 import PodcastApi from "@/services/podcastApi";
-import { fallbackHosts } from "@/data/hosts";
 import { contentPath } from "@/utils/seo";
 import HeroPhones from "@/components/home/HeroPhones";
 import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
@@ -183,9 +182,20 @@ function Learning() {
 }
 
 
-function Hosts() {
-  const hostOrder = ["mudit-khandelwal", "parag-dixit", "julius-dabre"];
-  const hosts = [...fallbackHosts].sort((a, b) => hostOrder.indexOf(a.slug) - hostOrder.indexOf(b.slug));
+function Hosts({ hosts: suppliedHosts = [] }) {
+  const sourceHosts = Array.isArray(suppliedHosts) ? suppliedHosts : [];
+  const hosts = [...sourceHosts]
+    .filter((host) => !host.isGuestOnly && host.isActive !== false)
+    .sort((a, b) => {
+      const aOrder = Number(a.displayOrder);
+      const bOrder = Number(b.displayOrder);
+      const normalizedA = aOrder > 0 ? aOrder : Number.MAX_SAFE_INTEGER;
+      const normalizedB = bOrder > 0 ? bOrder : Number.MAX_SAFE_INTEGER;
+      return normalizedA - normalizedB || String(a.name).localeCompare(String(b.name));
+    })
+    .slice(0, 3);
+
+  if (!hosts.length) return null;
 
   return (
     <section className="home-section home-hosts pt-0">
@@ -281,7 +291,7 @@ function Hosts() {
       </section>}
 
 
-  export default function PremiumHomepage({episodes=[],latestEpisode=null,heroPhones=[]}){const suppliedItems=Array.isArray(episodes)?episodes:[];const items=suppliedItems;
+  export default function PremiumHomepage({episodes=[],latestEpisode=null,heroPhones=[],hosts=[]}){const suppliedItems=Array.isArray(episodes)?episodes:[];const items=suppliedItems;
   const configuredPhones=Array.isArray(heroPhones)?heroPhones:[];
   return <div className={`premium-page home-premium overflow-hidden bg-[#07070B] text-[#F8F5FA]`}>
     <Hero latest={latestEpisode || items[0] || null} episodes={items} heroPhones={configuredPhones}/>
@@ -311,4 +321,4 @@ function Hosts() {
         <PlatformLinks/>
       </div>
     </section>
-    <Learning/><Hosts/><Newsletter/></div>}
+    <Learning/><Hosts hosts={hosts}/><Newsletter/></div>}

@@ -111,6 +111,9 @@ async enquiryGet(page, limit) {
   async enquiryDelete(id) {
     return Api.delete(`/contact/delete/${id}`);
   }
+  async enquirySheetSync(id) {
+    return Api.post(`/contact/sync/${id}`);
+  }
   async analyticsGet(params = {}) {
     return Api.get("/admin/analytics", { params });
   }

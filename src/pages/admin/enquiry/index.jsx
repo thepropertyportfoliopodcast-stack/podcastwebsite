@@ -17,6 +17,7 @@ export default function index() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingButton, setLoadingButton] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [syncingId, setSyncingId] = useState(null);
 
   const EnquiryList = async (pg, signal) => {
     try {
@@ -104,6 +105,22 @@ export default function index() {
     }
   };
 
+  const retrySheetSync = async (item) => {
+    try {
+      setSyncingId(item.id);
+      const response = await new PodcastApi().enquirySheetSync(item.id);
+      const updated = response?.data?.data;
+      setLisitng((current) => current.map((record) => record.id === item.id ? { ...record, ...updated } : record));
+      toast.success("Enquiry synced to Google Sheets");
+    } catch (error) {
+      const message = error?.response?.data?.message || "Google Sheets sync failed";
+      setLisitng((current) => current.map((record) => record.id === item.id ? { ...record, sheetSyncError: message } : record));
+      toast.error(message, { duration: 6000 });
+    } finally {
+      setSyncingId(null);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="flex items-center justify-between tracking-tight border-b border-[#2a2a2a] pb-4 mb-6 w-full">
@@ -187,6 +204,16 @@ export default function index() {
                       </td>
                       <td className="px-4 py-4 text-sm border-b border-white/10"><span title={item?.sheetSyncError || ""} className={item?.sheetSyncedAt ? "text-green-400" : item?.sheetSyncError ? "text-red-400" : "text-gray-500"}>{item?.sheetSyncedAt ? "Synced" : item?.sheetSyncError ? "Failed" : "Pending"}</span></td>
                       <td className="px-4 py-4 text-right text-sm border-b border-white/10">
+                        {!item?.sheetSyncedAt && (
+                          <button
+                            type="button"
+                            onClick={() => retrySheetSync(item)}
+                            disabled={syncingId === item.id}
+                            className="mr-2 rounded-lg border border-purple-500/50 bg-purple-500/10 px-3 py-2 font-semibold text-purple-700 transition hover:bg-purple-500/20 disabled:opacity-50"
+                          >
+                            {syncingId === item.id ? "Syncing..." : "Retry Sheet sync"}
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => deleteEnquiry(item)}

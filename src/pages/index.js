@@ -3,9 +3,9 @@ import { getCachedValue } from "@/utils/serverCache";
 import { previewEpisodes } from "@/data/previewEpisodes";
 
 
-export default function Home({ initialEpisodes = [], latestEpisode = null, initialHeroPhones = [] }) {
+export default function Home({ initialEpisodes = [], latestEpisode = null, initialHeroPhones = [], initialHosts = [] }) {
   return (
-    <HomePage initialEpisodes={initialEpisodes} latestEpisode={latestEpisode} initialHeroPhones={initialHeroPhones} />
+    <HomePage initialEpisodes={initialEpisodes} latestEpisode={latestEpisode} initialHeroPhones={initialHeroPhones} initialHosts={initialHosts} />
   );
 }
 
@@ -17,7 +17,7 @@ export async function getServerSideProps({ res }) {
   );
 
   try {
-    const [episodes, latestEpisode, heroPhones] = await Promise.all([
+    const [episodes, latestEpisode, heroPhones, hosts] = await Promise.all([
       getCachedValue("homepage-featured-episodes-v1", async () => {
         const response = await fetch(`${apiUrl}/home/file/getAll`);
         if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
@@ -37,6 +37,12 @@ export async function getServerSideProps({ res }) {
         const payload = await response.json();
         return Array.isArray(payload?.data) ? payload.data : [];
       }),
+      getCachedValue("homepage-hosts-v1", async () => {
+        const response = await fetch(`${apiUrl}/host/get`);
+        if (!response.ok) throw new Error(`Host API returned ${response.status}`);
+        const payload = await response.json();
+        return Array.isArray(payload?.data) ? payload.data : [];
+      }, 30000).catch(() => []),
     ]);
     const homepageEpisodes = episodes.length ? episodes : previewEpisodes.slice(0, 6);
     return {
@@ -44,6 +50,7 @@ export async function getServerSideProps({ res }) {
         initialEpisodes: homepageEpisodes,
         latestEpisode: latestEpisode || homepageEpisodes[0] || null,
         initialHeroPhones: heroPhones,
+        initialHosts: hosts,
       },
     };
   } catch (error) {
@@ -53,6 +60,7 @@ export async function getServerSideProps({ res }) {
         initialEpisodes: previewEpisodes.slice(0, 6),
         latestEpisode: previewEpisodes[0],
         initialHeroPhones: [],
+        initialHosts: [],
       },
     };
   }

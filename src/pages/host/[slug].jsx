@@ -54,7 +54,9 @@ export default function HostProfile({ host }) {
           {Array.isArray(host.episodes) && host.episodes.length > 0 && (
             <section className="mt-14 sm:mt-16">
               <h2 className="mb-7 text-3xl font-extrabold sm:text-4xl">Episodes featuring {host.name}</h2>
-              <div className="space-y-7">{host.episodes.map((episode) => <PublicEpisodeCard key={episode.uuid} episode={episode} />)}</div>
+              <div className="grid grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-3">
+                {host.episodes.map((episode) => <PublicEpisodeCard key={episode.uuid} episode={episode} />)}
+              </div>
             </section>
           )}
         </div>
