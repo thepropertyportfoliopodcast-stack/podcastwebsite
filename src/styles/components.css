@@ -1992,6 +1992,29 @@ body :where(a, button).bg-theme {
     linear-gradient(150deg, #fff 0%, #fbf7ff 55%, #f7effc 100%);
 }
 
+/* Keep filled dashboard actions legible after the global light-theme text remap. */
+.admin-content button:is(
+  .button-bg,
+  .bg-theme,
+  .text-white,
+  [class^="bg-gradient-to-"],
+  [class*=" bg-gradient-to-"]
+) {
+  color: #fff !important;
+}
+
+/* These legacy filled controls are otherwise converted to a light surface. */
+.admin-content button.bg-gray-700 {
+  color: #fff !important;
+  background-color: #374151;
+}
+
+/* Submit buttons must remain filled while their text remains white on hover. */
+.admin-content button.button-bg:hover:not(:disabled) {
+  color: #fff !important;
+  background: var(--site-primary);
+}
+
 /* ========================================================================== */
 /* DESKTOP VIEWPORT DENSITY                                                    */
 /* Keep complete section compositions readable within common laptop, desktop  */

@@ -45,17 +45,27 @@ export async function downloadAnalyticsPdf({ analytics, audits = {}, pages = [],
   section("Executive summary", ["Metric", "Value"], [
     ["Visitors", fixed(analytics.summary?.visitors)], ["Page views", fixed(analytics.summary?.pageViews)], ["Sessions", fixed(analytics.summary?.sessions)],
     ["Average engagement", seconds(analytics.summary?.averageEngagement)], ["Pages per session", fixed(analytics.summary?.pagesPerSession, 2)], ["Bounce rate", `${fixed((analytics.summary?.bounceRate || 0) * 100, 1)}%`],
-    ["Recorded events", fixed(analytics.summary?.events)], ["Live visitors (last 30 minutes)", fixed(analytics.realtime?.visitors)], ["Browser/resource errors", fixed(analytics.errors?.total)],
+    ["Recorded events", fixed(analytics.summary?.events)], ["Live visitors (last 30 minutes)", fixed(analytics.realtime?.visitors)], ["Active browser/resource issues", fixed(analytics.errors?.total)], ["Error occurrences", fixed(analytics.errors?.occurrences)],
   ]);
 
-  for (const chart of [
-    ["analytics-traffic-chart", "Traffic over time"], ["analytics-pages-chart", "Top page performance"],
-    ["analytics-devices-chart", "Device mix"], ["analytics-sources-chart", "Traffic sources"],
-  ]) {
-    const canvas = document.getElementById(chart[0]);
+  const percentageRows = (rows = []) => {
+    const total = rows.reduce((sum, row) => sum + (Number(row.value) || 0), 0);
+    return rows.map((row) => [text(row.label), fixed(row.value), total ? `${fixed(Number(row.value) / total * 100, 1)}%` : "0%"]);
+  };
+  const chartSections = [
+    { id: "analytics-traffic-chart", title: "Traffic over time", head: ["Date", "Page views", "Visitors", "Sessions"], body: (analytics.trend || []).map((row) => [row.date, fixed(row.views), fixed(row.visitors), fixed(row.sessions)]) },
+    { id: "analytics-pages-chart", title: "Top page performance", head: ["Page", "Path", "Views", "Visitors"], body: (analytics.pages || []).slice(0, 10).map((row) => [text(row.title), row.path, fixed(row.views), fixed(row.visitors)]) },
+    { id: "analytics-devices-chart", title: "Device mix", head: ["Device", "Sessions", "Share"], body: percentageRows(analytics.devices) },
+    { id: "analytics-sources-chart", title: "Traffic sources", head: ["Source", "Sessions", "Share"], body: percentageRows((analytics.sources || []).slice(0, 7)) },
+  ];
+  for (const chart of chartSections) {
+    const canvas = document.getElementById(chart.id);
     if (!canvas?.toDataURL) continue;
-    doc.addPage(); doc.setTextColor(55, 24, 84); doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.text(chart[1], margin, 42);
-    doc.addImage(canvas.toDataURL("image/png", 1), "PNG", margin, 60, width - margin * 2, 300, undefined, "FAST");
+    doc.addPage(); doc.setTextColor(55, 24, 84); doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.text(chart.title, margin, 42);
+    doc.addImage(canvas.toDataURL("image/png", 1), "PNG", margin, 60, width - margin * 2, 285, undefined, "FAST");
+    doc.setFontSize(11); doc.text("Chart data", margin, 366);
+    const emptyRow = chart.head.map((_, index) => index === 0 ? "No data in this period" : "-");
+    autoTable(doc, { startY: 374, head: [chart.head], body: chart.body.length ? chart.body : [emptyRow], margin: { left: margin, right: margin, bottom: 34 }, styles: { fontSize: 8, cellPadding: 4, overflow: "linebreak" }, headStyles: { fillColor: [126, 34, 206], textColor: 255 }, alternateRowStyles: { fillColor: [248, 245, 252] } });
   }
 
   doc.addPage();
@@ -71,7 +81,7 @@ export async function downloadAnalyticsPdf({ analytics, audits = {}, pages = [],
     ...Object.entries(analytics.scrollDepth || {}).map(([label, value]) => [`Scroll depth ${label}%`, fixed(value), "-"]),
     ...Object.entries(analytics.webVitals || {}).map(([label, value]) => [label, fixed(value.p75, 2), fixed(value.samples)]),
   ]);
-  section("Recent browser and resource errors", ["Time", "Type", "Page", "Message", "Source", "Line"], (analytics.errors?.recent || []).map((row) => [new Date(row.createdAt).toLocaleString("en-AU"), row.type, row.path, row.message, text(row.source), text(row.line)]));
+  section("Active browser and resource errors", ["Last seen", "Type", "Page", "Message", "Occurrences", "Source"], (analytics.errors?.recent || []).map((row) => [new Date(row.lastSeenAt || row.createdAt).toLocaleString("en-AU"), row.type, row.path, row.message, fixed(row.count || 1), text(row.source)]));
 
   const auditRows = pages.flatMap((page) => ["mobile", "desktop"].map((mode) => ({ page, mode, result: audits[`${page.url}:${mode}`] })).filter((row) => row.result));
   section("Self-hosted Lighthouse audits", ["Page SEO title", "Path", "Mode", "Performance", "Accessibility", "Best practices", "SEO", "LCP", "INP", "CLS", "TTFB"], auditRows.map(({ page, mode, result }) => [page.seoTitle || page.label, page.path, mode === "mobile" ? "Mobile" : "Desktop", text(result.scores?.performance), text(result.scores?.accessibility), text(result.scores?.["best-practices"]), text(result.scores?.seo), text(result.metrics?.lcp), text(result.metrics?.inp), text(result.metrics?.cls), text(result.metrics?.ttfb)]));

@@ -77,6 +77,7 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
   const [active, setActive] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [viewer, setViewer] = useState(null);
+  const [failedVideos, setFailedVideos] = useState(() => new Set());
   const items = useMemo(() => {
     const unique = [];
     const source = (phones.length ? phones : episodes).filter((item) => item?.isActive !== false).slice(0, 3);
@@ -139,6 +140,14 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
   const advancePhone = useCallback(() => {
     setActive((value) => items.length ? (value + 1) % items.length : 0);
   }, [items.length]);
+  const handlePreviewError = useCallback((uuid) => {
+    setFailedVideos((current) => {
+      if (current.has(uuid)) return current;
+      const next = new Set(current);
+      next.add(uuid);
+      return next;
+    });
+  }, []);
 
   const position = (index) => {
     if (index === active) return "tppp-phone-active";
@@ -186,8 +195,8 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
           <span className="tppp-phone-frame">
             <span className="tppp-phone-notch" aria-hidden="true" />
             <Image src={imageFor(episode)} alt={episode.title} fill priority={index === 0} fetchPriority={index === 0 ? "high" : "auto"} sizes="(max-width:620px) 188px, 270px" quality={74} className="object-cover" />
-            {mounted && !viewer && index === active && episode.shortVideo ? <video key={`${episode.uuid}-${active}`} src={episode.shortVideo} muted autoPlay playsInline preload="metadata" onEnded={advancePhone} className="absolute inset-0 z-[2] h-full w-full object-cover" /> : null}
-            {mounted && !viewer && index === active && !episode.shortVideo && episode.youtubeShortUrl ? <YouTubeShortPreview key={`${episode.uuid}-${active}`} url={episode.youtubeShortUrl} title={episode.title} onEnded={advancePhone} /> : null}
+            {mounted && !viewer && index === active && episode.shortVideo && !failedVideos.has(episode.uuid) ? <video key={`${episode.uuid}-${active}`} src={episode.shortVideo} muted autoPlay playsInline preload="metadata" onEnded={advancePhone} onError={() => handlePreviewError(episode.uuid)} className="absolute inset-0 z-[2] h-full w-full object-cover" /> : null}
+            {mounted && !viewer && index === active && (!episode.shortVideo || failedVideos.has(episode.uuid)) && episode.youtubeShortUrl ? <YouTubeShortPreview key={`${episode.uuid}-${active}`} url={episode.youtubeShortUrl} title={episode.title} onEnded={advancePhone} /> : null}
             <span className="tppp-phone-overlay">
               <span className="tppp-phone-copy"><small>{episode.episodeNumber ? `Episode ${episode.episodeNumber}` : "Featured video"}</small><strong>{episode.title}</strong>{episode.description && <span>{episode.description}</span>}<em><FaPlay /> Tap to watch</em></span>
             </span>

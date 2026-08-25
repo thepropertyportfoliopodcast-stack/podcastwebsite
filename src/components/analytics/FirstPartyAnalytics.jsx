@@ -3,6 +3,16 @@ import { useRouter } from "next/router";
 
 const API_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
 const id = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+const optionalScriptHosts = new Set(["www.googletagmanager.com", "googletagmanager.com", "sibautomation.com", "www.sibautomation.com"]);
+
+function ignoredClientError(message = "", source = "", tagName = "") {
+  if (/Object Not Found Matching Id:\d+,\s*MethodName:update,\s*ParamCount:\d+/i.test(message) || /^Script error\.?$/i.test(message.trim())) return true;
+  try {
+    const host = new URL(source, location.href).hostname.toLowerCase();
+    if (optionalScriptHosts.has(host) && (!tagName || tagName.toUpperCase() === "SCRIPT")) return true;
+  } catch {}
+  return false;
+}
 
 function storedId(storage, key) {
   let value = storage.getItem(key);
@@ -29,7 +39,16 @@ export default function FirstPartyAnalytics() {
       sessionStorage.setItem("tppp_session_id", sessionId);
     }
     if (campaignKey !== "{}") sessionStorage.setItem("tppp_campaign_key", campaignKey);
+    let storedErrorKeys = [];
+    try { storedErrorKeys = JSON.parse(sessionStorage.getItem("tppp_analytics_error_keys") || "[]"); } catch {}
+    const sentErrorKeys = new Set(Array.isArray(storedErrorKeys) ? storedErrorKeys : []);
     const send = (name, extra = {}, useBeacon = false, pathOverride = null) => {
+      if (name === "browser_error" || name === "resource_error") {
+        const errorKey = JSON.stringify([name, location.pathname, extra.metadata?.message || "", extra.metadata?.source || "", extra.metadata?.line || ""]);
+        if (sentErrorKeys.has(errorKey)) return;
+        sentErrorKeys.add(errorKey);
+        try { sessionStorage.setItem("tppp_analytics_error_keys", JSON.stringify([...sentErrorKeys].slice(-100))); } catch {}
+      }
       const eventId = id();
       const eventData = { eventId, sessionId, visitorId, name, path: pathOverride || location.pathname + location.search, title: document.title, referrer: document.referrer, metadata: { screenWidth: screen.width, screenHeight: screen.height, viewportWidth: innerWidth, viewportHeight: innerHeight, language: navigator.language, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, campaign, ...extra.metadata }, value: extra.value };
       // The same first-party event is exposed to GTM for optional tags/triggers.
@@ -69,12 +88,19 @@ export default function FirstPartyAnalytics() {
     const onError = (event) => {
       const target = event.target;
       if (target && target !== window) {
-        send("resource_error", { metadata: { source: target.currentSrc || target.src || target.href || target.tagName, message: `Failed to load ${target.tagName || "resource"}` } });
+        const source = target.currentSrc || target.src || target.href || target.tagName;
+        const message = `Failed to load ${target.tagName || "resource"}`;
+        if (!ignoredClientError(message, source, target.tagName)) send("resource_error", { metadata: { source, message } }, false, location.pathname);
         return;
       }
-      send("browser_error", { metadata: { message: String(event.message || "Unknown JavaScript error").slice(0, 500), source: event.filename, line: event.lineno, column: event.colno, stack: String(event.error?.stack || "").slice(0, 1500) } });
+      const message = String(event.message || "Unknown JavaScript error").slice(0, 500);
+      if (!ignoredClientError(message, event.filename)) send("browser_error", { metadata: { message, source: event.filename, line: event.lineno, column: event.colno, stack: String(event.error?.stack || "").slice(0, 1500) } }, false, location.pathname);
     };
-    const onRejection = (event) => send("browser_error", { metadata: { message: String(event.reason?.message || event.reason || "Unhandled promise rejection").slice(0, 500), stack: String(event.reason?.stack || "").slice(0, 1500) } });
+    const onRejection = (event) => {
+      const message = String(event.reason?.message || event.reason || "Unhandled promise rejection").slice(0, 500);
+      const source = event.reason?.source || "";
+      if (!ignoredClientError(message, source)) send("browser_error", { metadata: { message, source, stack: String(event.reason?.stack || "").slice(0, 1500) } }, false, location.pathname);
+    };
     pageView();
     router.events.on("routeChangeComplete", onRoute);
     document.addEventListener("visibilitychange", onVisibility); window.addEventListener("scroll", onScroll, { passive: true }); document.addEventListener("click", onClick, true); document.addEventListener("play", onPlay, true); document.addEventListener("submit", onSubmit, true); window.addEventListener("error", onError, true); window.addEventListener("unhandledrejection", onRejection); window.addEventListener("pagehide", engagement);

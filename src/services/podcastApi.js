@@ -117,6 +117,8 @@ async enquiryGet(page, limit) {
   async analyticsGet(params = {}) {
     return Api.get("/admin/analytics", { params });
   }
+  async analyticsErrorDelete(id) { return Api.delete(`/admin/analytics/errors/${id}`); }
+  async analyticsErrorsClear() { return Api.delete("/admin/analytics/errors"); }
   async analyticsLighthousePages() { return Api.get("/admin/analytics/lighthouse/pages"); }
   async analyticsLighthouse(params = {}) { return Api.get("/admin/analytics/lighthouse", { params }); }
   async analyticsHealth() { return Api.get("/admin/analytics/health"); }
