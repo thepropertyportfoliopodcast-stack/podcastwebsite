@@ -7,7 +7,6 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import PodcastApi from "@/services/podcastApi";
 import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
 import PageLoader from "@/components/ui/PageLoader";
-import { previewEpisodes } from "@/data/previewEpisodes";
 
 export default function Index({ initialEpisodes = [], initialTopics = [], initialPagination = {} }) {
   const router = useRouter();
@@ -41,10 +40,10 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
       setTopics(nextTopics);
       setTotalPages(Math.max(1, Number(resData?.pagination?.totalPages) || 1));
       setPage(Number(resData?.pagination?.page) || pageNumber);
-      setData(nextEpisodes.length || search || topic ? nextEpisodes : previewEpisodes);
+      setData(nextEpisodes);
     } catch (error) {
       console.log("error", error);
-      setData(search || topic ? [] : previewEpisodes);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -229,7 +228,7 @@ export async function getServerSideProps({ res, query }) {
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
     return {
       props: {
-        initialEpisodes: Array.isArray(data.episodes) && data.episodes.length ? data.episodes : previewEpisodes,
+        initialEpisodes: Array.isArray(data.episodes) ? data.episodes : [],
         initialTopics: data.topics || [],
         initialPagination: data.pagination || {},
       },
@@ -238,7 +237,7 @@ export async function getServerSideProps({ res, query }) {
     console.error("Episode listing SSR fetch failed:", error.message);
     return {
       props: {
-        initialEpisodes: previewEpisodes,
+        initialEpisodes: [],
         initialTopics: [],
         initialPagination: { page: 1, totalPages: 1 },
       },
