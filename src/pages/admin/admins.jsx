@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FaEdit, FaPlus, FaTimes } from "react-icons/fa";
+import { FaEdit, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
 import toast from "react-hot-toast";
 import AdminLayout from "@/components/layout/AdminLayout";
 import PodcastApi from "@/services/podcastApi";
@@ -9,7 +9,7 @@ const empty = { name: "", email: "", password: "", role: "ADMIN", permissions: A
 
 export default function AdminUsersPage() {
   const api = useMemo(() => new PodcastApi(), []);
-  const [users, setUsers] = useState([]); const [form, setForm] = useState(empty); const [editing, setEditing] = useState(null); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false);
+  const [users, setUsers] = useState([]); const [form, setForm] = useState(empty); const [editing, setEditing] = useState(null); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [deletingId, setDeletingId] = useState(null);
   const load = useCallback(async () => { setLoading(true); try { const response = await api.AdminUsersGet(); setUsers(response?.data?.data?.users || []); } catch (error) { toast.error(error?.response?.data?.message || "Unable to load administrators"); } finally { setLoading(false); } }, [api]);
   useEffect(() => { load(); }, [load]);
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
@@ -25,9 +25,20 @@ export default function AdminUsersPage() {
     } catch (error) { toast.error(error?.response?.data?.message || "Unable to save administrator"); }
     finally { setSaving(false); }
   };
+  const remove = async (user) => {
+    if (user.role !== "ADMIN" || !window.confirm(`Delete ${user.name}'s administrator account? This cannot be undone.`)) return;
+    setDeletingId(user.id);
+    try {
+      await api.AdminUserDelete(user.id);
+      if (editing?.id === user.id) reset();
+      toast.success("Administrator deleted");
+      await load();
+    } catch (error) { toast.error(error?.response?.data?.message || "Unable to delete administrator"); }
+    finally { setDeletingId(null); }
+  };
 
   return <AdminLayout><div className="mx-auto max-w-6xl text-white">
-    <header className="mb-8"><p className="text-sm font-black uppercase tracking-[.18em] text-[#c347ff]">Super admin only</p><h1 className="mt-2 text-3xl font-black">Administrators</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Create admins or super admins. Normal admins see and can call only the dashboard sections selected here; this Admins section is permanently hidden from them.</p></header>
+    <header className="mb-8"><p className="text-sm font-black uppercase tracking-[.18em] text-[#c347ff]">Super admin only</p><h1 className="mt-2 text-3xl font-black">Administrators</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Create admins or super admins. Normal admins see and can call only the dashboard sections selected here; this Admins section is permanently hidden from them. Only normal admin accounts can be deleted.</p></header>
     <form onSubmit={submit} className="mb-10 rounded-2xl border border-gray-700 bg-[#121212] p-5 md:p-7">
       <div className="mb-6 flex items-center justify-between"><h2 className="text-xl font-bold">{editing ? `Edit ${editing.name}` : "Create an administrator"}</h2>{editing && <button type="button" onClick={reset} className="inline-flex items-center gap-2 rounded-lg border border-gray-600 px-3 py-2 text-sm"><FaTimes />Cancel</button>}</div>
       <div className="grid gap-5 md:grid-cols-2">
@@ -40,6 +51,6 @@ export default function AdminUsersPage() {
       <label className="mt-6 flex items-center gap-3"><input type="checkbox" checked={form.isActive} onChange={(event) => update("isActive", event.target.checked)} className="h-4 w-4 accent-[#c347ff]" />Account is active</label>
       <button disabled={saving} className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-gradient-to-r from-[#8c2ed3] to-[#c347ff] px-7 font-bold disabled:opacity-60"><FaPlus />{saving ? "Saving…" : editing ? "Save administrator" : "Create administrator"}</button>
     </form>
-    <section className="grid gap-4 md:grid-cols-2">{loading ? <p className="text-gray-400">Loading administrators…</p> : users.map((user) => <article key={user.id} className="rounded-2xl border border-gray-700 bg-[#121212] p-5"><div className="flex items-start justify-between gap-4"><div><h2 className="text-lg font-bold">{user.name}</h2><p className="text-sm text-gray-400">{user.email}</p></div><span className={`rounded-full px-3 py-1 text-xs font-bold ${user.role === "SUPER_ADMIN" ? "bg-purple-900 text-purple-100" : "bg-gray-800 text-gray-200"}`}>{user.role === "SUPER_ADMIN" ? "Super admin" : "Admin"}</span></div><p className="mt-4 text-xs text-gray-400">{user.role === "SUPER_ADMIN" ? "All dashboard sections" : user.permissions.length ? user.permissions.join(", ") : "No dashboard sections"} · {user.isActive ? "Active" : "Inactive"}</p><button type="button" onClick={() => edit(user)} className="mt-5 inline-flex items-center gap-2 rounded-lg border border-gray-600 px-4 py-2 text-sm font-bold"><FaEdit />Edit</button></article>)}</section>
+    <section className="grid gap-4 md:grid-cols-2">{loading ? <p className="text-gray-400">Loading administrators…</p> : users.map((user) => <article key={user.id} className="rounded-2xl border border-gray-700 bg-[#121212] p-5"><div className="flex items-start justify-between gap-4"><div><h2 className="text-lg font-bold">{user.name}</h2><p className="text-sm text-gray-400">{user.email}</p></div><span className={`rounded-full px-3 py-1 text-xs font-bold text-white ${user.role === "SUPER_ADMIN" ? "bg-purple-900" : "bg-gray-800"}`}>{user.role === "SUPER_ADMIN" ? "Super admin" : "Admin"}</span></div><p className="mt-4 text-xs text-gray-400">{user.role === "SUPER_ADMIN" ? "All dashboard sections" : user.permissions.length ? user.permissions.join(", ") : "No dashboard sections"} · {user.isActive ? "Active" : "Inactive"}</p><div className="mt-5 flex flex-wrap gap-3"><button type="button" onClick={() => edit(user)} className="inline-flex items-center gap-2 rounded-lg border border-gray-600 px-4 py-2 text-sm font-bold"><FaEdit />Edit</button>{user.role === "ADMIN" && <button type="button" disabled={deletingId === user.id} onClick={() => remove(user)} className="inline-flex items-center gap-2 rounded-lg border border-red-500/70 px-4 py-2 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"><FaTrash />{deletingId === user.id ? "Deleting…" : "Delete"}</button>}</div></article>)}</section>
   </div></AdminLayout>;
 }

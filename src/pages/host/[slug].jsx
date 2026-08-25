@@ -23,6 +23,7 @@ export default function HostProfile({ host }) {
   return (
     <PublicLayout seo={{
       title: host.seoTitle || `${host.name} | Podcast Host`,
+      appendSiteName: !host.seoTitle,
       description: host.seoDescription || metaDescription(host.bio),
       keywords: [host.primaryKeyword, host.secondaryKeywords, host.designation, "Australian property podcast host"].filter(Boolean).join(", "),
       path: `/host/${host.slug}`,
