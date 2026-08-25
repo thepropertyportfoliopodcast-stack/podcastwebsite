@@ -20,6 +20,7 @@ const AudioPlayerClient = dynamic(() => import("@/components/media/AudioPlayerCl
 const GlobalSpotifyPlaylist = dynamic(() => import("@/components/media/GlobalSpotifyPlaylist"), { ssr: false });
 const FirstPartyAnalytics = dynamic(() => import("@/components/analytics/FirstPartyAnalytics"), { ssr: false });
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-PN33NMTB";
+const GTM_ENABLED = /^GTM-[A-Z0-9]+$/i.test(GTM_ID);
 
 function DeferredAudioPlayer() {
   const { selectedEpisode } = useAudioPlayer();
@@ -40,7 +41,7 @@ export default function App({ Component, pageProps }) {
         font-family: ${geistSans.style.fontFamily};
       }
     `}</style>
-    {!isAdminRoute && (
+    {!isAdminRoute && GTM_ENABLED && (
       <Script id="google-tag-manager" strategy="afterInteractive">
         {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

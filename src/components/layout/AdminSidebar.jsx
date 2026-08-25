@@ -5,11 +5,12 @@ import { HiOutlineUserCircle } from "react-icons/hi2";
 import Link from "next/link";
 import { FaRegUser } from "react-icons/fa";
 import { MdSupportAgent } from "react-icons/md";
-import { MdOutlinePhoneIphone } from "react-icons/md";
 import { MdOutlineAnalytics } from "react-icons/md";
+import { MdAdminPanelSettings } from "react-icons/md";
 import { usePathname } from "next/navigation";
+import { hasSectionAccess } from "@/config/adminSections";
 
-export default function AdminSidebar({ toggle, handleLogout }) {
+export default function AdminSidebar({ toggle, handleLogout, user }) {
   const pathname = usePathname();
   return (
     <>
@@ -32,33 +33,25 @@ export default function AdminSidebar({ toggle, handleLogout }) {
           </div>
         </div>
         <ul>
-          <li>
+          {hasSectionAccess(user, "analytics") && <li>
             <Link
               className={`admin-sidebar-link ${pathname === "/admin/analytics" ? "is-active" : ""}`}
               href="/admin/analytics"
             >
               <MdOutlineAnalytics className="me-2" size="1.4rem" /> Analytics
             </Link>
-          </li>
-          <li>
-            <Link
-              className={`admin-sidebar-link ${pathname === "/admin/hero-phones" ? "is-active" : ""}`}
-              href="/admin/hero-phones"
-            >
-              <MdOutlinePhoneIphone className="me-2" size="1.4rem" /> Hero Phones
-            </Link>
-          </li>
+          </li>}
 
-          <li>
+          {hasSectionAccess(user, "hosts") && <li>
             <Link
               className={`admin-sidebar-link ${pathname?.startsWith("/admin/host") ? "is-active" : ""}`}
               href="/admin/host"
             >
               <FaRegUser className="me-2" size="1.4rem" /> Hosts
             </Link>
-          </li>
+          </li>}
 
-          <li>
+          {hasSectionAccess(user, "dashboard") && <li>
             <Link
               className={`admin-sidebar-link ${pathname === "/admin" ? "is-active" : ""}`}
               href={"/admin"}
@@ -66,8 +59,8 @@ export default function AdminSidebar({ toggle, handleLogout }) {
               <MdOutlineSpaceDashboard className="me-2" size={"1.4rem"} />{" "}
               Dashboard
             </Link>
-          </li>
-          <li>
+          </li>}
+          {hasSectionAccess(user, "podcasts") && <li>
             <Link
               className={`admin-sidebar-link ${pathname === "/admin/podcast" ? "is-active" : ""}`}
               href={"/admin/podcast"}
@@ -75,25 +68,31 @@ export default function AdminSidebar({ toggle, handleLogout }) {
               <MdOutlineSpaceDashboard className="me-2" size={"1.4rem"} />{" "}
               Podcasts
             </Link>
-          </li>
+          </li>}
 
-          <li>
+          {hasSectionAccess(user, "enquiries") && <li>
             <Link
               className={`admin-sidebar-link ${pathname === "/admin/enquiry" ? "is-active" : ""}`}
               href={"/admin/enquiry"}
             >
               <MdSupportAgent className="me-2" size={"1.4rem"} /> Enquiry
             </Link>
-          </li>
+          </li>}
 
-          <li>
+          {hasSectionAccess(user, "subscribers") && <li>
             <Link
               className={`admin-sidebar-link ${pathname === "/admin/subscriber" ? "is-active" : ""}`}
               href={"/admin/subscriber"}
             >
               <FaRegUser className="me-2" size={"1.4rem"} /> Subscriber
             </Link>
-          </li>
+          </li>}
+
+          {user?.role === "SUPER_ADMIN" && <li>
+            <Link className={`admin-sidebar-link ${pathname === "/admin/admins" ? "is-active" : ""}`} href="/admin/admins">
+              <MdAdminPanelSettings className="me-2" size="1.4rem" /> Admins
+            </Link>
+          </li>}
 
           {/* <li>
             <Link

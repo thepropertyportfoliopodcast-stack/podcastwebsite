@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import PodcastApi from "@/services/podcastApi";
 import { useSearchParams } from "next/navigation";
+import { firstAccessibleRoute } from "@/config/adminSections";
 
 export default function Login() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function Login() {
           router.push(redirect);
           return;
         }
-        router.push("/admin");
+        router.push(firstAccessibleRoute(response.data.data));
         setData({
           email: "",
           password: "",

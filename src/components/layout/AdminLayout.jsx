@@ -7,9 +7,11 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import { useRole } from "@/context/RoleContext";
 import Link from "next/link";
+import { firstAccessibleRoute, hasSectionAccess, sectionForPath } from "@/config/adminSections";
 
 export default function AdminLayout({ children }) {
   const [toggle, setToggle] = useState(false);
+  const [verified, setVerified] = useState(false);
   const router = useRouter();
   const {user, setUser} = useRole();
 
@@ -22,8 +24,8 @@ export default function AdminLayout({ children }) {
       const main = new PodcastApi();
       const response = await main.profileVerify(signal);
       if (response.data) {
-        // console.log("token verify data",response?.data);
         setUser(response.data.data.user);
+        setVerified(true);
       }
     } catch (error) {
       console.log("error", error);
@@ -47,6 +49,16 @@ export default function AdminLayout({ children }) {
     fetchData(signal);
     return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    if (!verified || !user) return;
+    const section = sectionForPath(router.pathname);
+    const allowed = section === "super_admin" ? user.role === "SUPER_ADMIN" : !section || hasSectionAccess(user, section);
+    if (!allowed) {
+      toast.error("You do not have access to that dashboard section.");
+      router.replace(firstAccessibleRoute(user));
+    }
+  }, [router, router.pathname, user, verified]);
 
   // console.log("user", user);
 
@@ -98,9 +110,9 @@ export default function AdminLayout({ children }) {
             </div>
           </header>
           <div className="flex w-screen overflow-hidden">
-            <AdminSidebar toggle={toggle} handleLogout={handleLogout}/>
+            <AdminSidebar toggle={toggle} handleLogout={handleLogout} user={user}/>
             <div className="admin-content content min-w-0 flex-1 md:max-h-[100vh] overflow-y-auto p-4 md:p-6 !pt-[105px] lg:!pt-[112px] w-full">
-              {children}
+              {verified ? children : <div className="grid min-h-64 place-items-center text-slate-500">Checking dashboard access…</div>}
             </div>
           </div>
         </main>

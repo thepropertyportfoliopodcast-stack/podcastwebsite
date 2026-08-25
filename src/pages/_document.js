@@ -1,13 +1,14 @@
 import NextDocument, { Html, Head, Main, NextScript } from "next/document";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-PN33NMTB";
+const GTM_ENABLED = /^GTM-[A-Z0-9]+$/i.test(GTM_ID);
 
 export default function Document({ isAdminRoute }) {
   return (
     <Html lang="en">
       <Head />
       <body className="antialiased">
-        {!isAdminRoute && (
+        {!isAdminRoute && GTM_ENABLED && (
           <noscript>
             <iframe
               src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}

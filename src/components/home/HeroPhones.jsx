@@ -79,7 +79,7 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
   const [viewer, setViewer] = useState(null);
   const items = useMemo(() => {
     const unique = [];
-    const source = phones.length ? phones : episodes;
+    const source = (phones.length ? phones : episodes).filter((item) => item?.isActive !== false).slice(0, 3);
     for (const phone of source) {
       if (phone?.uuid && !unique.some((item) => item.uuid === phone.uuid)) unique.push(phone);
     }

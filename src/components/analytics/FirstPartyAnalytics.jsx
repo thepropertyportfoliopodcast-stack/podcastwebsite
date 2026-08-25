@@ -37,19 +37,28 @@ export default function FirstPartyAnalytics() {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "tppp_analytics_event",
+        event_name: name,
         tppp_event_name: name,
         tppp_event_id: eventId,
         tppp_path: eventData.path,
         tppp_title: eventData.title,
         tppp_value: extra.value ?? null,
         tppp_metadata: eventData.metadata,
+        page_path: eventData.path,
+        page_location: location.href,
+        page_title: eventData.title,
       });
       const body = JSON.stringify(eventData);
       sessionStorage.setItem("tppp_last_activity", String(Date.now()));
       if (useBeacon && navigator.sendBeacon) navigator.sendBeacon(`${API_URL}/analytics/collect`, new Blob([body], { type: "application/json" }));
       else fetch(`${API_URL}/analytics/collect`, { method: "POST", headers: { "Content-Type": "application/json" }, body, keepalive: true }).catch(()=>{});
     };
-    const pageView = () => { currentPath.current = location.pathname + location.search; enteredAt.current = Date.now(); sentScroll.current.clear(); send("page_view"); };
+    const pageView = () => {
+      currentPath.current = location.pathname + location.search; enteredAt.current = Date.now(); sentScroll.current.clear();
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: "virtual_page_view", page_path: currentPath.current, page_location: location.href, page_title: document.title, page_referrer: document.referrer });
+      send("page_view");
+    };
     const engagement = () => { const seconds = Math.round((Date.now() - enteredAt.current) / 1000); if (seconds > 0 && currentPath.current) send("engagement", { value: Math.min(seconds, 1800) }, true, currentPath.current); enteredAt.current = Date.now(); };
     const onRoute = () => { engagement(); setTimeout(pageView, 0); };
     const onVisibility = () => { if (document.visibilityState === "hidden") engagement(); else enteredAt.current = Date.now(); };

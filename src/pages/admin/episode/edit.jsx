@@ -11,6 +11,7 @@ import SeoFields from "@/components/admin/forms/SeoFields";
 import EpisodeContentFields from "@/components/admin/episodes/EpisodeContentFields";
 import HostSelector from "@/components/admin/episodes/HostSelector";
 import EpisodeRelationsFields from "@/components/admin/episodes/EpisodeRelationsFields";
+import EpisodeHeroPhoneFields from "@/components/admin/episodes/EpisodeHeroPhoneFields";
 
 export default function Edit() {
   const router = useRouter();
@@ -54,6 +55,8 @@ export default function Edit() {
     secondaryKeywords: "",
     isFeatured: false,
     relatedEpisodeUuids: [],
+    homePageHeroPhone: false,
+    heroPhones: [],
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null); 
   const [homepageThumbnailPreview, setHomepageThumbnailPreview] = useState(null);
@@ -418,6 +421,12 @@ export default function Edit() {
       payload.append("secondaryKeywords", formData.secondaryKeywords);
       payload.append("isFeatured", String(formData.isFeatured));
       payload.append("relatedEpisodeUuids", JSON.stringify(formData.relatedEpisodeUuids));
+      payload.append("homePageHeroPhone", String(formData.homePageHeroPhone));
+      payload.append("heroPhones", JSON.stringify((formData.heroPhones || []).map(({ thumbnail, shortVideo, ...phone }) => phone)));
+      (formData.heroPhones || []).forEach((phone, index) => {
+        if (phone.thumbnail instanceof File) payload.append(`heroPhoneThumbnail_${index}`, phone.thumbnail);
+        if (phone.shortVideo instanceof File) payload.append(`heroPhoneVideo_${index}`, phone.shortVideo);
+      });
       if (formData.thumbnail instanceof File) { 
         payload.append("thumbnail", formData.thumbnail);
       }
@@ -512,6 +521,8 @@ export default function Edit() {
       secondaryKeywords: response?.data?.data?.secondaryKeywords || "",
       isFeatured: Boolean(response?.data?.data?.isFeatured),
       relatedEpisodeUuids: Array.isArray(response?.data?.data?.relatedEpisodeUuids) ? response.data.data.relatedEpisodeUuids : [],
+      homePageHeroPhone: Boolean(response?.data?.data?.heroPhones?.length),
+      heroPhones: (response?.data?.data?.heroPhones || []).map((phone) => ({ ...phone, thumbnail: null, shortVideo: null, shortVideoUrl: phone.shortVideo || null, removeShortVideo: false })),
     });
 
     setThumbnailPreview(response?.data?.data?.thumbnail || null);
@@ -609,6 +620,7 @@ export default function Edit() {
 
             <HostSelector hosts={hosts} selected={formData.hostSlugs} onChange={(hostSlugs) => setFormData((current) => ({ ...current, hostSlugs }))} guestSelected={formData.guestHostSlugs} onGuestChange={(guestHostSlugs) => setFormData((current) => ({ ...current, guestHostSlugs }))} />
             <EpisodeRelationsFields formData={formData} episodes={episodes} currentUuid={id} onChange={setFormData} />
+            <EpisodeHeroPhoneFields formData={formData} onChange={setFormData} />
 
             <div className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
               <h4 className="text-lg font-semibold">Media</h4>

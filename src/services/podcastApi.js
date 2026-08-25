@@ -5,8 +5,8 @@ class PodcastApi {
     return Api.post("/user/login", data);
   }
 
-  async profileVerify() {
-    return Api.get("/user/profile")
+  async profileVerify(signal) {
+    return Api.get("/user/profile", { signal })
   }
 
   async Dashboard() {
@@ -120,6 +120,9 @@ async enquiryGet(page, limit) {
   async analyticsPageSpeedPages() { return Api.get("/admin/analytics/pagespeed/pages"); }
   async analyticsPageSpeed(params = {}) { return Api.get("/admin/analytics/pagespeed", { params }); }
   async analyticsHealth() { return Api.get("/admin/analytics/health"); }
+  async AdminUsersGet() { return Api.get("/admin/users"); }
+  async AdminUserCreate(data) { return Api.post("/admin/users", data); }
+  async AdminUserUpdate(id, data) { return Api.patch(`/admin/users/${id}`, data); }
    async GetSubscriber(page, limit){
     return Api.get(`/subscriber/get?page=${page}&limit=${limit}`);
   }

@@ -35,7 +35,7 @@ export async function getServerSideProps({ res }) {
         const response = await fetch(`${apiUrl}/hero-phone/get`);
         if (!response.ok) throw new Error(`Hero phone API returned ${response.status}`);
         const payload = await response.json();
-        return Array.isArray(payload?.data) ? payload.data : [];
+        return Array.isArray(payload?.data) ? payload.data.slice(0, 3) : [];
       }),
       getCachedValue("homepage-hosts-v1", async () => {
         const response = await fetch(`${apiUrl}/host/get`);
