@@ -27,12 +27,22 @@ export async function downloadAnalyticsPdf({ analytics, audits = {}, pages = [],
       doc.text(`Page ${page} of ${pageCount}`, width - margin, doc.internal.pageSize.getHeight() - 18, { align: "right" });
     }
   };
-  const section = (title, head, body) => {
+  const section = (title, head, body, { columnStyles = {}, fontSize = 7 } = {}) => {
     let currentPage = doc.internal.getCurrentPageInfo().pageNumber;
     let y = currentPage === lastTablePage ? lastTableY + 24 : 45;
     if (y > doc.internal.pageSize.getHeight() - 150) { doc.addPage(); currentPage += 1; y = 45; }
     doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(55, 24, 84); doc.text(title, margin, y);
-    autoTable(doc, { startY: y + 8, head: [head], body, margin: { left: margin, right: margin, bottom: 34 }, styles: { fontSize: 7, cellPadding: 4, overflow: "linebreak" }, headStyles: { fillColor: [126, 34, 206], textColor: 255 }, alternateRowStyles: { fillColor: [248, 245, 252] } });
+    autoTable(doc, {
+      startY: y + 8,
+      head: [head],
+      body,
+      margin: { left: margin, right: margin, bottom: 34 },
+      styles: { fontSize, cellPadding: 4, overflow: "linebreak", valign: "top" },
+      headStyles: { fillColor: [126, 34, 206], textColor: 255, valign: "middle" },
+      alternateRowStyles: { fillColor: [248, 245, 252] },
+      columnStyles,
+      rowPageBreak: "avoid",
+    });
     lastTablePage = doc.internal.getCurrentPageInfo().pageNumber;
     lastTableY = doc.lastAutoTable?.finalY || 45;
   };
@@ -54,7 +64,7 @@ export async function downloadAnalyticsPdf({ analytics, audits = {}, pages = [],
   };
   const chartSections = [
     { id: "analytics-traffic-chart", title: "Traffic over time", head: ["Date", "Page views", "Visitors", "Sessions"], body: (analytics.trend || []).map((row) => [row.date, fixed(row.views), fixed(row.visitors), fixed(row.sessions)]) },
-    { id: "analytics-pages-chart", title: "Top page performance", head: ["Page", "Path", "Views", "Visitors"], body: (analytics.pages || []).slice(0, 10).map((row) => [text(row.title), row.path, fixed(row.views), fixed(row.visitors)]) },
+    { id: "analytics-pages-chart", title: "Top page performance", head: ["Page SEO title", "Path", "Views", "Visitors"], body: (analytics.pages || []).slice(0, 10).map((row) => [text(row.title), row.path, fixed(row.views), fixed(row.visitors)]), columnStyles: { 0: { cellWidth: 220 }, 1: { cellWidth: 150 }, 2: { cellWidth: 55 }, 3: { cellWidth: 55 } } },
     { id: "analytics-devices-chart", title: "Device mix", head: ["Device", "Sessions", "Share"], body: percentageRows(analytics.devices) },
     { id: "analytics-sources-chart", title: "Traffic sources", head: ["Source", "Sessions", "Share"], body: percentageRows((analytics.sources || []).slice(0, 7)) },
   ];
@@ -65,15 +75,15 @@ export async function downloadAnalyticsPdf({ analytics, audits = {}, pages = [],
     doc.addImage(canvas.toDataURL("image/png", 1), "PNG", margin, 60, width - margin * 2, 285, undefined, "FAST");
     doc.setFontSize(11); doc.text("Chart data", margin, 366);
     const emptyRow = chart.head.map((_, index) => index === 0 ? "No data in this period" : "-");
-    autoTable(doc, { startY: 374, head: [chart.head], body: chart.body.length ? chart.body : [emptyRow], margin: { left: margin, right: margin, bottom: 34 }, styles: { fontSize: 8, cellPadding: 4, overflow: "linebreak" }, headStyles: { fillColor: [126, 34, 206], textColor: 255 }, alternateRowStyles: { fillColor: [248, 245, 252] } });
+    autoTable(doc, { startY: 374, head: [chart.head], body: chart.body.length ? chart.body : [emptyRow], margin: { left: margin, right: margin, bottom: 34 }, styles: { fontSize: 8, cellPadding: 4, overflow: "linebreak", valign: "top" }, headStyles: { fillColor: [126, 34, 206], textColor: 255, valign: "middle" }, alternateRowStyles: { fillColor: [248, 245, 252] }, columnStyles: chart.columnStyles || {}, rowPageBreak: "avoid" });
   }
 
   doc.addPage();
 
   section("Daily traffic", ["Date", "Views", "Visitors", "Sessions"], (analytics.trend || []).map((row) => [row.date, fixed(row.views), fixed(row.visitors), fixed(row.sessions)]));
-  section("All measured pages", ["Page", "Path", "Views", "Visitors", "Sessions", "Avg engagement"], (analytics.pages || []).map((row) => [text(row.title), row.path, fixed(row.views), fixed(row.visitors), fixed(row.sessions), seconds(row.averageEngagement)]));
-  section("Traffic attribution by page", ["Source", "Medium", "Campaign", "Page SEO title", "Path", "Views", "Visitors", "Total engagement", "Average"], (analytics.sourcePages || []).map((row) => [row.source, row.medium, row.campaign, text(row.title), row.path, fixed(row.pageViews), fixed(row.visitors), seconds(row.totalEngagementSeconds), seconds(row.averageEngagementSeconds)]));
-  section("Platform redirects", ["Platform", "Originating page SEO title", "Path", "Source", "Clicks", "Visitors", "Destination"], (analytics.platformConversions || []).map((row) => [row.platform, text(row.title), row.path, row.source, fixed(row.clicks), fixed(row.visitors), row.destination]));
+  section("All measured pages", ["Page SEO title", "Path", "Views", "Visitors", "Sessions", "Avg engagement"], (analytics.pages || []).map((row) => [text(row.title), row.path, fixed(row.views), fixed(row.visitors), fixed(row.sessions), seconds(row.averageEngagement)]), { columnStyles: { 0: { cellWidth: 170 }, 1: { cellWidth: 95 }, 2: { cellWidth: 48 }, 3: { cellWidth: 52 }, 4: { cellWidth: 52 }, 5: { cellWidth: 80 } } });
+  section("Traffic attribution by page", ["Source", "Medium", "Campaign", "Page SEO title", "Path", "Views", "Visitors", "Total engagement", "Average"], (analytics.sourcePages || []).map((row) => [row.source, row.medium, row.campaign, text(row.title), row.path, fixed(row.pageViews), fixed(row.visitors), seconds(row.totalEngagementSeconds), seconds(row.averageEngagementSeconds)]), { fontSize: 6.5, columnStyles: { 0: { cellWidth: 45 }, 1: { cellWidth: 42 }, 2: { cellWidth: 55 }, 3: { cellWidth: 125 }, 4: { cellWidth: 55 }, 5: { cellWidth: 32 }, 6: { cellWidth: 38 }, 7: { cellWidth: 52 }, 8: { cellWidth: 52 } } });
+  section("Platform redirects", ["Platform", "Originating page SEO title", "Path", "Source", "Clicks", "Visitors", "Destination"], (analytics.platformConversions || []).map((row) => [row.platform, text(row.title), row.path, row.source, fixed(row.clicks), fixed(row.visitors), row.destination]), { fontSize: 6.5, columnStyles: { 0: { cellWidth: 45 }, 1: { cellWidth: 135 }, 2: { cellWidth: 55 }, 3: { cellWidth: 45 }, 4: { cellWidth: 34 }, 5: { cellWidth: 40 }, 6: { cellWidth: 145 } } });
 
   const breakdowns = [["Traffic sources", analytics.sources], ["Referrers", analytics.referrers], ["Devices", analytics.devices], ["Browsers", analytics.browsers], ["Operating systems", analytics.operatingSystems], ["Countries", analytics.countries], ["Campaigns", analytics.campaigns], ["Events", analytics.events], ["Live pages", analytics.realtime?.pages]];
   section("Audience and acquisition breakdowns", ["Group", "Label", "Count"], breakdowns.flatMap(([group, rows]) => (rows || []).map((row) => [group, row.label, fixed(row.value)])));
@@ -81,11 +91,11 @@ export async function downloadAnalyticsPdf({ analytics, audits = {}, pages = [],
     ...Object.entries(analytics.scrollDepth || {}).map(([label, value]) => [`Scroll depth ${label}%`, fixed(value), "-"]),
     ...Object.entries(analytics.webVitals || {}).map(([label, value]) => [label, fixed(value.p75, 2), fixed(value.samples)]),
   ]);
-  section("Active browser and resource errors", ["Last seen", "Type", "Page", "Message", "Occurrences", "Source"], (analytics.errors?.recent || []).map((row) => [new Date(row.lastSeenAt || row.createdAt).toLocaleString("en-AU"), row.type, row.path, row.message, fixed(row.count || 1), text(row.source)]));
+  section("Active browser and resource errors", ["Last seen", "Type", "Page", "Message", "Occurrences", "Source"], (analytics.errors?.recent || []).map((row) => [new Date(row.lastSeenAt || row.createdAt).toLocaleString("en-AU"), row.type, row.path, row.message, fixed(row.count || 1), text(row.source)]), { fontSize: 6.5, columnStyles: { 0: { cellWidth: 82 }, 1: { cellWidth: 48 }, 2: { cellWidth: 65 }, 3: { cellWidth: 185 }, 4: { cellWidth: 55 }, 5: { cellWidth: 65 } } });
 
   const auditRows = pages.flatMap((page) => ["mobile", "desktop"].map((mode) => ({ page, mode, result: audits[`${page.url}:${mode}`] })).filter((row) => row.result));
-  section("Self-hosted Lighthouse audits", ["Page SEO title", "Path", "Mode", "Performance", "Accessibility", "Best practices", "SEO", "LCP", "INP", "CLS", "TTFB"], auditRows.map(({ page, mode, result }) => [page.seoTitle || page.label, page.path, mode === "mobile" ? "Mobile" : "Desktop", text(result.scores?.performance), text(result.scores?.accessibility), text(result.scores?.["best-practices"]), text(result.scores?.seo), text(result.metrics?.lcp), text(result.metrics?.inp), text(result.metrics?.cls), text(result.metrics?.ttfb)]));
-  section("Website health", ["Page SEO title", "Path", "Status", "HTTP", "Response time", "Checked", "Error"], (health?.pages || []).map((row) => [row.seoTitle || row.label, row.path, row.online ? "Online" : "Failing", text(row.status), `${fixed(row.responseTime)} ms`, row.checkedAt ? new Date(row.checkedAt).toLocaleString("en-AU") : "-", text(row.error)]));
+  section("Self-hosted Lighthouse audits", ["Page SEO title", "Path", "Mode", "Performance", "Accessibility", "Best practices", "SEO", "LCP", "INP", "CLS", "TTFB"], auditRows.map(({ page, mode, result }) => [page.seoTitle || page.label, page.path, mode === "mobile" ? "Mobile" : "Desktop", text(result.scores?.performance), text(result.scores?.accessibility), text(result.scores?.["best-practices"]), text(result.scores?.seo), text(result.metrics?.lcp), text(result.metrics?.inp), text(result.metrics?.cls), text(result.metrics?.ttfb)]), { fontSize: 6, columnStyles: { 0: { cellWidth: 112 }, 1: { cellWidth: 50 }, 2: { cellWidth: 38 }, 3: { cellWidth: 44 }, 4: { cellWidth: 44 }, 5: { cellWidth: 48 }, 6: { cellWidth: 32 }, 7: { cellWidth: 36 }, 8: { cellWidth: 36 }, 9: { cellWidth: 36 }, 10: { cellWidth: 36 } } });
+  section("Website health", ["Page SEO title", "Path", "Status", "HTTP", "Response time", "Checked", "Error"], (health?.pages || []).map((row) => [row.seoTitle || row.label, row.path, row.online ? "Online" : "Failing", text(row.status), `${fixed(row.responseTime)} ms`, row.checkedAt ? new Date(row.checkedAt).toLocaleString("en-AU") : "-", text(row.error)]), { fontSize: 6.5, columnStyles: { 0: { cellWidth: 140 }, 1: { cellWidth: 55 }, 2: { cellWidth: 45 }, 3: { cellWidth: 35 }, 4: { cellWidth: 55 }, 5: { cellWidth: 80 }, 6: { cellWidth: 108 } } });
 
   pageFooter();
   doc.save(`Podcast_Website_Analytics_${startDate}_to_${endDate}.pdf`);
