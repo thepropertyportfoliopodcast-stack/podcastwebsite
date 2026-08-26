@@ -80,8 +80,8 @@ function Hero({ latest, episodes = [], heroPhones = [] }) {
     <div className="mx-auto grid max-w-[1280px] items-center gap-12 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)] lg:px-10 xl:px-12">
       <div>
         <h1 className="mt-4 text-[clamp(2.65rem,4.4vw,4.35rem)] font-black leading-[.96] tracking-[-.045em]">Better Property Decisions<br></br> 
-          <span className="mt-4 text-[clamp(2rem,4.4vw,4.35rem)] font-black leading-[.96] tracking-[-.045em]"> Start With </span> 
-          <span className="block text-[#C347FF] font-black text-[clamp(4rem,4.4vw,4.35rem)] leading-[.96] tracking-[-.045em]">Intelligence</span>
+          <span className="mt-4 text-[clamp(2.65rem,4.4vw,4.35rem)] font-black leading-[.96] tracking-[-.045em]"> Start With </span> 
+          <span className="block text-[#C347FF] font-black text-[clamp(2.65rem,4.4vw,4.35rem)] leading-[.96] tracking-[-.045em]">Intelligence</span>
         </h1>
         <p className="mt-6 max-w-xl text-content-justify-all text-base leading-7 text-[#A837F4]">Australian property conversations covering market trends, suburb research, finance and the strategies investors use when deciding what, where and when to buy.</p>
         <div className="mt-7 grid gap-3 sm:flex">

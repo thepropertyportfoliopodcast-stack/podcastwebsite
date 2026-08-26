@@ -62,6 +62,8 @@ function YouTubeShortPreview({ url, title, onEnded }) {
 
 export default function HeroPhones({ phones = [], episodes = [] }) {
   const timers = useRef([]);
+  const swipeRef = useRef(null);
+  const suppressClickRef = useRef(false);
   const [active, setActive] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [viewer, setViewer] = useState(null);
@@ -138,6 +140,27 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
     });
   }, []);
 
+  const startSwipe = useCallback((event) => {
+    if (!event.isPrimary || event.target.closest("button")) return;
+    swipeRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  }, []);
+
+  const finishSwipe = useCallback((event) => {
+    const swipe = swipeRef.current;
+    swipeRef.current = null;
+    if (!swipe || swipe.pointerId !== event.pointerId || items.length < 2) return;
+    const deltaX = event.clientX - swipe.x;
+    const deltaY = event.clientY - swipe.y;
+    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.15) return;
+
+    suppressClickRef.current = true;
+    setActive((value) => deltaX < 0 ? (value + 1) % items.length : (value - 1 + items.length) % items.length);
+    window.setTimeout(() => { suppressClickRef.current = false; }, 0);
+  }, [items.length]);
+
+  const cancelSwipe = useCallback(() => { swipeRef.current = null; }, []);
+
   useEffect(() => {
     if (viewer || items.length < 2) return undefined;
     const current = items[active];
@@ -187,9 +210,17 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
   );
 
   return <>
-    <div className="tppp-phone-area">
+    <div
+      className="tppp-phone-area"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Featured episode phones. Swipe left or right to change the centred phone."
+      onPointerDown={startSwipe}
+      onPointerUp={finishSwipe}
+      onPointerCancel={cancelSwipe}
+    >
       {items.map((episode, index) => (
-        <div role="button" tabIndex={index === active ? 0 : -1} key={episode.uuid} data-hero-phone={episode.uuid} onClick={() => openViewer(episode)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openViewer(episode); } }} className={`tppp-hero-phone ${position(index)}`} aria-label={`Play ${episode.title}`}>
+        <div role="button" tabIndex={index === active ? 0 : -1} key={episode.uuid} data-hero-phone={episode.uuid} onClick={(event) => { if (suppressClickRef.current) { event.preventDefault(); event.stopPropagation(); return; } openViewer(episode); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openViewer(episode); } }} className={`tppp-hero-phone ${position(index)}`} aria-label={`Play ${episode.title}`}>
           <span className="tppp-phone-frame">
             <span className="tppp-phone-notch" aria-hidden="true" />
             <Image src={imageFor(episode)} alt={episode.title} fill priority={index === 0} fetchPriority={index === 0 ? "high" : "auto"} sizes="(max-width:620px) 188px, 270px" quality={68} className="object-cover" />
