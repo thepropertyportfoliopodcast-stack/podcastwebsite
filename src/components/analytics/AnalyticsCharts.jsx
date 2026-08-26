@@ -24,7 +24,7 @@ const common = {
 };
 
 function ChartPanel({ title, subtitle, children }) {
-  return <article className="analytics-panel rounded-xl border border-violet-200 bg-white p-4 shadow-sm"><h3 className="font-bold text-slate-950">{title}</h3><p className="mt-1 text-xs text-slate-600">{subtitle}</p><div className="mt-4 h-64">{children}</div></article>;
+  return <article className="analytics-panel rounded-xl border border-violet-200 bg-white p-4 shadow-sm"><h3 className="font-bold text-slate-950">{title}</h3><p className="mt-1 text-xs text-slate-600">{subtitle}</p><div className="analytics-chart-body mt-4 h-64">{children}</div></article>;
 }
 
 export default function AnalyticsCharts({ analytics }) {

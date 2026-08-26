@@ -16,11 +16,56 @@ const youtubeIdFrom = (value = "") => {
 
 const imageFor = (phone) => phone?.thumbnail || phone?.homepageThumbnail || "/heroimg01.jpg";
 
+function YouTubeShortPreview({ url, title, onEnded }) {
+  const mountRef = useRef(null);
+  const endedRef = useRef(onEnded);
+  endedRef.current = onEnded;
+
+  useEffect(() => {
+    const videoId = youtubeIdFrom(url);
+    if (!videoId || !mountRef.current) return undefined;
+    let player;
+    let cancelled = false;
+
+    const createPlayer = () => {
+      if (cancelled || !mountRef.current || !window.YT?.Player) return;
+      player = new window.YT.Player(mountRef.current, {
+        videoId,
+        playerVars: { autoplay: 1, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, mute: 1, playsinline: 1, rel: 0 },
+        events: {
+          onReady: (event) => { event.target.mute(); event.target.playVideo(); },
+          onStateChange: (event) => { if (event.data === 0) endedRef.current?.(); },
+        },
+      });
+    };
+
+    if (window.YT?.Player) createPlayer();
+    else {
+      const previousReady = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => { previousReady?.(); createPlayer(); };
+      if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+        const script = document.createElement("script");
+        script.src = "https://www.youtube.com/iframe_api";
+        script.async = true;
+        document.head.appendChild(script);
+      }
+    }
+
+    return () => {
+      cancelled = true;
+      try { player?.destroy(); } catch {}
+    };
+  }, [url]);
+
+  return <div className="tppp-phone-short" aria-label={`${title} short preview`}><div ref={mountRef} /></div>;
+}
+
 export default function HeroPhones({ phones = [], episodes = [] }) {
   const timers = useRef([]);
   const [active, setActive] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [viewer, setViewer] = useState(null);
+  const [failedVideos, setFailedVideos] = useState(() => new Set());
   const items = useMemo(() => {
     const unique = [];
     const source = (phones.length ? phones : episodes).filter((item) => item?.isActive !== false).slice(0, 3);
@@ -80,6 +125,28 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
     setViewer((current) => current ? { ...current, episode: phoneData, youtubeId: youtubeIdFrom(phoneData.youtubeVideoUrl || phoneData.youtubeUrl || phoneData.youtubeShortUrl), phase: "open" } : current);
   };
 
+  const advancePhone = useCallback(() => {
+    setActive((value) => items.length ? (value + 1) % items.length : 0);
+  }, [items.length]);
+
+  const handlePreviewError = useCallback((uuid) => {
+    setFailedVideos((current) => {
+      if (current.has(uuid)) return current;
+      const next = new Set(current);
+      next.add(uuid);
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (viewer || items.length < 2) return undefined;
+    const current = items[active];
+    const previewControlsRotation = (current?.shortVideo && !failedVideos.has(current.uuid)) || current?.youtubeShortUrl;
+    if (previewControlsRotation) return undefined;
+    const timer = window.setTimeout(advancePhone, 5000);
+    return () => window.clearTimeout(timer);
+  }, [active, advancePhone, failedVideos, items, viewer]);
+
   const position = (index) => {
     if (index === active) return "tppp-phone-active";
     if (index === (active - 1 + items.length) % items.length) return "tppp-phone-left";
@@ -126,6 +193,8 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
           <span className="tppp-phone-frame">
             <span className="tppp-phone-notch" aria-hidden="true" />
             <Image src={imageFor(episode)} alt={episode.title} fill priority={index === 0} fetchPriority={index === 0 ? "high" : "auto"} sizes="(max-width:620px) 188px, 270px" quality={68} className="object-cover" />
+            {mounted && !viewer && index === active && episode.shortVideo && !failedVideos.has(episode.uuid) ? <video key={`${episode.uuid}-${active}`} src={episode.shortVideo} muted autoPlay playsInline preload="metadata" onEnded={advancePhone} onError={() => handlePreviewError(episode.uuid)} className="absolute inset-0 z-[2] h-full w-full object-cover" aria-hidden="true" /> : null}
+            {mounted && !viewer && index === active && (!episode.shortVideo || failedVideos.has(episode.uuid)) && episode.youtubeShortUrl ? <YouTubeShortPreview key={`${episode.uuid}-${active}`} url={episode.youtubeShortUrl} title={episode.title} onEnded={advancePhone} /> : null}
             <span className="tppp-phone-overlay">
               <span className="tppp-phone-copy"><small>{episode.episodeNumber ? `Episode ${episode.episodeNumber}` : "Featured video"}</small><strong>{episode.title}</strong>{episode.description && <span>{episode.description}</span>}<em><FaPlay /> Tap to watch</em></span>
             </span>

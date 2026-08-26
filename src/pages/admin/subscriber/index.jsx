@@ -73,7 +73,7 @@ export default function SubscriberList() {
   return (
     <AdminLayout>
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#2a2a2a] pb-4 mb-6">
+      <div className="admin-page-header flex items-center justify-between border-b border-[#2a2a2a] pb-4 mb-6">
         <h1 className="text-3xl lg:text-4xl font-bold">Subscription List</h1>
         <button
             onClick={downloadExcel}
@@ -84,7 +84,7 @@ export default function SubscriberList() {
       </div>
 
       {/* Table */}
-      <div className="overflow-auto">
+      <div className="admin-table-scroll overflow-auto">
         {loading ? (
           <TableLoader length={2} />
         ) : listing?.length === 0 ? (

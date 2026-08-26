@@ -123,7 +123,7 @@ export default function index() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between tracking-tight border-b border-[#2a2a2a] pb-4 mb-6 w-full">
+      <div className="admin-page-header flex items-center justify-between tracking-tight border-b border-[#2a2a2a] pb-4 mb-6 w-full">
         <h1 className="text-3xl lg:text-4xl font-bold text-white">Enquiries</h1>
         <button
           onClick={downloadExcel}
@@ -132,7 +132,7 @@ export default function index() {
           Export as Excel
         </button>
       </div>
-      <div className="overflow-auto">
+      <div className="admin-table-scroll overflow-auto">
         {loading ? (
           <TableLoader length={10} />
         ) : // <Loader/>

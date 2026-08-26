@@ -60,7 +60,7 @@ export default function Index() {
   return (
     <AdminLayout>
       <div className="admin-podcast-page min-h-screen space-y-6 px-1 py-2 text-slate-900 md:px-3">
-        <div className="flex items-center justify-between border-b border-violet-200 pb-4 w-full">
+        <div className="admin-page-header flex items-center justify-between border-b border-violet-200 pb-4 w-full">
           <h1 className="text-3xl lg:text-4xl font-bold">🎙️ Latest Podcasts</h1>
           <button
             onClick={() => {

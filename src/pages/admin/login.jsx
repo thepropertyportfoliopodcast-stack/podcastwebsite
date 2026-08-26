@@ -89,10 +89,10 @@ export default function Login() {
             <div className="flex items-center justify-center lg:justify-start mb-6">
               <Link href="/">
                 <Image
-                  src="/logo.png"
+                  src="/logo.webp"
                   width={2110}
                   height={520}
-                  alt="logo"
+                  alt="The Property Portfolio Podcast"
                   className="w-[300px] h-auto "
                 />
               </Link>

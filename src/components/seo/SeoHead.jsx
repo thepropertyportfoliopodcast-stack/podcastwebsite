@@ -40,7 +40,7 @@ const pageMeta = {
   },
 };
 
-export default function SeoHead({ title, description, keywords, path, image = "/logo.png", type = "website", noindex = false, jsonLd, appendSiteName = true, publishedTime }) {
+export default function SeoHead({ title, description, keywords, path, image = "/logo.webp", type = "website", noindex = false, jsonLd, appendSiteName = true, publishedTime }) {
   const router = useRouter();
   const defaults = pageMeta[router.pathname] || {
     title: SITE_NAME,
