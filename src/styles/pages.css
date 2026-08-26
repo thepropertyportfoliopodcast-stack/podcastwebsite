@@ -2,6 +2,21 @@
 /* PAGE STYLES - route-specific styles                                         */
 /* ========================================================================== */
 
+@keyframes about-approach-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.about-approach-progress {
+  width: 100%;
+  transform-origin: left;
+  animation: about-approach-progress 3.5s linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-approach-progress { animation: none; transform: scaleX(1); }
+}
+
 /* -------------------------------------------------------------------------- */
 /* src/pages/contact/index.jsx + src/components/contact/*                     */
 /* -------------------------------------------------------------------------- */

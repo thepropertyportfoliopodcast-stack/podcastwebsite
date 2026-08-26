@@ -68,7 +68,7 @@ export default function HostProfile({ host }) {
 
 export async function getServerSideProps({ params, res }) {
   const fallback = fallbackHosts.find((host) => host.slug === params.slug);
-  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
   try {
     const response = await fetch(`${apiUrl}/host/get/${encodeURIComponent(params.slug)}`);
     if (!response.ok) throw new Error();

@@ -4,9 +4,10 @@ import Image from "next/image";
 import { FaCheck, FaChevronDown, FaSearch } from "react-icons/fa";
 import { useRouter } from "next/router";
 import SectionHeading from "@/components/ui/SectionHeading";
-import PodcastApi from "@/services/podcastApi";
+import { getEpisodes } from "@/services/publicApi";
 import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
 import PageLoader from "@/components/ui/PageLoader";
+import { getCachedValue } from "@/utils/serverCache";
 
 export default function Index({ initialEpisodes = [], initialTopics = [], initialPagination = {} }) {
   const router = useRouter();
@@ -32,9 +33,8 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
   const fetchEpisodes = async (search = "", topic = "", pageNumber = 1) => {
     try {
       setLoading(true);
-      const main = new PodcastApi();
-      const response = await main.EpisodeGetAll(search, topic, pageNumber, LIMIT);
-      const resData = response?.data?.data;
+      const response = await getEpisodes(search, topic, pageNumber, LIMIT);
+      const resData = response?.data;
       const nextTopics = Array.isArray(resData?.topics) ? resData.topics : [];
       const nextEpisodes = Array.isArray(resData?.episodes) ? resData.episodes : [];
       setTopics(nextTopics);
@@ -68,8 +68,8 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
     if (sval.trim().length < 2) { setSuggestions([]); setSuggestionsOpen(false); return; }
     timerRef.current = setTimeout(async () => {
       try {
-        const response = await new PodcastApi().EpisodeGetAll(sval.trim(), "", 1, 6);
-        const matches = response?.data?.data?.episodes;
+        const response = await getEpisodes(sval.trim(), "", 1, 6);
+        const matches = response?.data?.episodes;
         setSuggestions(Array.isArray(matches) ? matches.slice(0, 6) : []);
         setSuggestionsOpen(true);
       } catch { setSuggestions([]); setSuggestionsOpen(false); }
@@ -143,6 +143,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
                   onChange={handleSearchChange}
                   placeholder="Search episodes..."
                   aria-label="Search episodes"
+                  role="combobox"
                   aria-autocomplete="list"
                   aria-expanded={suggestionsOpen}
                   aria-controls="episode-suggestions"
@@ -186,7 +187,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
             ) : (
               <div id="episode-results" className="grid scroll-mt-28 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
                 {data.map((ep, index) => (
-                    <PublicEpisodeCard episode={ep} key={index} />
+                    <PublicEpisodeCard episode={ep} imagePriority={index === 0} key={ep.uuid || ep.slug || index} />
                   ))}
               </div>
             )}
@@ -218,12 +219,14 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
 }
 
 export async function getServerSideProps({ res, query }) {
-  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
   const requestedPage = Math.max(1, Number.parseInt(query.page, 10) || 1);
   try {
-    const response = await fetch(`${apiUrl}/file/getAll?search=&topic=&page=${requestedPage}&limit=9`);
-    if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
-    const payload = await response.json();
+    const payload = await getCachedValue(`episode-archive:${requestedPage}`, async () => {
+      const response = await fetch(`${apiUrl}/file/getAll?search=&topic=&page=${requestedPage}&limit=9`);
+      if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
+      return response.json();
+    }, 300000);
     const data = payload?.data || {};
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
     return {

@@ -27,9 +27,10 @@ export default function Header() {
                 height={52}
                 style={{ width: "auto", height: "auto" }}
                 className=" max-w-[170px] sm:max-w-[200px] md:max-w-[211px] w-auto h-auto object-content"
-                src={"/logo.png"}
+                src={"/logo.webp"}
                 alt="The Property Portfolio Podcast"
                 sizes="(max-width: 640px) 170px, (max-width: 768px) 200px, 211px"
+                quality={68}
                 priority
               />
             </Link>

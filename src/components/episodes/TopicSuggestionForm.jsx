@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { FaArrowRight, FaLightbulb, FaMicrophoneAlt, FaRegPaperPlane, FaStar } from "react-icons/fa";
-import PodcastApi from "@/services/podcastApi";
+import { addContact, publicApiError } from "@/services/publicApi";
 
 const initialForm = { name: "", email: "", topic: "" };
 const countWords = (value = "") => value.trim().split(/\s+/).filter(Boolean).length;
@@ -20,14 +20,14 @@ export default function TopicSuggestionForm({ episodeTitle = "" }) {
     if (wordCount < 30) return toast.error(`Your topic must contain at least 30 words. Please add ${30 - wordCount} more.`);
     setLoading(true);
     try {
-      const response = await new PodcastApi().AddContact({
+      const response = await addContact({
         name: form.name.trim(), email: form.email.trim(), subject: "Suggest a Topic",
         message: `${form.topic.trim()}${episodeTitle ? `\n\nSuggested from episode: ${episodeTitle}` : ""}`,
       });
-      if (!response?.data?.status) throw new Error(response?.data?.message || "Submission failed");
+      if (response?.status === false) throw new Error(response?.message || "Submission failed");
       setForm(initialForm); setComplete(true); toast.success("Your podcast idea has been sent!");
     } catch (error) {
-      toast.error(error?.response?.data?.errors || error?.response?.data?.message || error.message || "Unable to send your idea. Please try again.");
+      toast.error(publicApiError(error, "Unable to send your idea. Please try again."));
     } finally { setLoading(false); }
   };
 

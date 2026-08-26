@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { FaApple, FaFacebook, FaInstagram, FaLinkedin, FaSpotify, FaYoutube } from "react-icons/fa";
-import PodcastApi from "@/services/podcastApi";
+import { addSubscriber, publicApiError } from "@/services/publicApi";
 
 const social = [
   ["https://www.facebook.com/thepropertyportfoliopodcast", "Facebook", FaFacebook],
@@ -26,11 +26,11 @@ export default function Footer() {
     }
     setLoading(true);
     try {
-      await new PodcastApi().AddSubscriber({ email });
+      await addSubscriber({ email });
       setEmail("");
       toast.success("Thank you for subscribing!");
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Subscription failed. Please try again.");
+      toast.error(publicApiError(error, "Subscription failed. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -46,11 +46,12 @@ export default function Footer() {
             <div>
               <Link href="/" className="inline-block transition-opacity hover:opacity-90">
                 <Image
-                  src="/logo.png"
+                  src="/logo.webp"
                   alt="The Property Portfolio Podcast"
                   width={211}
                   height={52}
-                  sizes="211px"
+                  sizes="(max-width: 639px) 175px, 190px"
+                  quality={62}
                   className="h-auto w-[175px] sm:w-[190px]"
                 />
               </Link>

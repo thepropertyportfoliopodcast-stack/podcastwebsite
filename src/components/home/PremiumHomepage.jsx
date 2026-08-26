@@ -2,10 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { FaApple, FaBinoculars, FaBuilding, FaComments, FaLinkedin, FaPiggyBank, FaPlay, FaShieldAlt, FaSpotify, FaYoutube, FaMicrophoneAlt, FaMicrophone } from "react-icons/fa";
+import { FaApple, FaBinoculars, FaBuilding, FaComments, FaPiggyBank, FaPlay, FaShieldAlt, FaSpotify, FaYoutube, FaMicrophoneAlt, FaMicrophone } from "react-icons/fa";
 import { HiOutlineCalculator, HiOutlineSearch } from "react-icons/hi";
 import { MdArrowOutward, MdMic } from "react-icons/md";
-import PodcastApi from "@/services/podcastApi";
+import { addSubscriber, publicApiError } from "@/services/publicApi";
 import { contentPath } from "@/utils/seo";
 import HeroPhones from "@/components/home/HeroPhones";
 import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
@@ -30,10 +30,10 @@ function PlatformLinks({ compact = false }) {
   ];
 
   if (compact) {
-    return <div className="flex flex-wrap gap-4">{items.map(([href,label,,Icon])=><a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={`Open The Property Portfolio Podcast on ${label}`} className="inline-flex items-center justify-center gap-2 text-sm font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d2dcc]"><Icon aria-hidden="true" />{label}</a>)}</div>;
+    return <div className="flex flex-wrap gap-4">{items.map(([href,label,,Icon])=><a key={label} href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 text-sm font-bold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d2dcc]"><Icon aria-hidden="true" />{label}</a>)}</div>;
   }
 
-  return <div className="home-platform-link-grid">{items.map(([href,label,action,Icon,brandClass])=><a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={`Open The Property Portfolio Podcast on ${label}`} className={`home-platform-link ${brandClass}`}><span className="home-platform-icon"><Icon aria-hidden="true" /></span><span className="home-platform-link-copy"><strong>{label}</strong><small>{action}</small></span><MdArrowOutward className="home-platform-arrow" aria-hidden="true" /></a>)}</div>;
+  return <div className="home-platform-link-grid">{items.map(([href,label,action,Icon,brandClass])=><a key={label} href={href} target="_blank" rel="noopener noreferrer" className={`home-platform-link ${brandClass}`}><span className="home-platform-icon"><Icon aria-hidden="true" /></span><span className="home-platform-link-copy"><strong>{label}</strong><small>{action}</small></span><MdArrowOutward className="home-platform-arrow" aria-hidden="true" /></a>)}</div>;
 }
 function NowPlaying({ episode }) {
   const href = episode ? contentPath("episode", episode) : "/episode";
@@ -88,7 +88,7 @@ function Hero({ latest, episodes = [], heroPhones = [] }) {
           <Link prefetch={false} href={latest ? contentPath("episode",latest) : "/episode"} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8c2ed3] to-[#C347FF] px-5 font-bold transition hover:-translate-y-0.5 hover:brightness-110">
           <FaPlay size={13}/>Watch latest episode
           </Link>
-          <Link href="/episode" className="text-[#C347FF] inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-3 border-[#C347FF] bg-[#C347FF]/20 px-5 font-bold transition hover:border-[#C347FF]/60"><FaMicrophoneAlt size={18} />Browse episodes
+          <Link href="/episode" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-[#64237f] bg-white/85 px-5 font-bold text-[#64237f] transition hover:bg-white"><FaMicrophoneAlt size={18} />Browse episodes
           </Link>
           </div></div><HeroPhones phones={heroPhones} episodes={[latest, ...episodes].filter(Boolean)}/></div>
   </section></>;
@@ -99,7 +99,7 @@ function AboutPodcast(){
          return <section id="home-about-podcast" className="home-section home-about">
           <div className="home-container grid items-center gap-10 lg:grid-cols-[.48fr_.52fr]">
             <div className="home-about-image relative aspect-[6/5] overflow-hidden rounded-[22px] border border-[#C347FF]/35 shadow-[0_20px_70px_rgba(99,23,140,.35)]">
-            <Image src="/conversation.png" alt="Parag Dixit, Mudit Khandelwal and Julius Dabre" fill sizes="(max-width:1023px) calc(100vw - 40px), 560px" className="object-cover"/>
+            <Image src="/conversation.png" alt="Parag Dixit, Mudit Khandelwal and Julius Dabre" fill priority fetchPriority="high" quality={70} sizes="(max-width:1023px) calc(100vw - 40px), 560px" className="object-cover"/>
             </div>
             <div className="home-about-copy">
               <p className="home-eyebrow">ABOUT THE PODCAST</p>
@@ -129,9 +129,9 @@ function Episodes({episodes}){
           <p className="home-eyebrow">FEATURED CONVERSATIONS</p>
           <h2 className="home-title">Latest Episodes</h2>
         </div>
-        <Link href="/episode" className={`premium-desktopViewAll text-[#C347FF] mb-1 inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-[#C347FF] px-5 text-sm font-bold`}>View all episodes <MdArrowOutward aria-hidden="true" /></Link>
+        <Link href="/episode" className="premium-desktopViewAll mb-1 inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-[#64237f] px-5 text-sm font-bold text-[#64237f]">View all episodes <MdArrowOutward aria-hidden="true" /></Link>
       </div>{items.length?<div className="home-episode-grid mt-8 grid items-stretch gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{items.map(episode=><PublicEpisodeCard key={episode.uuid||episode.id} episode={episode} />)}</div>:<p className="mt-8 text-center text-[#8F879B]">Featured episodes will appear here when selected in the dashboard.</p>}
-      <div className={"premium-mobileViewAllWrap"}><Link href="/episode" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#C347FF] px-5 text-sm font-bold text-[#C347FF]">View all episodes <MdArrowOutward aria-hidden="true" /></Link></div>
+      <div className={"premium-mobileViewAllWrap"}><Link href="/episode" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#64237f] px-5 text-sm font-bold text-[#64237f]">View all episodes <MdArrowOutward aria-hidden="true" /></Link></div>
     </div></section>}
 
 
@@ -263,11 +263,11 @@ function Hosts({ hosts: suppliedHosts = [] }) {
     const submit=async(e)=>{e.preventDefault();setMessage("");
       if(!/^\S+@\S+\.\S+$/.test(email)){setMessage("Please enter a valid email address.");
         return;}setLoading(true);
-        try{await new PodcastApi().AddSubscriber({email});
+        try{await addSubscriber({email});
         setEmail("");
         setMessage("You’re subscribed. Thank you!");
         toast.success("Thank you for subscribing!");
-      }catch(error) {setMessage(error?.response?.data?.message||"Subscription failed. Please try again.");
+      }catch(error) {setMessage(publicApiError(error,"Subscription failed. Please try again."));
       }finally{setLoading(false);}};
       return <section className="home-newsletter">
         <div className="home-container">
@@ -278,7 +278,7 @@ function Hosts({ hosts: suppliedHosts = [] }) {
               <form onSubmit={submit} className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <label htmlFor="home-newsletter" className="sr-only">Email address</label>
                 <input id="home-newsletter" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter your email" className="min-h-12 min-w-0 flex-1 rounded-xl border border-white/20 bg-black/25 px-4 text-white outline-none focus:border-[#C347FF]"/>
-                <button disabled={loading} className="min-h-12 rounded-xl bg-[#A837F4] px-8 font-bold disabled:opacity-60">{loading?"Subscribing…":"Subscribe"}</button>
+                <button disabled={loading} className="min-h-12 rounded-xl bg-[#76239e] px-8 font-bold !text-white disabled:opacity-60">{loading?"Subscribing…":"Subscribe"}</button>
               </form>
               <p className="mt-3 min-h-5 text-sm text-[#DDBBFF]" role="status" aria-live="polite">{message}</p>
               <p className="text-xs text-[#8F879B]">By subscribing, you agree to receive podcast updates. You can unsubscribe at any time.</p>

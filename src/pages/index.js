@@ -8,7 +8,7 @@ export default function Home({ initialEpisodes = [], latestEpisode = null, initi
 }
 
 export async function getServerSideProps({ res }) {
-  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
   const safely = (request, fallback, label) => request.catch((error) => {
     console.error(`${label} fetch failed:`, error.message);
     return fallback;

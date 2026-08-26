@@ -2,7 +2,7 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import Image from "next/image";
 import PodcastDetails from "@/components/podcasts/PodcastDetails";
 import { useEffect, useState } from "react";
-import PodcastApi from "@/services/podcastApi";
+import { getPodcast } from "@/services/publicApi";
 import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
 import { useRouter } from "next/router";
 import { contentPath, extractUuid, metaDescription, plainText, podcastKeywords, SITE_URL } from "@/utils/seo";
@@ -16,10 +16,9 @@ export default function Index({ initialData = null }) {
   const fetchDetails = async (slug) => {
     try {
       setLoading(true);
-      const main = new PodcastApi();
-      const response = await main.PodcastDetail(extractUuid(slug));
-      const podcast = response?.data?.data && typeof response.data.data === "object" && !Array.isArray(response.data.data)
-        ? response.data.data
+      const response = await getPodcast(extractUuid(slug));
+      const podcast = response?.data && typeof response.data === "object" && !Array.isArray(response.data)
+        ? response.data
         : null;
       setData(podcast);
       if (podcast) {
@@ -131,7 +130,7 @@ export default function Index({ initialData = null }) {
 }
 
 export async function getServerSideProps({ params, res }) {
-  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
   try {
     const response = await fetch(`${apiUrl}/podcast/get/${encodeURIComponent(extractUuid(params.slug))}`);
     if (response.status === 404) return { notFound: true };

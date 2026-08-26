@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+/* Skip layout and paint work for content that is still well below the fold. */
+.home-premium > :not(.home-hero),
+.episode-detail-page .space-y-12 > section:not(:first-child),
+.about-modern > section:not(:first-child),
+.public-site footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
+
+.episode-grid-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 560px;
+}
+
+@media (max-width: 767px) {
+  .home-learning-bars span,
+  .home-learning-dot,
+  .home-host-onair-dot,
+  .home-host-scan,
+  .tppp-hero-phone {
+    animation: none !important;
+  }
+}
+
 /* ========================================================================== */
 /* COMPONENT STYLES - shared UI, layout, media, home, admin and utilities      */
 /* Source sections retain their existing comments for easy navigation.         */
@@ -1370,7 +1394,7 @@ body :where(a, button).bg-theme {
 .home-learning-track {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: .68rem; font-weight: 700; letter-spacing: .14em;
-  color: var(--home-purple-bright);
+  color: #76239e;
 }
 .home-learning-dot {
   width: 6px; height: 6px; border-radius: 50%;

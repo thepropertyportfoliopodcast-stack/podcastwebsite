@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 
-const API_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+const API_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
 const id = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const optionalScriptHosts = new Set(["www.googletagmanager.com", "googletagmanager.com", "sibautomation.com", "www.sibautomation.com"]);
 

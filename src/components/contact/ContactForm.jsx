@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import PodcastApi from "@/services/podcastApi";
+import { addContact, publicApiError } from "@/services/publicApi";
 import { FiArrowUpRight, FiMail, FiMapPin, FiMessageCircle, FiPhone, FiSend, FiUser } from "react-icons/fi";
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa";
 
@@ -22,14 +22,14 @@ export default function ContactForm() {
     if (messageWordCount < 30) return toast.error(`Your message must contain at least 30 words. Please add ${30 - messageWordCount} more.`);
     setLoading(true);
     try {
-      const response = await new PodcastApi().AddContact({ ...form, source: "contact_page" });
+      const response = await addContact({ ...form, source: "contact_page" });
       setForm(initial);
-      if (response?.data?.data?.sheetSyncError) {
+      if (response?.data?.sheetSyncError) {
         toast.success("Thanks — your message is saved. Our team will sync it to the enquiry sheet.");
       } else {
         toast.success("Thanks — your message is safely with our team and enquiry sheet.");
       }
-    } catch (error) { toast.error(error?.response?.data?.message || error?.response?.data?.errors || "We could not send your message. Please try again."); }
+    } catch (error) { toast.error(publicApiError(error, "We could not send your message. Please try again.")); }
     finally { setLoading(false); }
   };
 

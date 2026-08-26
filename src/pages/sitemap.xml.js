@@ -5,7 +5,7 @@ function escapeXml(value = "") {
 }
 
 export async function getServerSideProps({ res }) {
-  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
   const staticPaths = ["", "/episode", "/about", "/contact", "/privacy", "/access", "/use"];
   let dynamicEntries = [];
 

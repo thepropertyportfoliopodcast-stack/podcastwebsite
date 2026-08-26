@@ -62,7 +62,7 @@ export default function Login() {
       const isNetworkError = error?.code === "ERR_NETWORK" || !error?.response;
       toast.error(
         isNetworkError
-          ? `Cannot reach the backend at ${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api"}. Check that the backend is running, then restart the frontend.`
+          ? `Cannot reach the backend at ${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api"}. Check that the backend is running, then restart the frontend.`
           : error?.response?.data?.message || "Unable to log in. Please try again."
       );
       setLoading(false);

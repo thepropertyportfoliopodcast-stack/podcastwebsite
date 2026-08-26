@@ -21,32 +21,15 @@ const approaches = [
 ];
 
 export default function About() {
-  // Bulletproof auto-cycling state
   const [activeApproach, setActiveApproach] = useState(0);
-  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    setProgress(0);
-    let animationFrame;
-    let start;
-    const duration = 3500; // 3.5 seconds per item
-
-    const animate = (timestamp) => {
-      if (!start) start = timestamp;
-      const elapsed = timestamp - start;
-      const newProgress = Math.min((elapsed / duration) * 100, 100);
-      setProgress(newProgress);
-
-      if (elapsed < duration) {
-        animationFrame = requestAnimationFrame(animate);
-      } else {
-        setActiveApproach((p) => (p + 1) % approaches.length);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [activeApproach]);
+    const timer = window.setInterval(
+      () => setActiveApproach((current) => (current + 1) % approaches.length),
+      3500,
+    );
+    return () => window.clearInterval(timer);
+  }, []);
 
   return (
     <PublicLayout>
@@ -164,10 +147,7 @@ export default function About() {
 
                       {/* Auto-filling Progress Bar */}
                       {activeApproach === i && (
-                        <div 
-                          className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[#9747FF] to-[#FC18D8] rounded-tr-full" 
-                          style={{ width: `${progress}%`, transition: 'width 0.05s linear' }}
-                        ></div>
+                        <div className="about-approach-progress absolute bottom-0 left-0 h-1 rounded-tr-full bg-gradient-to-r from-[#9747FF] to-[#FC18D8]"></div>
                       )}
                       
                       {/* Icon Container */}

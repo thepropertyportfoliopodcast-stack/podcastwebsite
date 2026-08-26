@@ -12,7 +12,7 @@ function formatEpisodeDate(value) {
     .toUpperCase();
 }
 
-export default function PublicEpisodeCard({ episode }) {
+export default function PublicEpisodeCard({ episode, imagePriority = false }) {
   const href = contentPath("episode", episode);
   const minutes =
     Number(episode?.duration) ||
@@ -36,7 +36,9 @@ export default function PublicEpisodeCard({ episode }) {
                 alt={episode?.title || "Podcast episode artwork"}
                 fill
                 sizes="(max-width:639px) calc(100vw - 32px), (max-width:1023px) 50vw, 420px"
-                quality={84}
+                quality={68}
+                priority={imagePriority}
+                fetchPriority={imagePriority ? "high" : "auto"}
                 className="episode-card-artwork object-contain transition duration-500 group-hover:brightness-105"
               />
             )}

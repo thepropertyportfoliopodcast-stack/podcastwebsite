@@ -75,7 +75,7 @@ export default function EpisodePage({ initialData }) {
               <div className="relative mx-auto w-full max-w-[384px] md:mx-0 md:max-w-[384px]">
                 <div className="absolute -inset-3 -rotate-3 rounded-[28px] border-[9px] border-[#6f3aa4]/55 bg-[#261540] shadow-[0_0_34px_rgba(252,24,216,.22)]" aria-hidden="true" />
                 <div className="episode-hero-art relative aspect-square overflow-hidden rounded-2xl border border-white/10 shadow-[0_22px_55px_rgba(0,0,0,.5),0_0_35px_rgba(151,71,255,.14)]">
-                  <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority fetchPriority="high" quality={78} sizes="(max-width: 432px) calc(100vw - 48px), 384px" className="object-cover" />
+                  <Image src={data.thumbnail} alt={`${data.title} podcast artwork`} fill priority fetchPriority="high" quality={70} sizes="(max-width: 432px) calc(100vw - 48px), 384px" className="object-cover" />
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/45 to-transparent" aria-hidden="true" />
                 </div>
               </div>
@@ -150,7 +150,7 @@ export default function EpisodePage({ initialData }) {
 }
 
 export async function getServerSideProps({ params, res }) {
-  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+  const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
   try {
     const [response, hostsResult] = await Promise.all([
       fetch(`${apiUrl}/file/get/${encodeURIComponent(extractUuid(params.slug))}`),
