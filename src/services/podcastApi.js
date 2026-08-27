@@ -98,6 +98,26 @@ class PodcastApi {
     return Api.get("/admin/transcripts/status");
   }
 
+  async EpisodeTranscriptsList(params = {}) {
+    return Api.get("/admin/transcripts", { params });
+  }
+
+  async EpisodeTranscriptRetry(id) {
+    return Api.post(`/admin/transcripts/${id}/regenerate`);
+  }
+
+  async EpisodeTranscriptCancel(id) {
+    return Api.post(`/admin/transcripts/${id}/cancel`);
+  }
+
+  async EpisodeTranscriptDelete(id) {
+    return Api.delete(`/admin/transcripts/${id}`);
+  }
+
+  async EpisodeTranscriptsRetryFailed() {
+    return Api.post("/admin/transcripts/retry-failed");
+  }
+
   async EpisodeDelete(id) {
     return Api.delete(`/admin/file/delete/${id}`);
   }
