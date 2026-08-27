@@ -10,7 +10,6 @@ import { IoIosArrowDown, IoMdTime } from "react-icons/io";
 import toast from "react-hot-toast";
 import { MdOutlineHeadphones } from "react-icons/md";
 import Link from "next/link";
-import { episodeWebsiteArtwork, hasWebsiteEpisodeArtwork } from "@/utils/episodeArtwork";
 
 export default function AdminEpisodeCard({
   episode,
@@ -18,8 +17,6 @@ export default function AdminEpisodeCard({
   slug,
   data,
 }) {
-  const websiteArtwork = episodeWebsiteArtwork(episode);
-  const hasWebsiteArtwork = hasWebsiteEpisodeArtwork(episode);
   const { playTrack } = useAudioPlayer();
   const [isOpen, setIsOpen] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -87,15 +84,15 @@ export default function AdminEpisodeCard({
     }}
 >
   {/* Image */}
-  <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#160622] md:w-[360px] md:min-w-[360px] md:rounded-2xl">
-    {websiteArtwork && (
+  <div className="relative aspect-square w-full overflow-hidden rounded-xl sm:aspect-[16/10] md:h-[300px] md:w-[300px] md:min-w-[300px] md:rounded-2xl">
+    {episode?.thumbnail && (
       <Image
-        src={websiteArtwork}
-        alt={episode?.title ? `${episode.title} website thumbnail` : "Podcast episode thumbnail"}
+        src={episode.thumbnail}
+        alt={episode?.title || "Podcast episode artwork"}
         fill
         sizes="(max-width: 639px) calc(100vw - 48px), (max-width: 767px) 600px, 300px"
         quality={82}
-        className={`rounded-xl transition-transform duration-300 group-hover:scale-105 md:rounded-2xl ${hasWebsiteArtwork ? "object-cover" : "object-contain"}`}
+        className="rounded-xl object-cover transition-transform duration-300 group-hover:scale-105 md:rounded-2xl md:object-contain"
       />
     )}
     {/* Hover Play Icon */}

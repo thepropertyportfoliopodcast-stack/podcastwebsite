@@ -29,6 +29,7 @@ export default function Add() {
     spotifyLink: "",
     thumbnail: null,
     homepageThumbnail: null,
+    websiteThumbnail: null,
     video: null,
     audio: null,
     audioUrl: "",
@@ -54,6 +55,7 @@ export default function Add() {
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [homepageThumbnailPreview, setHomepageThumbnailPreview] = useState(null);
+  const [websiteThumbnailPreview, setWebsiteThumbnailPreview] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const [uploadingVideo, setUploadingVideo] = useState(false);
@@ -128,7 +130,7 @@ export default function Add() {
   const handleChange = async(e) => {
     const { name, value, files } = e.target;
 
-    if ((name === "thumbnail" || name === "homepageThumbnail") && files?.[0]) {
+    if (["thumbnail", "homepageThumbnail", "websiteThumbnail"].includes(name) && files?.[0]) {
       const file = files[0];
       if (!file.type.startsWith("image/")) {
         toast.error("Only image files allowed");
@@ -137,19 +139,21 @@ export default function Add() {
       try {
         if (name === "thumbnail") {
           await validateImageDimensions(file, 3000, 3000);
-        } else {
+        } else if (name === "websiteThumbnail") {
           await validateWebsiteThumbnail(file);
         }
         setFormData((prev) => ({ ...prev, [name]: file }));
         const preview = URL.createObjectURL(file);
         if (name === "thumbnail") setThumbnailPreview(preview);
-        else setHomepageThumbnailPreview(preview);
+        else if (name === "homepageThumbnail") setHomepageThumbnailPreview(preview);
+        else setWebsiteThumbnailPreview(preview);
       } catch (err) {
         toast.error(err);
         e.target.value = ""; // reset file input
         setFormData((prev) => ({ ...prev, [name]: null }));
         if (name === "thumbnail") setThumbnailPreview(null);
-        else setHomepageThumbnailPreview(null);
+        else if (name === "homepageThumbnail") setHomepageThumbnailPreview(null);
+        else setWebsiteThumbnailPreview(null);
       }
       return;
     } else if (name === "video" && files?.[0]) {
@@ -564,6 +568,9 @@ export default function Add() {
       if (formData.homepageThumbnail) {
         payload.append("homepageThumbnail", formData.homepageThumbnail);
       }
+      if (formData.websiteThumbnail) {
+        payload.append("websiteThumbnail", formData.websiteThumbnail);
+      }
 
       const response = await main.EpisodeAdd(payload);
 
@@ -580,6 +587,7 @@ export default function Add() {
           details: "",
           thumbnail: null,
           homepageThumbnail: null,
+          websiteThumbnail: null,
           videoUrl: "",
           thumbnailPreview: "",
           duration: 0,
@@ -592,6 +600,7 @@ export default function Add() {
         });
         setThumbnailPreview(null);
         setHomepageThumbnailPreview(null);
+        setWebsiteThumbnailPreview(null);
 
         router.push("/admin/podcast");
       } else {
@@ -711,17 +720,31 @@ export default function Add() {
           </div>
         </div>
 
-        {/* Optional website-only artwork */}
+        {/* Optional homepage hero artwork */}
         <div className="space-y-1">
-          <label className="block text-sm font-medium">Website thumbnail <span className="text-gray-400">(optional)</span></label>
-          <p className="text-xs text-gray-400">Used only on website episode cards, search, players and hero sections—never in RSS. Recommended: 1600 × 900 px; any 16:9 image at least 1280 × 720 px is accepted. The RSS artwork is the fallback when empty.</p>
+          <label className="block text-sm font-medium">Homepage hero image <span className="text-gray-400">(optional)</span></label>
+          <p className="text-xs text-gray-400">Used only for this episode when it appears in the homepage hero. The RSS artwork is used when this is empty.</p>
           <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white">
             {homepageThumbnailPreview ? (
-              <img src={homepageThumbnailPreview} alt="Website thumbnail preview" className="h-full w-full rounded object-cover" />
+              <img src={homepageThumbnailPreview} alt="Homepage hero preview" className="h-full w-full rounded object-cover" />
             ) : (
-              <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload a separate website thumbnail</p>
+              <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload a separate homepage hero image</p>
             )}
             <input type="file" name="homepageThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
+          </div>
+        </div>
+
+        {/* Optional website card artwork */}
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">Website card thumbnail <span className="text-gray-400">(optional)</span></label>
+          <p className="text-xs text-gray-400">Used only on episode cards—never in the homepage hero, episode detail page, players, search results or RSS. Recommended: 1600 × 900 px; any 16:9 image at least 1280 × 720 px is accepted. The RSS artwork is the fallback when empty.</p>
+          <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white">
+            {websiteThumbnailPreview ? (
+              <img src={websiteThumbnailPreview} alt="Website card thumbnail preview" className="h-full w-full rounded object-cover" />
+            ) : (
+              <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload an episode-card thumbnail</p>
+            )}
+            <input type="file" name="websiteThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
           </div>
         </div>
 

@@ -4,7 +4,6 @@ import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { IoMdClose } from "react-icons/io";
 import "plyr/dist/plyr.css";
 import { encodeMediaUrl } from "@/utils/mediaUrl";
-import { episodeWebsiteArtwork } from "@/utils/episodeArtwork";
 
 export default function VideoPlayer() {
   const { selectedEpisode, setCurrentTrack, setSelectedEpisode } =
@@ -61,7 +60,7 @@ export default function VideoPlayer() {
         </div>
 
         <video
-          poster={episodeWebsiteArtwork(selectedEpisode)}
+          poster={selectedEpisode?.thumbnail}
           ref={videoRef}
           src={encodeMediaUrl(selectedEpisode?.link)}
           playsInline

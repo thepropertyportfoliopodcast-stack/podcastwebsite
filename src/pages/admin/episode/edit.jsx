@@ -27,6 +27,7 @@ export default function Edit() {
     topic: "",
     thumbnail: null,
     homepageThumbnail: null,
+    websiteThumbnail: null,
     video: null,
     audio: null,
     audioUrl: "",
@@ -60,6 +61,7 @@ export default function Edit() {
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null); 
   const [homepageThumbnailPreview, setHomepageThumbnailPreview] = useState(null);
+  const [websiteThumbnailPreview, setWebsiteThumbnailPreview] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const [uploadingVideo, setUploadingVideo] = useState(false);
@@ -144,7 +146,7 @@ export default function Edit() {
         return;
       }
 
-      if ((name === "thumbnail" || name === "homepageThumbnail") && files?.[0]) {
+      if (["thumbnail", "homepageThumbnail", "websiteThumbnail"].includes(name) && files?.[0]) {
         const file = files[0];
         if (!file.type.startsWith("image/")) {
           toast.error("Only image files allowed");
@@ -153,19 +155,21 @@ export default function Edit() {
         try {
           if (name === "thumbnail") {
             await validateImageDimensions(file, 3000, 3000);
-          } else {
+          } else if (name === "websiteThumbnail") {
             await validateWebsiteThumbnail(file);
           }
           setFormData((prev) => ({ ...prev, [name]: file }));
           const preview = URL.createObjectURL(file);
           if (name === "thumbnail") setThumbnailPreview(preview);
-          else setHomepageThumbnailPreview(preview);
+          else if (name === "homepageThumbnail") setHomepageThumbnailPreview(preview);
+          else setWebsiteThumbnailPreview(preview);
         } catch (err) {
           toast.error(err);
           e.target.value = ""; // reset file input
           setFormData((prev) => ({ ...prev, [name]: null }));
           if (name === "thumbnail") setThumbnailPreview(null);
-          else setHomepageThumbnailPreview(null);
+          else if (name === "homepageThumbnail") setHomepageThumbnailPreview(null);
+          else setWebsiteThumbnailPreview(null);
         }
         return;
       }
@@ -459,6 +463,9 @@ export default function Edit() {
       if (formData.homepageThumbnail instanceof File) {
         payload.append("homepageThumbnail", formData.homepageThumbnail);
       }
+      if (formData.websiteThumbnail instanceof File) {
+        payload.append("websiteThumbnail", formData.websiteThumbnail);
+      }
       if (formData.isSpotify && formData.spotifyLink) {
         payload.append("spotifyLink", formData.spotifyLink);
       }
@@ -490,10 +497,12 @@ export default function Edit() {
           topic: "",
           thumbnail: null,
           homepageThumbnail: null,
+          websiteThumbnail: null,
           video: null,
         });
         setThumbnailPreview(null);
         setHomepageThumbnailPreview(null);
+        setWebsiteThumbnailPreview(null);
         router.push(`/admin/podcast/${data?.podcast?.uuid}`);
       } else {
         toast.error(response.data.message);
@@ -520,6 +529,7 @@ export default function Edit() {
       description: (response?.data?.data?.description || "").slice(0, DESCRIPTION_LIMIT),
       thumbnail: response?.data?.data?.thumbnail || null,
       homepageThumbnail: response?.data?.data?.homepageThumbnail || null,
+      websiteThumbnail: response?.data?.data?.websiteThumbnail || null,
       video: response?.data?.data?.link || null,
       audioUrl: response?.data?.data?.audio || "",
       audioSize: response?.data?.data?.audioSize || 0,
@@ -553,6 +563,7 @@ export default function Edit() {
 
     setThumbnailPreview(response?.data?.data?.thumbnail || null);
     setHomepageThumbnailPreview(response?.data?.data?.homepageThumbnail || null);
+    setWebsiteThumbnailPreview(response?.data?.data?.websiteThumbnail || null);
     } catch (error) {
       console.log("error", error);
       setData(null);
@@ -686,15 +697,28 @@ export default function Edit() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Website thumbnail <span className="text-gray-400">(optional)</span></label>
-                  <p className="text-xs text-gray-400">Used only on website episode cards, search, players and hero sections—never in RSS. Recommended: 1600 × 900 px; any 16:9 image at least 1280 × 720 px is accepted. The RSS artwork is the fallback when empty.</p>
+                  <label className="block text-sm font-medium">Homepage hero image <span className="text-gray-400">(optional)</span></label>
+                  <p className="text-xs text-gray-400">Used only for this episode when it appears in the homepage hero. The RSS artwork is used when this is empty.</p>
                   <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white">
                     {homepageThumbnailPreview ? (
-                      <img src={homepageThumbnailPreview} alt="Website thumbnail preview" className="h-full w-full rounded object-cover" />
+                      <img src={homepageThumbnailPreview} alt="Homepage hero preview" className="h-full w-full rounded object-cover" />
                     ) : (
-                      <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload a separate website thumbnail</p>
+                      <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload a separate homepage hero image</p>
                     )}
                     <input type="file" name="homepageThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
+                  </div>
+                </div>
+
+                <div className="space-y-2 lg:col-span-2">
+                  <label className="block text-sm font-medium">Website card thumbnail <span className="text-gray-400">(optional)</span></label>
+                  <p className="text-xs text-gray-400">Used only on episode cards—never in the homepage hero, episode detail page, players, search results or RSS. Recommended: 1600 × 900 px; any 16:9 image at least 1280 × 720 px is accepted. The RSS artwork is the fallback when empty.</p>
+                  <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white lg:max-w-[calc(50%-0.625rem)]">
+                    {websiteThumbnailPreview ? (
+                      <img src={websiteThumbnailPreview} alt="Website card thumbnail preview" className="h-full w-full rounded object-cover" />
+                    ) : (
+                      <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload an episode-card thumbnail</p>
+                    )}
+                    <input type="file" name="websiteThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
                   </div>
                 </div>
 

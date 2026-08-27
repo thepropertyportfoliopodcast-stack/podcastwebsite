@@ -26,7 +26,6 @@ export default function PublicEpisodeCard({ episode, imagePriority = false }) {
   return (
     <Link
       href={href}
-      prefetch={false}
       className="episode-grid-card group flex h-full min-w-0 flex-col text-inherit no-underline"
       aria-label={`Open episode: ${episode?.title || "Podcast episode"}`}
     >

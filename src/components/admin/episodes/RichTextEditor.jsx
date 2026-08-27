@@ -23,7 +23,6 @@ const ReactQuillEditor = ({ label, desc, handleBioChange }) => {
     "strike",
     "blockquote",
     "list",
-    "bullet",
     "link",
     "image",
   ];

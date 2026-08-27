@@ -8,7 +8,6 @@ import { getEpisodes } from "@/services/publicApi";
 import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
 import PageLoader from "@/components/ui/PageLoader";
 import { getCachedValue } from "@/utils/serverCache";
-import { episodeWebsiteArtwork } from "@/utils/episodeArtwork";
 
 export default function Index({ initialEpisodes = [], initialTopics = [], initialPagination = {} }) {
   const router = useRouter();
@@ -153,7 +152,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
                 />
                 <button type="submit" aria-label="Search episodes" className="absolute right-1.5 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-gradient-to-r from-[#9747FF] to-[#FC18D8] text-white transition hover:scale-105"><FaSearch aria-hidden="true" /></button>
                 {suggestionsOpen && <div id="episode-suggestions" role="listbox" className="absolute left-0 right-0 top-[calc(100%+8px)] z-40 max-h-80 overflow-y-auto rounded-2xl border border-[#ded2e7] bg-white p-2 shadow-xl">
-                  {suggestions.length ? suggestions.map((episode) => { const artwork = episodeWebsiteArtwork(episode); return <button key={episode.uuid || episode.id} type="button" role="option" onClick={() => submitSearch(episode.title)} className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-[#f7f0fa] focus:bg-[#f7f0fa] focus:outline-none"><span className="relative h-12 w-20 shrink-0 overflow-hidden rounded-lg bg-[#f3eaf7]">{artwork && <Image src={artwork} alt="" fill sizes="80px" className={episode.homepageThumbnail ? "object-cover" : "object-contain"} />}</span><span className="min-w-0"><strong className="line-clamp-2 text-sm text-[#24182c]">{episode.title}</strong><small className="mt-1 block text-xs text-[#7f2aa9]">{episode.topic || "Podcast episode"}</small></span></button>; }) : <p className="p-3 text-sm text-[#75677e]">No matching suggestions.</p>}
+                  {suggestions.length ? suggestions.map((episode) => <button key={episode.uuid || episode.id} type="button" role="option" onClick={() => submitSearch(episode.title)} className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-[#f7f0fa] focus:bg-[#f7f0fa] focus:outline-none"><span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-[#f3eaf7]">{episode.thumbnail && <Image src={episode.thumbnail} alt="" fill sizes="48px" className="object-cover" />}</span><span className="min-w-0"><strong className="line-clamp-2 text-sm text-[#24182c]">{episode.title}</strong><small className="mt-1 block text-xs text-[#7f2aa9]">{episode.topic || "Podcast episode"}</small></span></button>) : <p className="p-3 text-sm text-[#75677e]">No matching suggestions.</p>}
                 </div>}
               </form>
 
