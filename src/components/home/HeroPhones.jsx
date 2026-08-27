@@ -141,9 +141,8 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
   }, []);
 
   const startSwipe = useCallback((event) => {
-    if (!event.isPrimary || event.target.closest("button")) return;
+    if (!event.isPrimary || event.pointerType === "mouse" || event.target.closest("button")) return;
     swipeRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
-    event.currentTarget.setPointerCapture?.(event.pointerId);
   }, []);
 
   const finishSwipe = useCallback((event) => {
