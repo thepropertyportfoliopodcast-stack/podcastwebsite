@@ -97,6 +97,30 @@ export default function Add() {
     });
   };
 
+  const validateWebsiteThumbnail = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        const isSixteenByNine = Math.abs((img.width / img.height) - (16 / 9)) < 0.01;
+        if (isSixteenByNine && img.width >= 1280 && img.height >= 720) {
+          resolve(true);
+        } else {
+          reject(`Website thumbnail must be 16:9 and at least 1280 × 720 px. Selected image is ${img.width} × ${img.height} px.`);
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject("Invalid image file");
+      };
+
+      img.src = objectUrl;
+    });
+  };
+
   const handleQuillChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -113,6 +137,8 @@ export default function Add() {
       try {
         if (name === "thumbnail") {
           await validateImageDimensions(file, 3000, 3000);
+        } else {
+          await validateWebsiteThumbnail(file);
         }
         setFormData((prev) => ({ ...prev, [name]: file }));
         const preview = URL.createObjectURL(file);
@@ -654,10 +680,10 @@ export default function Add() {
         {/* Thumbnail */}
         <div className="space-y-1">
           <label className="block text-sm font-medium">
-            Thumbnail <span className="text-red-500">*</span>
+            RSS episode artwork <span className="text-red-500">*</span>
           </label>
           <p className="text-xs text-gray-400">
-            Required size: 3000 × 3000 px
+            Required size: 3000 × 3000 px (square). This image is sent to podcast apps through the RSS feed.
           </p>
           <div
             onDrop={handleDrop}
@@ -685,15 +711,15 @@ export default function Add() {
           </div>
         </div>
 
-        {/* Optional homepage hero artwork */}
+        {/* Optional website-only artwork */}
         <div className="space-y-1">
-          <label className="block text-sm font-medium">Homepage hero image <span className="text-gray-400">(optional)</span></label>
-          <p className="text-xs text-gray-400">Used only for this episode when it is the latest episode in the homepage hero. A 16:9 image (for example 1920 × 1080 px) is recommended. The regular thumbnail is used when this is empty.</p>
-          <div className="relative flex h-64 w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white">
+          <label className="block text-sm font-medium">Website thumbnail <span className="text-gray-400">(optional)</span></label>
+          <p className="text-xs text-gray-400">Used only on website episode cards, search, players and hero sections—never in RSS. Recommended: 1600 × 900 px; any 16:9 image at least 1280 × 720 px is accepted. The RSS artwork is the fallback when empty.</p>
+          <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white">
             {homepageThumbnailPreview ? (
-              <img src={homepageThumbnailPreview} alt="Homepage hero preview" className="h-full w-full rounded object-contain" />
+              <img src={homepageThumbnailPreview} alt="Website thumbnail preview" className="h-full w-full rounded object-cover" />
             ) : (
-              <p className="px-4 text-center text-sm">Click to upload a separate homepage hero image</p>
+              <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload a separate website thumbnail</p>
             )}
             <input type="file" name="homepageThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
           </div>

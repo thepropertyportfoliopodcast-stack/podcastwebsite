@@ -4,6 +4,7 @@ import { GoScreenFull } from "react-icons/go";
 import { BsFullscreenExit } from "react-icons/bs";
 import Image from "next/image";
 import { encodeMediaUrl } from "@/utils/mediaUrl";
+import { episodeWebsiteArtwork, hasWebsiteEpisodeArtwork } from "@/utils/episodeArtwork";
 
 export default function AudioPlyr() {
   const AudioPlayer = require("react-h5-audio-player").default;
@@ -38,14 +39,14 @@ export default function AudioPlyr() {
     <div className="flex justify-between z-[51] !bg-[#111827] sm:px-3">
       {isMinimized && (
         <div className="flex gap-2 items-center w-[16vw]">
-          <div className=" relative w-18 h-18">
-            {selectedEpisode?.thumbnail && (
+          <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-lg bg-[#160622]">
+            {episodeWebsiteArtwork(selectedEpisode) && (
               <Image
-                src={selectedEpisode.thumbnail}
+                src={episodeWebsiteArtwork(selectedEpisode)}
                 alt={selectedEpisode?.title || "Podcast episode artwork"}
                 fill
-                sizes="72px"
-                className="object-cover rounded-lg"
+                sizes="112px"
+                className={`rounded-lg ${hasWebsiteEpisodeArtwork(selectedEpisode) ? "object-cover" : "object-contain"}`}
               />
             )}
           </div>

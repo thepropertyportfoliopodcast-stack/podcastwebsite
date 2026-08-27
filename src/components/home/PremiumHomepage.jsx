@@ -9,6 +9,7 @@ import { addSubscriber, publicApiError } from "@/services/publicApi";
 import { contentPath } from "@/utils/seo";
 import HeroPhones from "@/components/home/HeroPhones";
 import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
+import { episodeWebsiteArtwork, hasWebsiteEpisodeArtwork } from "@/utils/episodeArtwork";
 
 const platforms = {
   youtube: "https://www.youtube.com/@ThePropertyPortfolioPodcast",
@@ -37,6 +38,8 @@ function PlatformLinks({ compact = false }) {
 }
 function NowPlaying({ episode }) {
   const href = episode ? contentPath("episode", episode) : "/episode";
+  const artwork = episodeWebsiteArtwork(episode, "/heroimg01.jpg");
+  const hasWebsiteArtwork = hasWebsiteEpisodeArtwork(episode);
   return <div className="hero-player hero-player-card group relative rounded-[28px] p-[1px]">
     <span className="hero-player-frame hero-player-frame-one" aria-hidden="true" />
     <span className="hero-player-frame hero-player-frame-two" aria-hidden="true" />
@@ -48,7 +51,7 @@ function NowPlaying({ episode }) {
         <div className="flex items-center gap-2 rounded-full border border-[#C347FF]/30 bg-[#C347FF]/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[.14em] text-white sm:text-xs"><MdMic aria-hidden="true" />{episodeNumber(episode)}</div>
       </div>
       <Link href={href} aria-label={`Play ${episode?.title || "the latest episode"}`} className="hero-player-visual relative block aspect-video overflow-hidden rounded-[20px] border border-white/15 bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDBBFF]">
-        <Image src={episode?.homepageThumbnail || episode?.thumbnail || "/heroimg01.jpg"} alt={episode?.title ? `${episode.title} episode artwork` : "The Property Portfolio Podcast hosts recording an episode"} fill priority fetchPriority="high" sizes="(max-width:1023px) calc(100vw - 44px), 720px" quality={90} className="hero-player-image object-cover" />
+        <Image src={artwork} alt={episode?.title ? `${episode.title} website thumbnail` : "The Property Portfolio Podcast hosts recording an episode"} fill priority fetchPriority="high" sizes="(max-width:1023px) calc(100vw - 44px), 720px" quality={90} className={`hero-player-image ${hasWebsiteArtwork || !episode ? "object-cover" : "object-contain"}`} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#09050f]/95 via-transparent to-black/15" />
         <div className="hero-scanline" aria-hidden="true" />
         <div className="hero-spectrum-tower" aria-hidden="true">{[34,62,88,49,96,71,42,82].map((height,index)=><span key={index} style={{height:`${height}%`,animationDelay:`${index * 90}ms`}} />)}</div>

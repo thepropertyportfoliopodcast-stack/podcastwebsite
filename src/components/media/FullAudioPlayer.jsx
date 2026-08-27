@@ -1,6 +1,7 @@
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import Image from "next/image";
 import { BsFullscreenExit } from "react-icons/bs";
+import { episodeWebsiteArtwork, hasWebsiteEpisodeArtwork } from "@/utils/episodeArtwork";
 
 export default function FullPlayer() {
   const { selectedEpisode, setIsMinimized } = useAudioPlayer();
@@ -24,14 +25,14 @@ export default function FullPlayer() {
       </div>
 
       <div className="flex-grow flex items-center justify-center">
-        {selectedEpisode?.thumbnail && (
-          <div className="w-64 sm:w-80 h-64 sm:h-80 relative shadow-lg rounded-lg overflow-hidden">
+        {episodeWebsiteArtwork(selectedEpisode) && (
+          <div className="relative aspect-video w-[min(90vw,640px)] overflow-hidden rounded-lg bg-[#160622] shadow-lg">
             <Image
-              src={selectedEpisode.thumbnail}
-              alt="Podcast Cover"
+              src={episodeWebsiteArtwork(selectedEpisode)}
+              alt="Podcast episode thumbnail"
               fill
-              sizes="(max-width: 640px) 256px, 320px"
-              className="object-cover"
+              sizes="(max-width: 640px) 90vw, 640px"
+              className={hasWebsiteEpisodeArtwork(selectedEpisode) ? "object-cover" : "object-contain"}
             />
           </div>
         )}

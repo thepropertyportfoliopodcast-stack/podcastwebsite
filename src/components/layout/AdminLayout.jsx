@@ -28,15 +28,22 @@ export default function AdminLayout({ children }) {
     try {
       const main = new PodcastApi();
       const response = await main.profileVerify(signal);
-      if (response.data) {
-        setUser(response.data.data.user);
+      const profile = response?.data?.data?.user;
+      if (profile) {
+        setUser(profile);
         setVerified(true);
       }
     } catch (error) {
-      console.log("error", error);
+      // React runs effect cleanup once during development Strict Mode. The
+      // cleanup abort is expected and must never invalidate a valid login.
+      if (signal?.aborted || error?.code === "ERR_CANCELED" || error?.name === "CanceledError") {
+        return;
+      }
+
+      console.error("Dashboard profile verification failed:", error);
       localStorage?.removeItem("token");
       setUser(null);
-      router.push("/admin/login");
+      router.replace("/admin/login");
       toast.error("Please log in first.");
     }
   };

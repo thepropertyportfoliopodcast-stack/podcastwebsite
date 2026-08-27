@@ -1211,22 +1211,25 @@ body :where(a, button).bg-theme {
   container-type: inline-size;
 }
 
-/* Episode artwork is supplied as a square asset. Keep the complete artwork in
-   view at every responsive breakpoint instead of cropping it into a landscape
-   frame. The surrounding colour prevents empty image pixels from flashing. */
+/* Website episode artwork is 16:9, matching this frame so object-fit: cover
+   fills it without cropping. Older square RSS artwork stays fully visible. */
 .episode-grid-image > div:first-child {
   background: #160622;
 }
 
 .episode-grid-image {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
 }
 
 .episode-card-artwork {
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain !important;
+  object-fit: cover !important;
   object-position: center;
+}
+
+.episode-card-artwork--rss {
+  object-fit: contain !important;
 }
 
 .episode-grid-card:hover {

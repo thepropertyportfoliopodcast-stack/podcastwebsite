@@ -92,6 +92,7 @@ export default function Login() {
                   src="/logo.webp"
                   width={2110}
                   height={520}
+                  priority
                   alt="The Property Portfolio Podcast"
                   className="w-[300px] h-auto "
                 />

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaClock, FaPlay } from "react-icons/fa";
 import { contentPath } from "@/utils/seo";
+import { episodeWebsiteArtwork, hasWebsiteEpisodeArtwork } from "@/utils/episodeArtwork";
 
 function formatEpisodeDate(value) {
   if (!value) return "LATEST";
@@ -14,6 +15,8 @@ function formatEpisodeDate(value) {
 
 export default function PublicEpisodeCard({ episode, imagePriority = false }) {
   const href = contentPath("episode", episode);
+  const artwork = episodeWebsiteArtwork(episode);
+  const hasWebsiteArtwork = hasWebsiteEpisodeArtwork(episode);
   const minutes =
     Number(episode?.duration) ||
     (episode?.durationInSec
@@ -30,16 +33,16 @@ export default function PublicEpisodeCard({ episode, imagePriority = false }) {
       <article className="episode-card-surface flex h-full flex-col">
         <div className="episode-grid-image relative overflow-visible rounded-[22px]">
           <div className="absolute inset-0 overflow-hidden rounded-[22px]">
-            {episode?.thumbnail && (
+            {artwork && (
               <Image
-                src={episode.thumbnail}
-                alt={episode?.title || "Podcast episode artwork"}
+                src={artwork}
+                alt={episode?.title ? `${episode.title} website thumbnail` : "Podcast episode thumbnail"}
                 fill
                 sizes="(max-width:639px) calc(100vw - 32px), (max-width:1023px) 50vw, 420px"
                 quality={68}
                 priority={imagePriority}
                 fetchPriority={imagePriority ? "high" : "auto"}
-                className="episode-card-artwork object-contain transition duration-500 group-hover:brightness-105"
+                className={`episode-card-artwork transition duration-500 group-hover:brightness-105 ${hasWebsiteArtwork ? "object-cover" : "episode-card-artwork--rss object-contain"}`}
               />
             )}
             <div
