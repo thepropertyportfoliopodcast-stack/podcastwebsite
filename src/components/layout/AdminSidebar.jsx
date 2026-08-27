@@ -7,6 +7,7 @@ import { FaRegUser } from "react-icons/fa";
 import { MdSupportAgent } from "react-icons/md";
 import { MdOutlineAnalytics } from "react-icons/md";
 import { MdAdminPanelSettings } from "react-icons/md";
+import { MdOutlineSubtitles } from "react-icons/md";
 import { usePathname } from "next/navigation";
 import { hasSectionAccess } from "@/config/adminSections";
 
@@ -69,6 +70,16 @@ export default function AdminSidebar({ toggle, onNavigate, handleLogout, user })
             >
               <MdOutlineSpaceDashboard className="me-2" size={"1.4rem"} />{" "}
               Podcasts
+            </Link>
+          </li>}
+
+          {hasSectionAccess(user, "transcripts") && <li>
+            <Link
+              className={`admin-sidebar-link ${pathname === "/admin/transcripts" ? "is-active" : ""}`}
+              href="/admin/transcripts"
+              onClick={onNavigate}
+            >
+              <MdOutlineSubtitles className="me-2" size="1.4rem" /> Transcripts
             </Link>
           </li>}
 

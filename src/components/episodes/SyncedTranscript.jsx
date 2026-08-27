@@ -37,6 +37,171 @@ function normaliseWords(value) {
   })).filter((word) => word.text && Number.isFinite(word.startMs) && Number.isFinite(word.endMs));
 }
 
+function clockMilliseconds(value = "") {
+  const parts = value.split(":").map(Number);
+  if (!parts.length || parts.some((part) => !Number.isFinite(part))) return null;
+  return parts.reduce((total, part) => total * 60 + part, 0) * 1000;
+}
+
+function speakerAliases(speakerNames = []) {
+  const aliases = new Map();
+  const firstNameCounts = new Map();
+  speakerNames.filter(Boolean).forEach((name) => {
+    const first = String(name).trim().split(/\s+/)[0]?.toLowerCase();
+    if (first) firstNameCounts.set(first, (firstNameCounts.get(first) || 0) + 1);
+  });
+  speakerNames.filter(Boolean).forEach((name) => {
+    const clean = String(name).trim();
+    aliases.set(clean.toLowerCase(), clean);
+    const first = clean.split(/\s+/)[0];
+    if (first && firstNameCounts.get(first.toLowerCase()) === 1) aliases.set(first.toLowerCase(), first);
+  });
+  return aliases;
+}
+
+function parseManualSpeakerBlocks(transcript = "", speakerNames = []) {
+  const aliases = speakerAliases(speakerNames);
+  const lines = stripHtml(transcript).split(/\r?\n/).map((line) => line.trim());
+  const blocks = [];
+  let current = null;
+  const flush = () => {
+    if (!current) return;
+    const text = current.lines.join(" ").replace(/\s+/g, " ").trim();
+    if (text) blocks.push({ speaker: current.speaker, timeMs: current.timeMs, text });
+    current = null;
+  };
+  lines.forEach((line) => {
+    if (!line) return;
+    const timed = line.match(/^(.+?)\s+(\d{1,2}:\d{2}(?::\d{2})?)$/);
+    const knownSpeaker = aliases.get(line.toLowerCase());
+    const looksLikeSpeakerName = line.length <= 70 && /^(?:[A-Z][\p{L}'’.-]*)(?:\s+[A-Z][\p{L}'’.-]*){0,5}$/u.test(line);
+    if (timed || knownSpeaker || looksLikeSpeakerName) {
+      flush();
+      current = {
+        speaker: timed ? timed[1].trim() : (knownSpeaker || line),
+        timeMs: timed ? clockMilliseconds(timed[2]) : null,
+        lines: [],
+      };
+      return;
+    }
+    if (current) current.lines.push(line);
+  });
+  flush();
+  return blocks;
+}
+
+function comparableToken(value = "") {
+  return value.normalize("NFKD").toLowerCase().replace(/[’']/g, "").replace(/[^a-z0-9]+/g, "");
+}
+
+function closestSourceWord(words, timeMs) {
+  if (!words.length) return 0;
+  let low = 0;
+  let high = words.length - 1;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (words[middle].startMs < timeMs) low = middle + 1;
+    else high = middle;
+  }
+  if (low > 0 && Math.abs(words[low - 1].startMs - timeMs) < Math.abs(words[low].startMs - timeMs)) return low - 1;
+  return low;
+}
+
+function alignedManualTranscript(transcript, speakerNames, sourceWords) {
+  const blocks = parseManualSpeakerBlocks(transcript, speakerNames);
+  if (!blocks.length || !sourceWords.length) return null;
+  const manualWords = [];
+  const segments = [];
+  blocks.forEach((block, blockIndex) => {
+    const firstWord = manualWords.length;
+    const tokens = block.text.match(/\S+/g) || [];
+    tokens.forEach((text) => manualWords.push({ text, speaker: block.speaker, segment: blockIndex }));
+    if (manualWords.length > firstWord) segments.push({ speaker: block.speaker, timeMs: block.timeMs, firstWord, lastWord: manualWords.length, key: `manual-speaker-${blockIndex}` });
+  });
+  if (!manualWords.length) return null;
+
+  const manualPositions = new Map();
+  const sourcePositions = new Map();
+  manualWords.forEach((word, index) => {
+    const token = comparableToken(word.text);
+    if (token) manualPositions.set(token, [...(manualPositions.get(token) || []), index]);
+  });
+  sourceWords.forEach((word, index) => {
+    const token = comparableToken(word.text);
+    if (token) sourcePositions.set(token, [...(sourcePositions.get(token) || []), index]);
+  });
+
+  const strongAnchors = [{ manual: -1, source: -1 }];
+  segments.forEach((segment) => {
+    if (segment.timeMs == null) return;
+    const source = closestSourceWord(sourceWords, segment.timeMs);
+    const previous = strongAnchors[strongAnchors.length - 1];
+    if (segment.firstWord > previous.manual && source > previous.source) strongAnchors.push({ manual: segment.firstWord, source });
+  });
+  strongAnchors.push({ manual: manualWords.length, source: sourceWords.length });
+
+  const anchors = [];
+  for (let interval = 0; interval < strongAnchors.length - 1; interval += 1) {
+    const left = strongAnchors[interval];
+    const right = strongAnchors[interval + 1];
+    if (!anchors.length || anchors[anchors.length - 1].manual !== left.manual) anchors.push(left);
+    let lastSource = left.source;
+    const candidates = [];
+    manualPositions.forEach((manualIndexes, token) => {
+      const sourceIndexes = sourcePositions.get(token);
+      if (manualIndexes.length !== 1 || sourceIndexes?.length !== 1) return;
+      const manual = manualIndexes[0];
+      const source = sourceIndexes[0];
+      if (manual > left.manual && manual < right.manual && source > left.source && source < right.source) candidates.push({ manual, source });
+    });
+    candidates.sort((a, b) => a.manual - b.manual);
+    candidates.forEach((candidate) => {
+      if (candidate.source > lastSource && candidate.source < right.source) {
+        anchors.push(candidate);
+        lastSource = candidate.source;
+      }
+    });
+  }
+  anchors.push(strongAnchors[strongAnchors.length - 1]);
+
+  const sourceIndexForManual = new Array(manualWords.length).fill(0);
+  for (let index = 0; index < anchors.length - 1; index += 1) {
+    const left = anchors[index];
+    const right = anchors[index + 1];
+    for (let manual = Math.max(0, left.manual); manual < Math.min(manualWords.length, right.manual + 1); manual += 1) {
+      const fraction = (manual - left.manual) / Math.max(1, right.manual - left.manual);
+      sourceIndexForManual[manual] = Math.max(0, Math.min(sourceWords.length - 1, Math.round(left.source + ((right.source - left.source) * fraction))));
+    }
+  }
+
+  let runStart = 0;
+  while (runStart < manualWords.length) {
+    let runEnd = runStart + 1;
+    while (runEnd < manualWords.length && sourceIndexForManual[runEnd] === sourceIndexForManual[runStart]) runEnd += 1;
+    const source = sourceWords[sourceIndexForManual[runStart]];
+    const step = Math.max(1, (source.endMs - source.startMs) / (runEnd - runStart));
+    for (let index = runStart; index < runEnd; index += 1) {
+      manualWords[index] = {
+        ...manualWords[index],
+        startMs: Math.round(source.startMs + (step * (index - runStart))),
+        endMs: Math.round(source.startMs + (step * (index - runStart + 1))),
+        originalIndex: index,
+      };
+    }
+    runStart = runEnd;
+  }
+  return { words: manualWords, segments };
+}
+
+function ManualTranscript({ blocks }) {
+  return <div className="space-y-5" aria-label="Episode transcript">
+    {blocks.map((block, index) => <div key={`${block.speaker}-${index}`} className="rounded-xl border border-white/5 bg-white/[.025] px-4 py-3 sm:px-5">
+      <p className="mb-1 text-xs font-black uppercase tracking-[.12em] text-[#c99cff]">{block.speaker}</p>
+      <p className="leading-8 text-white/75 md:leading-9">{block.text}</p>
+    </div>)}
+  </div>;
+}
+
 function normaliseSegments(value, words) {
   if (Array.isArray(value) && value.length) {
     const segments = value.map((segment, index) => ({
@@ -159,16 +324,19 @@ function GeneratedTranscript({ words, segments, playback, expanded, syncOffsetMs
   );
 }
 
-export default function SyncedTranscript({ transcript, timestamps, wordTimings, transcriptSegments, transcriptStatus, playback, positionMs = 0, expanded, syncOffsetMs = 0 }) {
+export default function SyncedTranscript({ transcript, transcriptIsManual = true, timestamps, wordTimings, transcriptSegments, transcriptStatus, speakerNames = [], playback, positionMs = 0, expanded, syncOffsetMs = 0 }) {
   const words = useMemo(() => (!transcriptStatus || transcriptStatus === "READY") ? normaliseWords(wordTimings) : [], [transcriptStatus, wordTimings]);
   const generatedSegments = useMemo(() => normaliseSegments(transcriptSegments, words), [transcriptSegments, words]);
+  const manualAligned = useMemo(() => transcriptIsManual ? alignedManualTranscript(transcript, speakerNames, words) : null, [speakerNames, transcript, transcriptIsManual, words]);
+  const manualBlocks = useMemo(() => transcriptIsManual ? parseManualSpeakerBlocks(transcript, speakerNames) : [], [speakerNames, transcript, transcriptIsManual]);
   const legacySegments = useMemo(() => timedSegments(transcript, timestamps), [transcript, timestamps]);
   const legacySeconds = positionMs / 1000;
   const legacyActiveIndex = legacySegments.reduce((active, segment, index) => legacySeconds >= segment.seconds ? index : active, 0);
 
   if (words.length) {
-    return <GeneratedTranscript words={words} segments={generatedSegments} playback={playback || { position: positionMs, isPaused: true }} expanded={expanded} syncOffsetMs={syncOffsetMs} />;
+    return <GeneratedTranscript words={manualAligned?.words || words} segments={manualAligned?.segments || generatedSegments} playback={playback || { position: positionMs, isPaused: true }} expanded={expanded} syncOffsetMs={syncOffsetMs} />;
   }
+  if (manualBlocks.length) return <ManualTranscript blocks={manualBlocks} />;
   if (!stripHtml(transcript)) {
     const pending = ["PENDING", "QUEUED", "PROCESSING"].includes(transcriptStatus);
     return <div className="rounded-xl border border-white/10 bg-white/[.035] p-5 text-white/70">{pending ? "The English transcript is being generated. It will appear here automatically." : "A transcript is not available for this episode yet."}</div>;

@@ -841,7 +841,7 @@ export default function Edit() {
               formData={formData}
               onChange={handleChange}
               onTranscriptChange={(value) => setFormData((prev) => ({ ...prev, transcript: value }))}
-              transcription={{ status: data?.transcriptStatus, error: data?.transcriptError, generatedAt: data?.transcriptGeneratedAt }}
+              transcription={{ status: data?.transcriptStatus, error: data?.transcriptError, generatedAt: data?.transcriptGeneratedAt, progress: data?.transcriptProgress, note: data?.transcriptProgressNote }}
               onRegenerate={handleRegenerateTranscript}
               regenerating={regeneratingTranscript}
             />

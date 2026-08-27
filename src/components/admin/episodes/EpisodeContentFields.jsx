@@ -7,12 +7,13 @@ const STATUS_STYLE = {
 
 export default function EpisodeContentFields({ formData, onChange, onTranscriptChange, transcription, onRegenerate, regenerating = false }) {
   const fieldClass = "w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#9747FF]";
+  const transcriptProgress = transcription?.status === "READY" ? 100 : Math.max(0, Math.min(99, Number(transcription?.progress) || 0));
 
   return (
     <section className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
       <div>
         <h4 className="text-lg font-semibold">Video and episode content</h4>
-        <p className="mt-1 text-sm text-gray-400">YouTube chapters are optional. The English transcript and word timings are generated automatically from the uploaded episode audio by WhisperX.</p>
+        <p className="mt-1 text-sm text-gray-400">WhisperX generates the timing. Your speaker transcript below controls the exact words, spelling and speaker grouping visitors see.</p>
       </div>
 
       {transcription?.status && <div className="rounded-xl border border-gray-700 bg-white p-4 text-slate-800">
@@ -23,6 +24,10 @@ export default function EpisodeContentFields({ formData, onChange, onTranscriptC
           </div>
           <span className={`rounded-full border px-3 py-1 text-xs font-bold ${STATUS_STYLE[transcription.status] || "border-slate-300 bg-slate-50 text-slate-700"}`}>{transcription.status}</span>
         </div>
+        {["QUEUED", "PROCESSING"].includes(transcription.status) && <div className="mt-4">
+          <div className="mb-1 flex justify-between gap-3 text-xs font-bold text-slate-600"><span>{transcription.note || (transcription.status === "QUEUED" ? "Waiting in queue" : "Processing audio")}</span><span>{transcriptProgress}%</span></div>
+          <div className="h-2.5 overflow-hidden rounded-full bg-violet-100"><div className="h-full rounded-full bg-gradient-to-r from-[#7b249d] to-[#d72db8] transition-[width] duration-700" style={{ width: `${transcriptProgress}%` }} /></div>
+        </div>}
         {transcription.error && <p className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-700">{transcription.error}</p>}
         {onRegenerate && <button type="button" onClick={onRegenerate} disabled={regenerating} className="mt-3 rounded-lg bg-gradient-to-r from-[#7b249d] to-[#d72db8] px-4 py-2 text-sm font-bold !text-white disabled:cursor-wait disabled:opacity-60">{regenerating ? "Queueing…" : "Regenerate word transcript"}</button>}
       </div>}
@@ -39,9 +44,9 @@ export default function EpisodeContentFields({ formData, onChange, onTranscriptC
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium">Manual fallback transcript (optional)</span>
-        <textarea className={fieldClass} rows="12" name="transcript" value={formData.transcript || ""} onChange={(event) => onTranscriptChange(event.target.value)} placeholder="Leave blank to generate the English transcript automatically..." />
-        <span className="block text-xs text-gray-400">No timestamps are required here. This text is kept as a fallback; word highlighting uses WhisperX’s generated words, so leaving it blank gives the most consistent result.</span>
+        <span className="text-sm font-medium">Speaker transcript (recommended for exact wording)</span>
+        <textarea className={fieldClass} rows="12" name="transcript" value={formData.transcript || ""} onChange={(event) => onTranscriptChange(event.target.value)} placeholder={"Parag Dixit\nFull text spoken by Parag...\n\nJulius\nFull text spoken by Julius..."} />
+        <span className="block text-xs leading-5 text-gray-400">Put a host or guest name on its own line, followed by everything they said. The website shows that full speaker turn as one block and uses your spelling. Existing times such as <strong className="text-gray-300">Parag Dixit 0:00</strong> are supported and hidden automatically—you do not need to remove them. WhisperX still provides word-by-word timing.</span>
       </label>
 
       <label className="block space-y-2">

@@ -2121,6 +2121,11 @@ body :where(a, button).bg-theme {
   background: var(--site-primary);
 }
 
+/* Role pills are spans, so they need their own override outside the button rule. */
+.admin-content .admin-role-badge {
+  color: #fff !important;
+}
+
 /* Shared responsive safeguards for every public route and dashboard screen. */
 html,
 body { max-width: 100%; overflow-x: clip; }
