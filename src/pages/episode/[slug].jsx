@@ -41,9 +41,12 @@ function guestExpertiseTags(guest = {}) {
 
 export default function EpisodePage({ initialData }) {
   const [expanded, setExpanded] = useState(false);
-  const [spotifyPlayback, setSpotifyPlayback] = useState({ position: 0, duration: 0, isPaused: true });
+  const [spotifyPlayback, setSpotifyPlayback] = useState({ position: 0, duration: 0, isPaused: true, isBuffering: false, observedAt: 0 });
   const data = initialData;
   const transcript = data.transcript || plainText(data.detail) || data.description;
+  const transcriptLength = Array.isArray(data.transcriptWords)
+    ? data.transcriptWords.reduce((total, word) => total + String(word?.text || word?.word || "").length + 1, 0)
+    : transcript?.length || 0;
   const related = Array.isArray(data.relatedEpisodes) ? data.relatedEpisodes.slice(0, 3) : [];
   const episodeHosts = resolveEpisodeHosts(data, Array.isArray(data.hostProfiles) ? data.hostProfiles : fallbackHosts);
   const guestHosts = Array.isArray(data.guestHostProfiles) ? data.guestHostProfiles : [];
@@ -131,8 +134,8 @@ export default function EpisodePage({ initialData }) {
           <section>
             <article className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 md:p-8 ${expanded ? "h-[520px]" : "md:h-[370px]"}`}>
               <h2 className="flex items-center gap-3 text-2xl font-bold text-[#c99cff] md:text-3xl"><FaMicrophoneAlt aria-hidden="true" /><span>Episode transcript</span></h2>
-              <div className={`mt-5 text-base leading-8 text-white/75 md:text-lg ${expanded ? "min-h-0 flex-1 overflow-y-auto pr-3 [scrollbar-color:#9747FF_#1b1b1b] [scrollbar-width:thin]" : "line-clamp-4 md:min-h-0 md:flex-1 md:overflow-hidden md:[display:block]"}`}><SyncedTranscript transcript={transcript} timestamps={data.timestamps} positionMs={spotifyPlayback.position} expanded={expanded}/></div>
-              {transcript?.length > 350 && <button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={expanded} className={`w-fit font-bold text-[#c99cff] hover:text-[#7b249d] hover:cursor-pointer ${expanded ? "mt-5" : "mt-auto pt-5"}`}>{expanded ? "Read less" : "Read more"}</button>}
+              <div data-transcript-scroll className={`mt-5 text-base leading-8 text-white/75 md:text-lg ${expanded ? "min-h-0 flex-1 overflow-y-auto pr-3 [scrollbar-color:#9747FF_#1b1b1b] [scrollbar-width:thin]" : "line-clamp-4 md:min-h-0 md:flex-1 md:overflow-hidden md:[display:block]"}`}><SyncedTranscript transcript={transcript} timestamps={data.timestamps} wordTimings={data.transcriptWords} transcriptSegments={data.transcriptSegments} transcriptStatus={data.transcriptStatus} playback={spotifyPlayback} positionMs={spotifyPlayback.position} syncOffsetMs={data.transcriptSyncOffsetMs} expanded={expanded}/></div>
+              {transcriptLength > 350 && <button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={expanded} className={`w-fit font-bold text-[#c99cff] hover:text-[#7b249d] hover:cursor-pointer ${expanded ? "mt-5" : "mt-auto pt-5"}`}>{expanded ? "Read less" : "Read more"}</button>}
             </article>
           </section>
 

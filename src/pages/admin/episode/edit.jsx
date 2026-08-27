@@ -36,6 +36,7 @@ export default function Edit() {
     timestamps: "",
     youtubeUrl: "",
     transcript: "",
+    transcriptSyncOffsetMs: 0,
     topicsCovered: "",
     reelLinks: "",
     hostSlugs: [],
@@ -72,11 +73,26 @@ export default function Edit() {
   const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
   const [hosts, setHosts] = useState([]);
   const [episodes, setEpisodes] = useState([]);
+  const [regeneratingTranscript, setRegeneratingTranscript] = useState(false);
 
   useEffect(() => {
     new PodcastApi().AdminHostGet().then((response) => setHosts(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setHosts([]));
   }, []);
   useEffect(() => { new PodcastApi().AdminEpisodeGetAll().then((response) => setEpisodes(Array.isArray(response?.data?.data) ? response.data.data : [])).catch(() => setEpisodes([])); }, []);
+
+  const handleRegenerateTranscript = async () => {
+    if (!id || regeneratingTranscript) return;
+    setRegeneratingTranscript(true);
+    try {
+      const response = await new PodcastApi().EpisodeTranscriptRegenerate(id);
+      setData((current) => current ? { ...current, transcriptStatus: response?.data?.data?.status || "QUEUED", transcriptError: null } : current);
+      toast.success(response?.data?.message || "Transcript regeneration queued");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Unable to queue transcript regeneration");
+    } finally {
+      setRegeneratingTranscript(false);
+    }
+  };
 
   const validateImageDimensions = (file, requiredWidth, requiredHeight) => {
     return new Promise((resolve, reject) => {
@@ -441,6 +457,7 @@ export default function Edit() {
       payload.append("timestamps", formData.timestamps);
       payload.append("youtubeUrl", formData.youtubeUrl);
       payload.append("transcript", formData.transcript);
+      payload.append("transcriptSyncOffsetMs", String(formData.transcriptSyncOffsetMs || 0));
       payload.append("topicsCovered", formData.topicsCovered);
       payload.append("reelLinks", formData.reelLinks);
       payload.append("hostSlugs", JSON.stringify(formData.hostSlugs));
@@ -537,6 +554,7 @@ export default function Edit() {
       timestamps: response?.data?.data?.timestamps || "",
       youtubeUrl: response?.data?.data?.youtubeUrl || "",
       transcript: response?.data?.data?.transcript || "",
+      transcriptSyncOffsetMs: response?.data?.data?.transcriptSyncOffsetMs || 0,
       topicsCovered: (response?.data?.data?.topicsCovered || []).join("\n"),
       reelLinks: (response?.data?.data?.reelLinks || []).join("\n"),
       hostSlugs: Array.isArray(response?.data?.data?.hostSlugs) ? response.data.data.hostSlugs : [],
@@ -823,6 +841,9 @@ export default function Edit() {
               formData={formData}
               onChange={handleChange}
               onTranscriptChange={(value) => setFormData((prev) => ({ ...prev, transcript: value }))}
+              transcription={{ status: data?.transcriptStatus, error: data?.transcriptError, generatedAt: data?.transcriptGeneratedAt }}
+              onRegenerate={handleRegenerateTranscript}
+              regenerating={regeneratingTranscript}
             />
 
             <div className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">

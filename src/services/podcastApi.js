@@ -86,6 +86,18 @@ class PodcastApi {
     return Api.post(`/admin/file/update/${id}`, data);
   }
 
+  async EpisodeTranscriptRegenerate(id) {
+    return Api.post(`/admin/file/${id}/transcript/regenerate`);
+  }
+
+  async EpisodeTranscriptsBackfill(force = false) {
+    return Api.post("/admin/transcripts/backfill", { force });
+  }
+
+  async EpisodeTranscriptsStatus() {
+    return Api.get("/admin/transcripts/status");
+  }
+
   async EpisodeDelete(id) {
     return Api.delete(`/admin/file/delete/${id}`);
   }

@@ -38,6 +38,7 @@ export default function Add() {
     timestamps: "",
     youtubeUrl: "",
     transcript: "",
+    transcriptSyncOffsetMs: 0,
     topicsCovered: "",
     reelLinks: "",
     hostSlugs: [],
@@ -524,6 +525,7 @@ export default function Add() {
       payload.append("timestamps", formData.timestamps);
       payload.append("youtubeUrl", formData.youtubeUrl);
       payload.append("transcript", formData.transcript);
+      payload.append("transcriptSyncOffsetMs", String(formData.transcriptSyncOffsetMs || 0));
       payload.append("topicsCovered", formData.topicsCovered);
       payload.append("reelLinks", formData.reelLinks);
       payload.append("hostSlugs", JSON.stringify(formData.hostSlugs));

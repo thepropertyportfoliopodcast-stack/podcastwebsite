@@ -37,7 +37,9 @@ export default function SpotifyEmbed({ url, title, onPlaybackUpdate }) {
           position: Number(event?.data?.position) || 0,
           duration: Number(event?.data?.duration) || 0,
           isPaused: Boolean(event?.data?.isPaused),
+          isBuffering: Boolean(event?.data?.isBuffering),
           playingURI: event?.data?.playingURI || "",
+          observedAt: performance.now(),
         }));
       });
     };

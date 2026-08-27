@@ -1,12 +1,31 @@
-export default function EpisodeContentFields({ formData, onChange, onTranscriptChange }) {
+const STATUS_STYLE = {
+  READY: "border-emerald-300 bg-emerald-50 text-emerald-800",
+  PROCESSING: "border-violet-300 bg-violet-50 text-violet-800",
+  QUEUED: "border-amber-300 bg-amber-50 text-amber-800",
+  FAILED: "border-red-300 bg-red-50 text-red-800",
+};
+
+export default function EpisodeContentFields({ formData, onChange, onTranscriptChange, transcription, onRegenerate, regenerating = false }) {
   const fieldClass = "w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#9747FF]";
 
   return (
     <section className="rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6 space-y-5">
       <div>
         <h4 className="text-lg font-semibold">Video and episode content</h4>
-        <p className="mt-1 text-sm text-gray-400">Add a YouTube URL, then enter one timestamp per line. Clicking a timestamp on the episode page will jump to that point and play the video. Add one YouTube Short URL per line below.</p>
+        <p className="mt-1 text-sm text-gray-400">YouTube chapters are optional. The English transcript and word timings are generated automatically from the uploaded episode audio by WhisperX.</p>
       </div>
+
+      {transcription?.status && <div className="rounded-xl border border-gray-700 bg-white p-4 text-slate-800">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-bold">Automatic transcript</p>
+            <p className="mt-1 text-xs text-slate-500">{transcription.generatedAt ? `Generated ${new Date(transcription.generatedAt).toLocaleString()}` : "The worker will process this episode audio in the background."}</p>
+          </div>
+          <span className={`rounded-full border px-3 py-1 text-xs font-bold ${STATUS_STYLE[transcription.status] || "border-slate-300 bg-slate-50 text-slate-700"}`}>{transcription.status}</span>
+        </div>
+        {transcription.error && <p className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-700">{transcription.error}</p>}
+        {onRegenerate && <button type="button" onClick={onRegenerate} disabled={regenerating} className="mt-3 rounded-lg bg-gradient-to-r from-[#7b249d] to-[#d72db8] px-4 py-2 text-sm font-bold !text-white disabled:cursor-wait disabled:opacity-60">{regenerating ? "Queueing…" : "Regenerate word transcript"}</button>}
+      </div>}
 
       <label className="block space-y-2">
         <span className="text-sm font-medium">YouTube video URL</span>
@@ -14,14 +33,21 @@ export default function EpisodeContentFields({ formData, onChange, onTranscriptC
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium">Clickable YouTube timestamps</span>
+        <span className="text-sm font-medium">Clickable YouTube chapter timestamps (optional)</span>
         <textarea className={fieldClass} rows="7" name="timestamps" value={formData.timestamps || ""} onChange={onChange} placeholder={"00:00 | Introduction\n03:25 | Market overview\n12:40 | Investment strategy"} />
         <span className="block text-xs text-gray-400">Accepted formats: MM:SS | Title or HH:MM:SS | Title. Enter each chapter on a new line.</span>
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm font-medium">Full transcript</span>
-        <textarea className={fieldClass} rows="12" name="transcript" value={formData.transcript || ""} onChange={(event) => onTranscriptChange(event.target.value)} placeholder="Paste the complete podcast transcript here..." />
+        <span className="text-sm font-medium">Manual fallback transcript (optional)</span>
+        <textarea className={fieldClass} rows="12" name="transcript" value={formData.transcript || ""} onChange={(event) => onTranscriptChange(event.target.value)} placeholder="Leave blank to generate the English transcript automatically..." />
+        <span className="block text-xs text-gray-400">No timestamps are required here. This text is kept as a fallback; word highlighting uses WhisperX’s generated words, so leaving it blank gives the most consistent result.</span>
+      </label>
+
+      <label className="block space-y-2">
+        <span className="text-sm font-medium">Spotify transcript sync offset (milliseconds)</span>
+        <input className={fieldClass} type="number" min="-300000" max="300000" step="50" name="transcriptSyncOffsetMs" value={formData.transcriptSyncOffsetMs || 0} onChange={onChange} />
+        <span className="block text-xs text-gray-400">Keep this at 0 normally. Use a positive number if highlighting is behind Spotify, or a negative number if it is ahead.</span>
       </label>
 
       <label className="block space-y-2">
