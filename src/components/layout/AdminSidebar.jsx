@@ -11,14 +11,14 @@ import { MdOutlineSubtitles } from "react-icons/md";
 import { usePathname } from "next/navigation";
 import { hasSectionAccess } from "@/config/adminSections";
 
-export default function AdminSidebar({ toggle, onNavigate, handleLogout, user }) {
+export default function AdminSidebar({ toggle, collapsed, onNavigate, handleLogout, user }) {
   const pathname = usePathname();
   return (
     <>
       <aside
         id="admin-navigation"
         aria-label="Dashboard navigation"
-        className={`admin-sidebar mobilesidebar ${toggle ? "is-open" : ""}`}
+        className={`admin-sidebar mobilesidebar ${toggle ? "is-open" : ""} ${collapsed ? "is-collapsed" : ""}`}
       >
         <div className="admin-sidebar-menu">
 
@@ -37,8 +37,11 @@ export default function AdminSidebar({ toggle, onNavigate, handleLogout, user })
               className={`admin-sidebar-link ${pathname === "/admin/analytics" ? "is-active" : ""}`}
               href="/admin/analytics"
               onClick={onNavigate}
+              aria-label="Analytics"
+              title={collapsed ? "Analytics" : undefined}
             >
-              <MdOutlineAnalytics className="me-2" size="1.4rem" /> Analytics
+              <MdOutlineAnalytics className="admin-sidebar-icon" size="1.4rem" />
+              <span className="admin-sidebar-label">Analytics</span>
             </Link>
           </li>}
 
@@ -47,8 +50,11 @@ export default function AdminSidebar({ toggle, onNavigate, handleLogout, user })
               className={`admin-sidebar-link ${pathname?.startsWith("/admin/host") ? "is-active" : ""}`}
               href="/admin/host"
               onClick={onNavigate}
+              aria-label="Hosts"
+              title={collapsed ? "Hosts" : undefined}
             >
-              <FaRegUser className="me-2" size="1.4rem" /> Hosts
+              <FaRegUser className="admin-sidebar-icon" size="1.4rem" />
+              <span className="admin-sidebar-label">Hosts</span>
             </Link>
           </li>}
 
@@ -57,9 +63,11 @@ export default function AdminSidebar({ toggle, onNavigate, handleLogout, user })
               className={`admin-sidebar-link ${pathname === "/admin" ? "is-active" : ""}`}
               href={"/admin"}
               onClick={onNavigate}
+              aria-label="Dashboard"
+              title={collapsed ? "Dashboard" : undefined}
             >
-              <MdOutlineSpaceDashboard className="me-2" size={"1.4rem"} />{" "}
-              Dashboard
+              <MdOutlineSpaceDashboard className="admin-sidebar-icon" size={"1.4rem"} />
+              <span className="admin-sidebar-label">Dashboard</span>
             </Link>
           </li>}
           {hasSectionAccess(user, "podcasts") && <li>
@@ -67,9 +75,11 @@ export default function AdminSidebar({ toggle, onNavigate, handleLogout, user })
               className={`admin-sidebar-link ${pathname === "/admin/podcast" ? "is-active" : ""}`}
               href={"/admin/podcast"}
               onClick={onNavigate}
+              aria-label="Podcasts"
+              title={collapsed ? "Podcasts" : undefined}
             >
-              <MdOutlineSpaceDashboard className="me-2" size={"1.4rem"} />{" "}
-              Podcasts
+              <MdOutlineSpaceDashboard className="admin-sidebar-icon" size={"1.4rem"} />
+              <span className="admin-sidebar-label">Podcasts</span>
             </Link>
           </li>}
 
@@ -78,8 +88,11 @@ export default function AdminSidebar({ toggle, onNavigate, handleLogout, user })
               className={`admin-sidebar-link ${pathname === "/admin/transcripts" ? "is-active" : ""}`}
               href="/admin/transcripts"
               onClick={onNavigate}
+              aria-label="Transcripts"
+              title={collapsed ? "Transcripts" : undefined}
             >
-              <MdOutlineSubtitles className="me-2" size="1.4rem" /> Transcripts
+              <MdOutlineSubtitles className="admin-sidebar-icon" size="1.4rem" />
+              <span className="admin-sidebar-label">Transcripts</span>
             </Link>
           </li>}
 
@@ -88,8 +101,11 @@ export default function AdminSidebar({ toggle, onNavigate, handleLogout, user })
               className={`admin-sidebar-link ${pathname === "/admin/enquiry" ? "is-active" : ""}`}
               href={"/admin/enquiry"}
               onClick={onNavigate}
+              aria-label="Enquiry"
+              title={collapsed ? "Enquiry" : undefined}
             >
-              <MdSupportAgent className="me-2" size={"1.4rem"} /> Enquiry
+              <MdSupportAgent className="admin-sidebar-icon" size={"1.4rem"} />
+              <span className="admin-sidebar-label">Enquiry</span>
             </Link>
           </li>}
 
@@ -98,14 +114,18 @@ export default function AdminSidebar({ toggle, onNavigate, handleLogout, user })
               className={`admin-sidebar-link ${pathname === "/admin/subscriber" ? "is-active" : ""}`}
               href={"/admin/subscriber"}
               onClick={onNavigate}
+              aria-label="Subscriber"
+              title={collapsed ? "Subscriber" : undefined}
             >
-              <FaRegUser className="me-2" size={"1.4rem"} /> Subscriber
+              <FaRegUser className="admin-sidebar-icon" size={"1.4rem"} />
+              <span className="admin-sidebar-label">Subscriber</span>
             </Link>
           </li>}
 
           {user?.role === "SUPER_ADMIN" && <li>
-            <Link className={`admin-sidebar-link ${pathname === "/admin/admins" ? "is-active" : ""}`} href="/admin/admins" onClick={onNavigate}>
-              <MdAdminPanelSettings className="me-2" size="1.4rem" /> Admins
+            <Link className={`admin-sidebar-link ${pathname === "/admin/admins" ? "is-active" : ""}`} href="/admin/admins" onClick={onNavigate} aria-label="Admins" title={collapsed ? "Admins" : undefined}>
+              <MdAdminPanelSettings className="admin-sidebar-icon" size="1.4rem" />
+              <span className="admin-sidebar-label">Admins</span>
             </Link>
           </li>}
 
@@ -119,8 +139,9 @@ export default function AdminSidebar({ toggle, onNavigate, handleLogout, user })
           </li> */}
 
           <li>
-            <button type="button" className="admin-sidebar-link w-full cursor-pointer" onClick={handleLogout}>
-              <MdOutlineLogout className="me-2" size={"1.4rem"} /> Logout
+            <button type="button" className="admin-sidebar-link w-full cursor-pointer" onClick={handleLogout} aria-label="Logout" title={collapsed ? "Logout" : undefined}>
+              <MdOutlineLogout className="admin-sidebar-icon" size={"1.4rem"} />
+              <span className="admin-sidebar-label">Logout</span>
             </button>
           </li>
         </ul>

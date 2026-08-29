@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { TbLogout } from "react-icons/tb";
+import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbLogout } from "react-icons/tb";
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import AdminSidebar from "./AdminSidebar";
 import PodcastApi from "@/services/podcastApi";
@@ -12,6 +12,7 @@ import { firstAccessibleRoute, hasSectionAccess, sectionForPath } from "@/config
 
 export default function AdminLayout({ children }) {
   const [toggle, setToggle] = useState(false);
+  const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(false);
   const [verified, setVerified] = useState(false);
   const menuButtonRef = useRef(null);
   const router = useRouter();
@@ -23,6 +24,18 @@ export default function AdminLayout({ children }) {
   }, []);
 
   const showSidebar = () => setToggle((open) => !open);
+
+  const toggleDesktopSidebar = () => {
+    setDesktopSidebarCollapsed((collapsed) => {
+      const nextValue = !collapsed;
+      try {
+        window.localStorage.setItem("adminSidebarCollapsed", String(nextValue));
+      } catch {
+        // The dashboard still works when browser storage is unavailable.
+      }
+      return nextValue;
+    });
+  };
 
   const fetchData = async (signal) => {
     try {
@@ -61,6 +74,16 @@ export default function AdminLayout({ children }) {
     const { signal } = controller;
     fetchData(signal);
     return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    try {
+      setDesktopSidebarCollapsed(
+        window.localStorage.getItem("adminSidebarCollapsed") === "true"
+      );
+    } catch {
+      setDesktopSidebarCollapsed(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -110,6 +133,7 @@ export default function AdminLayout({ children }) {
       <div className="auth-wrap flex justify-between max-lg:flex-wrap">
         <main className="main-wrap">
           <header className="admin-shell-header fixed top-0 left-0 w-full z-[51] px-6 md:px-7 py-2 xl:py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
               <Link href="/" aria-label="Go to The Property Portfolio Podcast website">
                 <Image
                   className="admin-brand-logo h-auto w-auto object-contain"
@@ -120,6 +144,22 @@ export default function AdminLayout({ children }) {
                   alt="The Property Portfolio Podcast"
                 />
               </Link>
+              <button
+                type="button"
+                onClick={toggleDesktopSidebar}
+                className="admin-desktop-sidebar-toggle hidden md:flex"
+                aria-label={desktopSidebarCollapsed ? "Open dashboard sidebar" : "Close dashboard sidebar"}
+                aria-expanded={!desktopSidebarCollapsed}
+                aria-controls="admin-navigation"
+                title={desktopSidebarCollapsed ? "Open sidebar" : "Close sidebar"}
+              >
+                {desktopSidebarCollapsed ? (
+                  <TbLayoutSidebarLeftExpand aria-hidden="true" />
+                ) : (
+                  <TbLayoutSidebarLeftCollapse aria-hidden="true" />
+                )}
+              </button>
+            </div>
             <div className="flex gap-2 items-center">
               <div className="hidden md:flex items-center">
                 <div>
@@ -152,7 +192,13 @@ export default function AdminLayout({ children }) {
             </div>
           </header>
           <div className="admin-workspace flex w-screen overflow-hidden">
-            <AdminSidebar toggle={toggle} onNavigate={closeSidebar} handleLogout={handleLogout} user={user}/>
+            <AdminSidebar
+              toggle={toggle}
+              collapsed={desktopSidebarCollapsed}
+              onNavigate={closeSidebar}
+              handleLogout={handleLogout}
+              user={user}
+            />
             <div className="admin-content content min-w-0 flex-1 md:max-h-[100vh] overflow-y-auto p-4 md:p-6 !pt-[105px] lg:!pt-[112px] w-full">
               <div className="admin-page-frame">
                 {verified ? children : <div className="grid min-h-64 place-items-center text-slate-500">Checking dashboard access…</div>}
