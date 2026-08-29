@@ -50,7 +50,12 @@ export default function EpisodePage({ initialData }) {
   const related = Array.isArray(data.relatedEpisodes) ? data.relatedEpisodes.slice(0, 3) : [];
   const episodeHosts = resolveEpisodeHosts(data, Array.isArray(data.hostProfiles) ? data.hostProfiles : fallbackHosts);
   const guestHosts = Array.isArray(data.guestHostProfiles) ? data.guestHostProfiles : [];
-  const transcriptSpeakerNames = [...episodeHosts, ...guestHosts].map((host) => host.name).filter(Boolean);
+  const heroHosts = [...episodeHosts, ...guestHosts].filter((host, index, people) => {
+    if (!host?.name) return false;
+    const identity = host.slug || host.name;
+    return people.findIndex((person) => (person?.slug || person?.name) === identity) === index;
+  });
+  const transcriptSpeakerNames = heroHosts.map((host) => host.name);
   const titleParts = displayTitleParts(data.title);
   const hasPlatformLinks = Boolean(data.youtubeUrl || data.spotifyLink || data.appleLink);
   useEffect(() => {
@@ -88,7 +93,7 @@ export default function EpisodePage({ initialData }) {
               <h1 className="episode-hero-title font-extrabold leading-[1.08] text-white"><span className="block">{titleParts.lead}</span>{titleParts.accent && <span className="mt-2 block bg-gradient-to-r from-[#A96BFF] to-[#FC4FD8] bg-clip-text text-transparent">{titleParts.accent}</span>}</h1>
               <p className="mt-4 line-clamp-3 text-sm font-medium leading-6 text-white/65 sm:text-base sm:leading-7">{data.description}</p>
 
-              <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-3">{episodeHosts.map((host, index) => <span key={host.slug} className="flex items-center gap-3"><Link href={`/host/${host.slug}`} className="inline-flex items-center gap-2 font-bold text-white transition hover:text-[#FC18D8]"><span className="text-[#FFFFFF] grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#9747FF] to-[#5d1c90]"><FaUser aria-hidden="true" /></span>{host.name}</Link>{index < episodeHosts.length - 1 && <span className="text-[#c99cff]" aria-hidden="true">•</span>}</span>)}</div>
+              <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-3">{heroHosts.map((host, index) => <span key={host.slug || host.name} className="flex items-center gap-3"><Link href={`/host/${host.slug}`} className="inline-flex items-center gap-2 font-bold text-white transition hover:text-[#FC18D8]"><span className="text-[#FFFFFF] grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#9747FF] to-[#5d1c90]"><FaUser aria-hidden="true" /></span>{host.name}</Link>{index < heroHosts.length - 1 && <span className="text-[#c99cff]" aria-hidden="true">•</span>}</span>)}</div>
 
               <div className="mt-5 flex flex-wrap gap-x-4 gap-y-3 text-sm font-semibold text-white/65">
                 <span className="inline-flex items-center gap-2"><FaCalendarAlt className="text-[#c99cff]" aria-hidden="true" />{episodeDate(data.createdAt)}</span>
@@ -119,8 +124,8 @@ export default function EpisodePage({ initialData }) {
                 <div className="min-w-0">
                   <h3 className="text-xl font-bold leading-tight tracking-[-.02em] text-[#190d21] sm:text-2xl">{guest.name}</h3>
                   <p className="mt-1 line-clamp-1 text-xs font-semibold text-[#642984] sm:text-sm">{guest.designation}</p>
-                  <div className="mt-3 flex flex-wrap gap-1.5">{tags.map((tag, tagIndex) => <span key={tag} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold sm:text-xs ${tagIndex === 0 ? "bg-[#8d2dcc] text-white" : "bg-[#ead7f4] text-[#6f228e]"}`}>
-                    <span className="grid h-4 w-4 place-items-center" aria-hidden="true">{tagIndex === 0 ? <FaTag size={10} /> : <FaUser size={10} />}</span>{tag}</span>)}</div>
+                  <div className="mt-3 flex flex-wrap gap-1.5">{tags.map((tag, tagIndex) => <span key={tag} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold sm:text-xs ${tagIndex === 0 ? "bg-[#8d2dcc] !text-white" : "bg-[#ead7f4] text-[#6f228e]"}`}>
+                    <span className={`grid h-4 w-4 place-items-center ${tagIndex === 0 ? "!text-white" : ""}`} aria-hidden="true">{tagIndex === 0 ? <FaTag className="!text-white" size={10} /> : <FaUser size={10} />}</span>{tag}</span>)}</div>
                   <p className="mt-3 line-clamp-3 text-xs leading-5 text-[#514657] sm:text-sm sm:leading-6">{guest.shortBio || guest.bio}</p>
                   {socialUrl && <a href={socialUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex w-fit items-center gap-1.5 text-xs font-bold text-[#7b249d] transition hover:gap-2.5 hover:text-[#FC18D8] sm:text-sm">Connect <span aria-hidden="true">↗</span></a>}
                 </div>

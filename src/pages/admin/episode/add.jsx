@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import AdminLayout from "@/components/layout/AdminLayout";
 import toast from "react-hot-toast";
@@ -688,65 +689,71 @@ export default function Add() {
           <input type="url" name="spotifyLink" value={formData.spotifyLink} onChange={handleChange} placeholder="https://open.spotify.com/episode/..." className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white" />
         </div>
 
-        {/* Thumbnail */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">
-            RSS episode artwork <span className="text-red-500">*</span>
-          </label>
-          <p className="text-xs text-gray-400">
-            Required size: 3000 × 3000 px (square). This image is sent to podcast apps through the RSS feed.
-          </p>
-          <div
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            className="relative w-full h-64 bg-[#1c1c1c] border-2 border-dashed border-gray-600 rounded-xl flex items-center justify-center text-gray-400 cursor-pointer hover:border-white transition"
-          >
-            {thumbnailPreview ? (
-              <img
-                src={thumbnailPreview}
-                alt="Preview"
-                className="h-full object-contain rounded"
-              />
-            ) : (
-              <p className="text-center text-sm">
-                Drag & drop or click to upload
+        <div className="space-y-5 rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-6">
+          <h4 className="text-lg font-semibold">Media</h4>
+
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            {/* Thumbnail */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">
+                RSS episode artwork <span className="text-red-500">*</span>
+              </label>
+              <p className="text-xs text-gray-400">
+                Required size: 3000 × 3000 px (square). This image is sent to podcast apps through the RSS feed.
               </p>
-            )}
-            <input
-              type="file"
-              name="thumbnail"
-              accept="image/*"
-              onChange={handleChange}
-              className="absolute inset-0 opacity-0 cursor-pointer"
-            />
-          </div>
-        </div>
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                className="relative flex h-[320px] w-full cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white"
+              >
+                {thumbnailPreview ? (
+                  <img
+                    src={thumbnailPreview}
+                    alt="Preview"
+                    className="h-full rounded object-contain"
+                  />
+                ) : (
+                  <p className="text-center text-sm">
+                    Drag & drop or click to upload
+                  </p>
+                )}
+                <input
+                  type="file"
+                  name="thumbnail"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="absolute inset-0 cursor-pointer opacity-0"
+                />
+              </div>
+            </div>
 
-        {/* Optional homepage hero artwork */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">Homepage hero image <span className="text-gray-400">(optional)</span></label>
-          <p className="text-xs text-gray-400">Used only for this episode when it appears in the homepage hero. The RSS artwork is used when this is empty.</p>
-          <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white">
-            {homepageThumbnailPreview ? (
-              <img src={homepageThumbnailPreview} alt="Homepage hero preview" className="h-full w-full rounded object-cover" />
-            ) : (
-              <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload a separate homepage hero image</p>
-            )}
-            <input type="file" name="homepageThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
-          </div>
-        </div>
+            {/* Optional homepage hero artwork */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Homepage hero image <span className="text-gray-400">(optional)</span></label>
+              <p className="text-xs text-gray-400">Used only for this episode when it appears in the homepage hero. The RSS artwork is used when this is empty.</p>
+              <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white">
+                {homepageThumbnailPreview ? (
+                  <img src={homepageThumbnailPreview} alt="Homepage hero preview" className="h-full w-full rounded object-cover" />
+                ) : (
+                  <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload a separate homepage hero image</p>
+                )}
+                <input type="file" name="homepageThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
+              </div>
+            </div>
 
-        {/* Optional website card artwork */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium">Website card thumbnail <span className="text-gray-400">(optional)</span></label>
-          <p className="text-xs text-gray-400">Used only on episode cards—never in the homepage hero, episode detail page, players, search results or RSS. Recommended: 1600 × 900 px; any 16:9 image at least 1280 × 720 px is accepted. The RSS artwork is the fallback when empty.</p>
-          <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white">
-            {websiteThumbnailPreview ? (
-              <img src={websiteThumbnailPreview} alt="Website card thumbnail preview" className="h-full w-full rounded object-cover" />
-            ) : (
-              <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload an episode-card thumbnail</p>
-            )}
-            <input type="file" name="websiteThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
+            {/* Optional website card artwork */}
+            <div className="space-y-2 lg:col-span-2">
+              <label className="block text-sm font-medium">Website card thumbnail <span className="text-gray-400">(optional)</span></label>
+              <p className="text-xs text-gray-400">Used only on episode cards—never in the homepage hero, episode detail page, players, search results or RSS. Recommended: 1600 × 900 px; any 16:9 image at least 1280 × 720 px is accepted. The RSS artwork is the fallback when empty.</p>
+              <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-600 bg-[#1c1c1c] text-gray-400 transition hover:border-white lg:max-w-[calc(50%-0.625rem)]">
+                {websiteThumbnailPreview ? (
+                  <img src={websiteThumbnailPreview} alt="Website card thumbnail preview" className="h-full w-full rounded object-cover" />
+                ) : (
+                  <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload an episode-card thumbnail</p>
+                )}
+                <input type="file" name="websiteThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
+              </div>
+            </div>
           </div>
         </div>
 

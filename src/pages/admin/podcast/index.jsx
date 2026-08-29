@@ -77,10 +77,11 @@ export default function Index() {
         ) : data?.length === 0 ? (
           <p className="text-gray-500 text-center mt-20">No podcasts found.</p>
         ) : (
-          (Array.isArray(data) ? data : []).map((podcast) => (
+          <div className="grid items-stretch gap-5 xl:grid-cols-2">
+          {(Array.isArray(data) ? data : []).map((podcast) => (
             <div
               key={podcast.id}
-              className="admin-podcast-card relative w-full overflow-hidden rounded-xl border border-violet-200 bg-white shadow-sm"
+              className="admin-podcast-card relative h-full w-full overflow-hidden rounded-xl border border-violet-200 bg-white shadow-sm"
             >
               {/* 3 Dots Dropdown in top-right corner */}
               <div
@@ -129,23 +130,24 @@ export default function Index() {
 
               {/* Main Link Content */}
               <Link
-                className={`flex cursor-pointer flex-col justify-between gap-5 p-5 transition hover:bg-violet-50 md:flex-row md:items-center
+                className={`flex h-full cursor-pointer flex-col gap-4 p-4 transition hover:bg-violet-50 sm:flex-row sm:items-center
                 ${podcast?.isDeleted ? "opacity-50" : ""}`}
                 href={`/admin/podcast/${podcast?.uuid}`}
               >
 
                 
-                <div className="flex flex-col md:flex-row md:items-center gap-6 flex-1">
+                <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-center">
                   <Image
                     src={podcast?.thumbnail}
-                    height={880}
-                    width={1200}
+                    height={240}
+                    width={240}
                     alt="Thumbnail"
-                    className="h-full w-full max-w-[360px] object-cover rounded-md shadow-sm"
+                    sizes="(max-width: 639px) calc(100vw - 64px), 192px"
+                    className="aspect-square w-full rounded-lg object-cover shadow-sm sm:h-48 sm:w-48 sm:min-w-48"
                   />
 
-                  <div>
-                    <h2 className="text-2xl font-bold mb-1">{podcast?.name}</h2>
+                  <div className="min-w-0 pr-7">
+                    <h2 className="mb-1 line-clamp-2 text-xl font-bold leading-tight">{podcast?.name}</h2>
                     <p className="text-sm text-slate-600">
                       By {podcast?.author}
                     </p>
@@ -154,21 +156,22 @@ export default function Index() {
                     </p>
                     <p className="mt-2 text-sm text-slate-700">
                       <span className="font-semibold">Language:</span>{" "}
-                      {podcast?.language.join(", ") || ""}
+                      {Array.isArray(podcast?.language) ? podcast.language.join(", ") : podcast?.language || ""}
                     </p>
                     <p className="mt-2 text-sm text-slate-700">
                       <span className="font-semibold">Cast:</span>{" "}
-                      {podcast?.cast.join(", ") || ""}
+                      {Array.isArray(podcast?.cast) ? podcast.cast.join(", ") : podcast?.cast || ""}
                     </p>
 
-                    <p className="mt-4 line-clamp-2 text-sm text-slate-600">
+                    <p className="mt-3 line-clamp-2 text-sm text-slate-600">
                       {podcast?.description}
                     </p>
                   </div>
                 </div>
               </Link>
             </div>
-          ))
+          ))}
+          </div>
         )}
       </div>
       <PodcastFormModal
