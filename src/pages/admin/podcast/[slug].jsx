@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { MdVerified } from "react-icons/md";
 import Image from "next/image";
@@ -11,6 +11,9 @@ import PodcastDetails from "@/components/podcasts/PodcastDetails";
 import Link from "next/link";
 import PageLoader from "@/components/ui/PageLoader";
 import toast from "react-hot-toast";
+import { FiSearch } from "react-icons/fi";
+
+const EPISODES_PER_PAGE = 6;
 
 export default function Detail() {
   const router = useRouter();
@@ -19,6 +22,8 @@ export default function Detail() {
   const [isEpisodePopupOpen, setIsEpisodePopupOpen] = useState(false);
   const [data, setData] = useState([]);
   const [selectedEpisode, setSelectedEpisode] = useState(null);
+  const [episodeSearch, setEpisodeSearch] = useState("");
+  const [episodePage, setEpisodePage] = useState(1);
 
   const fetchDetails = async (slug) => {
     try {
@@ -50,6 +55,73 @@ export default function Detail() {
       toast.error("Copy failed")
     }
   }
+
+  const filteredEpisodes = useMemo(() => {
+    const query = episodeSearch.trim().toLowerCase();
+    const episodes = Array.isArray(data?.episodes) ? [...data.episodes] : [];
+
+    return episodes
+      .sort((firstEpisode, secondEpisode) => {
+        const firstDate = Date.parse(firstEpisode?.createdAt || firstEpisode?.updatedAt || "") || 0;
+        const secondDate = Date.parse(secondEpisode?.createdAt || secondEpisode?.updatedAt || "") || 0;
+
+        return (
+          secondDate - firstDate ||
+          (Number(secondEpisode?.episodeNumber) || 0) -
+            (Number(firstEpisode?.episodeNumber) || 0)
+        );
+      })
+      .filter((episode) => {
+        if (!query) return true;
+
+        const searchableValues = [
+          episode?.title,
+          episode?.description,
+          episode?.detail,
+          episode?.topic,
+          episode?.seoTitle,
+          episode?.seoDescription,
+          episode?.episodeNumber,
+          episode?.duration,
+          episode?.podcast?.author,
+          data?.author,
+          `episode ${episode?.episodeNumber || ""}`,
+          `ep ${episode?.episodeNumber || ""}`,
+          `ep${episode?.episodeNumber || ""}`,
+        ];
+
+        return searchableValues.some((value) =>
+          String(value || "").toLowerCase().includes(query)
+        );
+      });
+  }, [data, episodeSearch]);
+
+  const totalEpisodePages = Math.max(
+    1,
+    Math.ceil(filteredEpisodes.length / EPISODES_PER_PAGE)
+  );
+
+  const visibleEpisodes = useMemo(() => {
+    const pageStart = (episodePage - 1) * EPISODES_PER_PAGE;
+    return filteredEpisodes.slice(pageStart, pageStart + EPISODES_PER_PAGE);
+  }, [episodePage, filteredEpisodes]);
+
+  useEffect(() => {
+    if (episodePage > totalEpisodePages) {
+      setEpisodePage(totalEpisodePages);
+    }
+  }, [episodePage, totalEpisodePages]);
+
+  const changeEpisodePage = (page) => {
+    const nextPage = Math.min(Math.max(page, 1), totalEpisodePages);
+    setEpisodePage(nextPage);
+
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById("admin-podcast-episodes")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
   // console.log("data", data);
 
   return (
@@ -132,7 +204,7 @@ export default function Detail() {
           </div>
         </div>
 
-      <div className="mt-8">
+      <div id="admin-podcast-episodes" className="mt-8 scroll-mt-24">
         <div className="flex justify-between items-center mb-3">
         <h2 className="text-2xl font-bold">Episodes</h2>
         <Link
@@ -142,11 +214,99 @@ export default function Detail() {
           Add New Episode
         </Link>
         </div>
-         <div className="space-y-8 mt-6">
-          {(Array.isArray(data?.episodes) ? data.episodes : []).map((item,index)=>(
-            <AdminEpisodeCard episode={item} key={index} fetchDetails={fetchDetails} slug={slug} data={data}/>
-          ))}
-         </div>
+
+        <div className="mt-6 rounded-2xl border border-[#e5d5f0] bg-white p-3 shadow-sm sm:p-4">
+          <label htmlFor="episode-search" className="sr-only">
+            Search episodes
+          </label>
+          <div className="relative">
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-lg text-[#7b6f83]"
+            >
+              <FiSearch />
+            </span>
+            <input
+              id="episode-search"
+              type="search"
+              value={episodeSearch}
+              onChange={(event) => {
+                setEpisodeSearch(event.target.value);
+                setEpisodePage(1);
+              }}
+              placeholder="Search by title, description, episode number or topic..."
+              className="w-full rounded-xl border border-[#dcc8eb] bg-white py-3 pl-12 pr-4 text-sm text-[#170d1c] outline-none transition focus:border-[#b52bea] focus:ring-2 focus:ring-[#b52bea]/20 sm:text-base"
+            />
+          </div>
+          <p className="mt-2 px-1 text-xs text-[#736879] sm:text-sm">
+            {filteredEpisodes.length} {filteredEpisodes.length === 1 ? "episode" : "episodes"}
+            {episodeSearch.trim() ? " found" : " · latest first"}
+          </p>
+        </div>
+
+        {visibleEpisodes.length > 0 ? (
+          <div className="space-y-8 mt-6">
+            {visibleEpisodes.map((item) => (
+              <AdminEpisodeCard
+                episode={item}
+                key={item?.uuid || item?.id}
+                fetchDetails={fetchDetails}
+                slug={slug}
+                data={data}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6 rounded-2xl border border-[#e5d5f0] bg-white px-5 py-10 text-center">
+            <p className="font-semibold text-[#170d1c]">No episodes found</p>
+            <p className="mt-1 text-sm text-[#736879]">
+              Try a different title, description, topic, or episode number.
+            </p>
+          </div>
+        )}
+
+        {totalEpisodePages > 1 && (
+          <nav
+            aria-label="Episode pagination"
+            className="mt-8 flex flex-wrap items-center justify-center gap-2"
+          >
+            <button
+              type="button"
+              onClick={() => changeEpisodePage(episodePage - 1)}
+              disabled={episodePage === 1}
+              className="rounded-lg border border-[#dcc8eb] bg-white px-4 py-2 text-sm font-semibold text-[#5c246f] transition hover:border-[#b52bea] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              Previous
+            </button>
+
+            {Array.from({ length: totalEpisodePages }, (_, index) => index + 1).map(
+              (page) => (
+                <button
+                  key={page}
+                  type="button"
+                  aria-current={page === episodePage ? "page" : undefined}
+                  onClick={() => changeEpisodePage(page)}
+                  className={`min-w-10 rounded-lg border px-3 py-2 text-sm font-bold transition ${
+                    page === episodePage
+                      ? "border-[#9b22cf] bg-[#9b22cf] !text-white"
+                      : "border-[#dcc8eb] bg-white text-[#5c246f] hover:border-[#b52bea]"
+                  }`}
+                >
+                  {page}
+                </button>
+              )
+            )}
+
+            <button
+              type="button"
+              onClick={() => changeEpisodePage(episodePage + 1)}
+              disabled={episodePage === totalEpisodePages}
+              className="rounded-lg border border-[#dcc8eb] bg-white px-4 py-2 text-sm font-semibold text-[#5c246f] transition hover:border-[#b52bea] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              Next
+            </button>
+          </nav>
+        )}
       </div>
       <EpisodeFormModal
         isOpen={isEpisodePopupOpen}
