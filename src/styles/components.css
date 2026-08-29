@@ -892,6 +892,15 @@ main > [class*="bg-black"] {
 .episode-detail-page article > h2 { color: #6f218f; }
 .episode-detail-page article p:not([class*="text-[#"]) { color: #302437; }
 .episode-detail-page .episode-card-chip { background: #ead9f4; color: #57166d; }
+.episode-detail-page .guest-primary-badge,
+.episode-detail-page .guest-primary-badge * {
+  color: #fff !important;
+}
+.episode-detail-page .guest-primary-badge svg,
+.episode-detail-page .guest-primary-badge svg path {
+  color: #fff !important;
+  fill: #fff !important;
+}
 .episode-detail-page .episode-card-topic,
 .episode-detail-page .episode-card-meta,
 .episode-detail-page .episode-card-divider,

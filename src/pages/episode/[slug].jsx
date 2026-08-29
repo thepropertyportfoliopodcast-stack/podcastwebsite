@@ -124,8 +124,8 @@ export default function EpisodePage({ initialData }) {
                 <div className="min-w-0">
                   <h3 className="text-xl font-bold leading-tight tracking-[-.02em] text-[#190d21] sm:text-2xl">{guest.name}</h3>
                   <p className="mt-1 line-clamp-1 text-xs font-semibold text-[#642984] sm:text-sm">{guest.designation}</p>
-                  <div className="mt-3 flex flex-wrap gap-1.5">{tags.map((tag, tagIndex) => <span key={tag} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold sm:text-xs ${tagIndex === 0 ? "bg-[#8d2dcc] !text-white" : "bg-[#ead7f4] text-[#6f228e]"}`}>
-                    <span className={`grid h-4 w-4 place-items-center ${tagIndex === 0 ? "!text-white" : ""}`} aria-hidden="true">{tagIndex === 0 ? <FaTag className="!text-white" size={10} /> : <FaUser size={10} />}</span>{tag}</span>)}</div>
+                  <div className="mt-3 flex flex-wrap gap-1.5">{tags.map((tag, tagIndex) => <span key={tag} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold sm:text-xs ${tagIndex === 0 ? "guest-primary-badge bg-[#8d2dcc]" : "bg-[#ead7f4] text-[#6f228e]"}`}>
+                    <span className="grid h-4 w-4 place-items-center" aria-hidden="true">{tagIndex === 0 ? <FaTag size={10} /> : <FaUser size={10} />}</span>{tag}</span>)}</div>
                   <p className="mt-3 line-clamp-3 text-xs leading-5 text-[#514657] sm:text-sm sm:leading-6">{guest.shortBio || guest.bio}</p>
                   {socialUrl && <a href={socialUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex w-fit items-center gap-1.5 text-xs font-bold text-[#7b249d] transition hover:gap-2.5 hover:text-[#FC18D8] sm:text-sm">Connect <span aria-hidden="true">↗</span></a>}
                 </div>
