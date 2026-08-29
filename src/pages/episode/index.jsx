@@ -102,7 +102,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
       undefined,
       { shallow: true, scroll: false }
     );
-    document.getElementById("episode-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("episode-archive-hero")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const paginationItems = Array.from({ length: totalPages }, (_, index) => index + 1)
@@ -123,7 +123,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
 
           <div className="pointer-events-none absolute -right-[24rem] top-[-18rem] h-[720px] w-[720px] rounded-full bg-[radial-gradient(circle,rgba(151,71,255,.4)_0%,rgba(252,24,216,.2)_42%,transparent_72%)] blur-3xl" aria-hidden="true" />
 
-          <div className="relative z-[2] mx-auto mb-4 w-full max-w-[1310px] px-4 pb-8 sm:px-6 lg:mb-10 lg:px-8 lg:pb-12">
+          <div id="episode-archive-hero" className="relative z-[2] mx-auto mb-4 w-full max-w-[1310px] scroll-mt-[105px] px-4 pb-8 sm:scroll-mt-[120px] sm:px-6 lg:mb-10 lg:scroll-mt-[142px] lg:px-8 lg:pb-12">
             {/* Heading Section */}
             <SectionHeading
               className={"text-center max-w-3xl mx-auto"}
