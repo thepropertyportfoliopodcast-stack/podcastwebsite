@@ -905,6 +905,14 @@ main > [class*="bg-black"] {
 .episode-detail-page .episode-card-meta,
 .episode-detail-page .episode-card-divider,
 .episode-detail-page .episode-card-icon { color: #6f218f; }
+.episode-detail-page .episode-related-section {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.episode-detail-page .episode-related-section::before,
+.episode-detail-page .episode-related-section::after { display: none !important; }
 main article,
 main section[class*="border-white"],
 main div[class*="border-white"][class*="bg-[#111"] {
