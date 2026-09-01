@@ -414,6 +414,84 @@ main > div, main > section { max-width:100%; }
     transform:scale(.94);
   }
 }
+/* Phone-sized landscape viewports use an iPhone-style 19.5:9 shell. The
+   tablet/desktop landscape treatment above remains unchanged on taller screens. */
+@media (orientation:landscape) and (max-height:550px) {
+  .tppp-viewer-mobile .tppp-viewer-device,
+  .tppp-viewer-open.tppp-viewer-mobile .tppp-viewer-device {
+    width:min(96vw,980px,calc((100svh - 16px) * 2.1667));
+    height:auto;
+    aspect-ratio:19.5 / 9;
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-device::before,
+  .tppp-viewer-mobile .tppp-viewer-device::after {
+    content:"";
+    position:absolute;
+    z-index:9;
+    top:-4px;
+    height:5px;
+    border:1px solid #08070a;
+    border-bottom:0;
+    border-radius:5px 5px 0 0;
+    background:linear-gradient(180deg,#302c34,#0b0a0d);
+    box-shadow:inset 0 1px rgba(255,255,255,.12);
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-device::before {
+    left:20%;
+    width:clamp(54px,11vw,88px);
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-device::after {
+    left:34%;
+    width:clamp(34px,7vw,54px);
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-frame {
+    padding:0;
+    border:4px solid #030304;
+    border-radius:clamp(34px,11svh,54px);
+    background:linear-gradient(112deg,#050506 0%,#302c34 8%,#080709 17%,#020203 76%,#312d35 94%,#050506 100%);
+    box-shadow:
+      0 22px 70px rgba(0,0,0,.88),
+      0 0 0 2px #17151a,
+      0 0 0 4px #010102,
+      0 0 38px rgba(195,71,255,.2),
+      inset 2px 0 1px rgba(255,255,255,.17),
+      inset -3px 0 2px #000;
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-frame::before {
+    inset:5px;
+    border-radius:clamp(28px,9.5svh,47px);
+    box-shadow:inset 0 0 0 2px #020203,inset 0 0 14px rgba(0,0,0,.9);
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-screen {
+    inset:8px;
+    width:auto;
+    height:auto;
+    padding:0;
+    border-radius:clamp(26px,9svh,44px);
+    background:#000;
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-video {
+    border-radius:clamp(23px,8svh,40px);
+    background:#000;
+  }
+
+  .tppp-viewer-mobile .tppp-landscape-island {
+    left:clamp(13px,2.5vw,21px);
+    top:50%;
+    width:clamp(23px,3.3vw,29px);
+    height:clamp(78px,24svh,98px);
+    border-radius:999px;
+    background:linear-gradient(90deg,#080809,#000 58%,#070708);
+    transform:translateY(-50%);
+  }
+}
 @media (prefers-reduced-motion:reduce) { .tppp-hero-phone,.tppp-viewer-device { transition-duration:.01ms; }.tppp-viewer-glow { animation:none; } }
 
 @media (max-width: 480px) {
