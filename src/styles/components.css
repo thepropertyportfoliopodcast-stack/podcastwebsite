@@ -470,6 +470,9 @@ main > div, main > section { max-width:100%; }
 
   .tppp-viewer-mobile .tppp-viewer-screen {
     inset:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     width:auto;
     height:auto;
     padding:0;
@@ -478,6 +481,11 @@ main > div, main > section { max-width:100%; }
   }
 
   .tppp-viewer-mobile .tppp-viewer-video {
+    flex:0 0 auto;
+    width:min(100%,calc((100svh - 40px) * 1.7778));
+    height:100%;
+    margin:auto;
+    aspect-ratio:16 / 9;
     border-radius:clamp(23px,8svh,40px);
     background:#000;
   }
