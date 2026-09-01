@@ -342,6 +342,78 @@ main > div, main > section { max-width:100%; }
   .tppp-viewer-frame>.tppp-phone-notch::before { left:32px; top:9px; width:34px; height:4px; }
   .tppp-viewer-frame>.tppp-phone-notch::after { right:10px; top:8px; width:8px; height:8px; }
 }
+/* A phone viewer opened in portrait keeps its mobile class after the physical
+   device rotates. Give that same viewer one stable, full-size landscape state
+   so the portrait card and desktop rotation transforms never overlap. */
+@media (orientation:landscape) and (max-height:720px) {
+  .tppp-viewer.tppp-viewer-mobile {
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-device,
+  .tppp-viewer-open.tppp-viewer-mobile .tppp-viewer-device {
+    width:min(94vw,1200px,calc((100svh - 18px) * 1.7778));
+    height:min(52.875vw,675px,calc(100svh - 18px));
+    transform:none;
+    transition:none;
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-frame {
+    display:block;
+    padding:9px;
+    border-width:3px;
+    border-radius:clamp(24px,7svh,42px);
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-frame::before {
+    inset:5px;
+    display:block;
+    border-radius:clamp(19px,6svh,36px);
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-screen {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    min-height:0;
+    aspect-ratio:auto;
+    padding:9px;
+    margin:0;
+    border:0;
+    border-radius:clamp(20px,6.4svh,38px);
+    transform:none;
+    box-shadow:none;
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-video {
+    width:100%;
+    height:100%;
+    border-radius:clamp(15px,5.2svh,30px);
+  }
+
+  .tppp-viewer-mobile .tppp-viewer-backdrop,
+  .tppp-viewer-mobile .tppp-mobile-info,
+  .tppp-viewer-mobile .tppp-viewer-frame>.tppp-phone-notch {
+    display:none;
+  }
+
+  .tppp-viewer-mobile .tppp-landscape-island { display:block; }
+
+  .tppp-viewer-mobile .tppp-viewer-close {
+    top:max(10px,env(safe-area-inset-top));
+    right:max(10px,env(safe-area-inset-right));
+  }
+
+  .tppp-viewer-mobile.tppp-viewer-closing .tppp-viewer-device {
+    opacity:0;
+    transform:scale(.94);
+  }
+}
 @media (prefers-reduced-motion:reduce) { .tppp-hero-phone,.tppp-viewer-device { transition-duration:.01ms; }.tppp-viewer-glow { animation:none; } }
 
 @media (max-width: 480px) {
