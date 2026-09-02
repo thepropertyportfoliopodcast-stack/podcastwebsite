@@ -131,7 +131,7 @@ export default function Footer() {
                 Get the latest episodes and market discussions in your inbox.
               </p>
             </div>
-            <form onSubmit={submit} className="mt-5 flex gap-2">
+            <form onSubmit={submit} className="site-footer-newsletter-form mt-5 flex gap-2">
               <label htmlFor="footer-email" className="sr-only">
                 Email address
               </label>
@@ -142,12 +142,12 @@ export default function Footer() {
                 type="email"
                 required
                 placeholder="Email address"
-                className="min-h-11 min-w-0 flex-1 rounded-lg border border-white/15 bg-white/[0.04] px-3.5 text-sm text-white placeholder-white/40 outline-none transition duration-200 focus:border-[#C347FF] focus:ring-2 focus:ring-[#C347FF]/30"
+                className="site-footer-newsletter-input min-h-11 min-w-0 flex-1 rounded-lg border border-white/15 bg-white/[0.04] px-3.5 text-sm text-white placeholder-white/40 outline-none transition duration-200 focus:border-[#C347FF] focus:ring-2 focus:ring-[#C347FF]/30"
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="min-h-11 rounded-lg bg-[#A837F4] px-4 text-sm font-bold tracking-wide text-white transition-all duration-200 hover:bg-[#b842ff] hover:shadow-lg hover:shadow-[#A837F4]/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="site-footer-newsletter-button min-h-11 rounded-lg bg-[#A837F4] px-4 text-sm font-bold tracking-wide text-white transition-all duration-200 hover:bg-[#b842ff] hover:shadow-lg hover:shadow-[#A837F4]/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "…" : "Subscribe"}
               </button>
