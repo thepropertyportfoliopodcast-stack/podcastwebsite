@@ -16,6 +16,17 @@ const youtubeIdFrom = (value = "") => {
 
 const imageFor = (phone) => phone?.thumbnail || phone?.homepageThumbnail || "/heroimg01.jpg";
 
+const isPhoneDevice = () => {
+  const userAgent = window.navigator.userAgent || "";
+  const isIPad = /iPad/i.test(userAgent) || (window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1);
+  if (isIPad || (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent))) return false;
+  if (/iPhone|iPod|Windows Phone|IEMobile/i.test(userAgent) || (/Android/i.test(userAgent) && /Mobile/i.test(userAgent))) return true;
+
+  const coarsePointer = window.matchMedia("(pointer: coarse)").matches || window.navigator.maxTouchPoints > 0;
+  const shortestScreenSide = Math.min(window.screen?.width || window.innerWidth, window.screen?.height || window.innerHeight);
+  return coarsePointer ? shortestScreenSide <= 550 : window.matchMedia("(max-width: 720px)").matches;
+};
+
 function YouTubeShortPreview({ url, title, onEnded }) {
   const mountRef = useRef(null);
   const endedRef = useRef(onEnded);
@@ -105,7 +116,7 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
     const phone = document.querySelector(`[data-hero-phone="${phoneData.uuid}"]`);
     if (!phone) return;
     const rect = phone.getBoundingClientRect();
-    const mobile = window.matchMedia("(max-width: 720px)").matches;
+    const mobile = isPhoneDevice();
     clearTimers();
     setViewer({
       episode: phoneData,

@@ -348,10 +348,10 @@ main > div, main > section { max-width:100%; }
 @media (orientation:landscape) and (max-height:720px) {
   .tppp-viewer.tppp-viewer-mobile {
     padding:
-      max(8px, env(safe-area-inset-top))
-      max(10px, env(safe-area-inset-right))
-      max(8px, env(safe-area-inset-bottom))
-      max(10px, env(safe-area-inset-left));
+      max(4px, env(safe-area-inset-top))
+      max(4px, env(safe-area-inset-right))
+      max(4px, env(safe-area-inset-bottom))
+      max(4px, env(safe-area-inset-left));
   }
 
   .tppp-viewer-mobile .tppp-viewer-device,
@@ -417,9 +417,11 @@ main > div, main > section { max-width:100%; }
 /* Phone-sized landscape viewports use an iPhone-style 19.5:9 shell. The
    tablet/desktop landscape treatment above remains unchanged on taller screens. */
 @media (orientation:landscape) and (max-height:550px) {
+  .tppp-viewer.tppp-viewer-mobile { padding:4px; }
+
   .tppp-viewer-mobile .tppp-viewer-device,
   .tppp-viewer-open.tppp-viewer-mobile .tppp-viewer-device {
-    width:min(96vw,980px,calc((100svh - 16px) * 2.1667));
+    width:min(calc(100vw - 8px),980px,calc((100svh - 8px) * 2.1667));
     height:auto;
     aspect-ratio:19.5 / 9;
   }
@@ -469,7 +471,7 @@ main > div, main > section { max-width:100%; }
   }
 
   .tppp-viewer-mobile .tppp-viewer-screen {
-    inset:8px;
+    inset:4px;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -482,10 +484,10 @@ main > div, main > section { max-width:100%; }
 
   .tppp-viewer-mobile .tppp-viewer-video {
     flex:0 0 auto;
-    width:min(100%,calc((100svh - 40px) * 1.7778));
+    width:100%;
     height:100%;
-    margin:auto;
-    aspect-ratio:16 / 9;
+    margin:0;
+    aspect-ratio:auto;
     border-radius:clamp(23px,8svh,40px);
     background:#000;
   }
