@@ -47,7 +47,7 @@ function NowPlaying({ episode }) {
         <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[.2em] text-[#E7C9FF] sm:text-xs"><span className="hero-live-dot h-2 w-2 rounded-full bg-[#D34DFF]" />Now streaming</div>
         <div className="flex items-center gap-2 rounded-full border border-[#C347FF]/30 bg-[#C347FF]/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[.14em] text-white sm:text-xs"><MdMic aria-hidden="true" />{episodeNumber(episode)}</div>
       </div>
-      <Link href={href} aria-label={`Play ${episode?.title || "the latest episode"}`} className="hero-player-visual relative block aspect-video overflow-hidden rounded-[20px] border border-white/15 bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDBBFF]">
+      <Link href={href} prefetch={false} aria-label={`Play ${episode?.title || "the latest episode"}`} className="hero-player-visual relative block aspect-video overflow-hidden rounded-[20px] border border-white/15 bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDBBFF]">
         <Image src={episode?.homepageThumbnail || episode?.thumbnail || "/heroimg01.jpg"} alt={episode?.title ? `${episode.title} episode artwork` : "The Property Portfolio Podcast hosts recording an episode"} fill priority fetchPriority="high" sizes="(max-width:1023px) calc(100vw - 44px), 720px" quality={90} className="hero-player-image object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#09050f]/95 via-transparent to-black/15" />
         <div className="hero-scanline" aria-hidden="true" />
@@ -85,7 +85,7 @@ function Hero({ latest, episodes = [], heroPhones = [] }) {
         </h1>
         <p className="mt-6 max-w-xl text-content-justify-all text-base leading-7 text-[#A837F4]">Australian property conversations covering market trends, suburb research, finance and the strategies investors use when deciding what, where and when to buy.</p>
         <div className="mt-7 grid gap-3 sm:flex">
-          <Link href={latest ? contentPath("episode",latest) : "/episode"} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8c2ed3] to-[#C347FF] px-5 font-bold transition hover:-translate-y-0.5 hover:brightness-110">
+          <Link href={latest ? contentPath("episode",latest) : "/episode"} prefetch={false} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8c2ed3] to-[#C347FF] px-5 font-bold transition hover:-translate-y-0.5 hover:brightness-110">
           <FaPlay size={13}/>Watch latest episode
           </Link>
           <Link href="/episode" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-[#64237f] bg-white/85 px-5 font-bold text-[#64237f] transition hover:bg-white"><FaMicrophoneAlt size={18} />Browse episodes

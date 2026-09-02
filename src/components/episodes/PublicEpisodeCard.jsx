@@ -26,8 +26,8 @@ export default function PublicEpisodeCard({ episode, imagePriority = false }) {
   return (
     <Link
       href={href}
+      prefetch={false}
       className="episode-grid-card group flex h-full min-w-0 flex-col text-inherit no-underline"
-      aria-label={`Open episode: ${episode?.title || "Podcast episode"}`}
     >
       <article className="episode-card-surface flex h-full flex-col">
         <div className="episode-grid-image relative overflow-visible rounded-[22px]">

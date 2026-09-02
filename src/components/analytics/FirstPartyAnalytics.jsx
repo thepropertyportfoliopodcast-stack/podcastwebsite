@@ -81,7 +81,18 @@ export default function FirstPartyAnalytics() {
     const engagement = () => { const seconds = Math.round((Date.now() - enteredAt.current) / 1000); if (seconds > 0 && currentPath.current) send("engagement", { value: Math.min(seconds, 1800) }, true, currentPath.current); enteredAt.current = Date.now(); };
     const onRoute = () => { engagement(); setTimeout(pageView, 0); };
     const onVisibility = () => { if (document.visibilityState === "hidden") engagement(); else enteredAt.current = Date.now(); };
-    const onScroll = () => { const maximum = document.documentElement.scrollHeight - innerHeight; if (maximum <= 0) return; const depth = Math.min(100, Math.round(scrollY / maximum * 100)); [25,50,75,100].forEach((threshold)=>{ if (depth >= threshold && !sentScroll.current.has(threshold)) { sentScroll.current.add(threshold); send("scroll_depth", { value: threshold }); } }); };
+    let scrollFrame = 0;
+    const measureScroll = () => {
+      scrollFrame = 0;
+      const maximum = document.documentElement.scrollHeight - innerHeight;
+      if (maximum <= 0) return;
+      const depth = Math.min(100, Math.round(scrollY / maximum * 100));
+      [25,50,75,100].forEach((threshold)=>{ if (depth >= threshold && !sentScroll.current.has(threshold)) { sentScroll.current.add(threshold); send("scroll_depth", { value: threshold }); } });
+    };
+    const onScroll = () => {
+      if (scrollFrame || sentScroll.current.size === 4) return;
+      scrollFrame = window.requestAnimationFrame(measureScroll);
+    };
     const onClick = (event) => { const anchor = event.target.closest?.("a[href]"); if (!anchor) return; try { const url = new URL(anchor.href, location.href); if (url.origin !== location.origin) send("outbound_click", { metadata: { url: url.href, domain: url.hostname, text: anchor.textContent?.trim().slice(0,120) } }); } catch {} };
     const onPlay = (event) => { if (event.target.matches?.("audio,video")) send("media_play", { metadata: { source: event.target.currentSrc || event.target.src } }); };
     const onSubmit = (event) => send("form_submit", { metadata: { form: event.target.id || event.target.getAttribute("aria-label") || event.target.action || "form" } });
@@ -112,7 +123,7 @@ export default function FirstPartyAnalytics() {
     observe("largest-contentful-paint", (entries)=>{ const entry = entries.at(-1); if (entry) send("web_vital", { value: entry.startTime, metadata: { metric: "LCP" } }); });
     let cls = 0; observe("layout-shift", (entries)=>{ entries.forEach((entry)=>{ if (!entry.hadRecentInput) cls += entry.value; }); });
     observe("event", (entries)=>{ const value = Math.max(0, ...entries.map((entry)=>entry.duration || 0)); if (value) send("web_vital", { value, metadata: { metric: "INP" } }); });
-    return () => { if (cls) send("web_vital", { value: cls, metadata: { metric: "CLS" } }, true); engagement(); router.events.off("routeChangeComplete", onRoute); document.removeEventListener("visibilitychange", onVisibility); window.removeEventListener("scroll", onScroll); document.removeEventListener("click", onClick, true); document.removeEventListener("play", onPlay, true); document.removeEventListener("submit", onSubmit, true); window.removeEventListener("error", onError, true); window.removeEventListener("unhandledrejection", onRejection); window.removeEventListener("pagehide", engagement); observers.forEach((observer)=>observer.disconnect()); };
+    return () => { if (cls) send("web_vital", { value: cls, metadata: { metric: "CLS" } }, true); engagement(); router.events.off("routeChangeComplete", onRoute); document.removeEventListener("visibilitychange", onVisibility); window.removeEventListener("scroll", onScroll); document.removeEventListener("click", onClick, true); document.removeEventListener("play", onPlay, true); document.removeEventListener("submit", onSubmit, true); window.removeEventListener("error", onError, true); window.removeEventListener("unhandledrejection", onRejection); window.removeEventListener("pagehide", engagement); if (scrollFrame) window.cancelAnimationFrame(scrollFrame); observers.forEach((observer)=>observer.disconnect()); };
   }, [router.events]);
   return null;
 }

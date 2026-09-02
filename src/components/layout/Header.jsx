@@ -11,7 +11,23 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
   const toggleMenu = () => setMenuOpen(!menuOpen);
-  useEffect(() => { const update = () => setScrolled(window.scrollY > 20); update(); window.addEventListener("scroll", update, { passive: true }); return () => window.removeEventListener("scroll", update); }, []);
+  useEffect(() => {
+    let frameId = 0;
+    const update = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        const next = window.scrollY > 20;
+        setScrolled((current) => current === next ? current : next);
+      });
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", update);
+      if (frameId) window.cancelAnimationFrame(frameId);
+    };
+  }, []);
   useEffect(() => setMenuOpen(false), [router.asPath]);
   const links = [["/","Home"],["/episode","Episodes"],["/about","About"],["/contact","Contact"]];
   const active = (href) => href === "/" ? router.pathname === "/" : router.pathname.startsWith(href);
@@ -30,7 +46,7 @@ export default function Header() {
                 src={"/logo.webp"}
                 alt="The Property Portfolio Podcast"
                 sizes="(max-width: 640px) 170px, (max-width: 768px) 200px, 211px"
-                quality={68}
+                quality={55}
                 priority
               />
             </Link>

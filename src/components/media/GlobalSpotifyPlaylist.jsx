@@ -45,15 +45,20 @@ export default function GlobalSpotifyPlaylist() {
       return () => aboutObserver?.disconnect();
     }
 
+    let frameId = 0;
     const updateVisibility = () => {
-      const visible = window.scrollY >= Math.max(180, window.innerHeight * .62);
-      setScrolledPastHero(visible);
-      if (visible) setShouldLoad(true);
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        const visible = window.scrollY >= Math.max(180, window.innerHeight * .62);
+        setScrolledPastHero((current) => current === visible ? current : visible);
+        if (visible) setShouldLoad(true);
+      });
     };
     updateVisibility();
     window.addEventListener("scroll", updateVisibility, { passive: true });
     window.addEventListener("resize", updateVisibility);
-    return () => { window.removeEventListener("scroll", updateVisibility); window.removeEventListener("resize", updateVisibility); aboutObserver?.disconnect(); };
+    return () => { window.removeEventListener("scroll", updateVisibility); window.removeEventListener("resize", updateVisibility); if (frameId) window.cancelAnimationFrame(frameId); aboutObserver?.disconnect(); };
   }, []);
   if (!src) return null;
   return <aside className={`global-spotify-player ${scrolledPastHero ? "is-scroll-visible" : ""}`} aria-label="The Property Portfolio Podcast on Spotify">

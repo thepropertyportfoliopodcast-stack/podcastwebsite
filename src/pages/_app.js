@@ -55,8 +55,9 @@ function DeferredTagManager() {
     if (!GTM_ENABLED) return undefined;
     let loaded = false;
     let timerId;
-    const events = ["pointerdown", "touchstart", "keydown"];
-    const removeListeners = () => events.forEach((event) => window.removeEventListener(event, load));
+    let idleId;
+    const events = ["click", "keydown"];
+    const removeListeners = () => events.forEach((event) => window.removeEventListener(event, requestLoad));
     const load = () => {
       if (loaded) return;
       loaded = true;
@@ -69,8 +70,16 @@ function DeferredTagManager() {
       script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(GTM_ID)}`;
       document.head.appendChild(script);
     };
+    const requestLoad = () => {
+      removeListeners();
+      window.clearTimeout(timerId);
+      timerId = window.setTimeout(() => {
+        if ("requestIdleCallback" in window) idleId = window.requestIdleCallback(load, { timeout: 2500 });
+        else load();
+      }, 1200);
+    };
     const schedule = () => { timerId = window.setTimeout(load, 12000); };
-    events.forEach((event) => window.addEventListener(event, load, { once: true, passive: true }));
+    events.forEach((event) => window.addEventListener(event, requestLoad, { once: true, passive: true }));
     if (document.readyState === "complete") schedule();
     else window.addEventListener("load", schedule, { once: true });
 
@@ -78,6 +87,7 @@ function DeferredTagManager() {
       window.removeEventListener("load", schedule);
       removeListeners();
       window.clearTimeout(timerId);
+      if (idleId && "cancelIdleCallback" in window) window.cancelIdleCallback(idleId);
     };
   }, []);
 

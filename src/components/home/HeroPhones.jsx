@@ -230,7 +230,7 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
       onPointerCancel={cancelSwipe}
     >
       {items.map((episode, index) => (
-        <div role="button" tabIndex={index === active ? 0 : -1} key={episode.uuid} data-hero-phone={episode.uuid} onClick={(event) => { if (suppressClickRef.current) { event.preventDefault(); event.stopPropagation(); return; } openViewer(episode); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openViewer(episode); } }} className={`tppp-hero-phone ${position(index)}`} aria-label={`Play ${episode.title}`}>
+        <div role="button" tabIndex={index === active ? 0 : -1} key={episode.uuid} data-hero-phone={episode.uuid} onClick={(event) => { if (suppressClickRef.current) { event.preventDefault(); event.stopPropagation(); return; } openViewer(episode); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openViewer(episode); } }} className={`tppp-hero-phone ${position(index)}`}>
           <span className="tppp-phone-frame">
             <span className="tppp-phone-notch" aria-hidden="true" />
             <Image src={imageFor(episode)} alt={episode.title} fill priority={index === 0} fetchPriority={index === 0 ? "high" : "auto"} sizes="(max-width:620px) 188px, 270px" quality={68} className="object-cover" />

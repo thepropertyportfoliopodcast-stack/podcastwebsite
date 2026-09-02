@@ -1657,7 +1657,7 @@ body :where(a, button).bg-theme {
   grid-area: title;
   font-size: 1.05rem;
   font-weight: 800;
-  color: var(--home-purple-bright);
+  color: var(--site-primary);
   align-self: center;
 }
 .home-learning-card p {
@@ -1799,7 +1799,7 @@ body :where(a, button).bg-theme {
 .home-host-body h3 {
   font-size: 1.05rem;
   font-weight: 800;
-  color: var(--home-purple-bright);
+  color: var(--site-primary);
 }
 
 .home-host-body p {
@@ -2545,6 +2545,90 @@ body { max-width: 100%; overflow-x: clip; }
     top: auto;
     bottom: 10px;
     left: 10px;
+  }
+}
+
+/* Native, low-overhead scrolling for links and programmatic navigation. */
+@media (prefers-reduced-motion: no-preference) {
+  html,
+  .admin-content,
+  [data-transcript-scroll],
+  .tppp-mobile-playlist {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Touch devices repaint fixed backgrounds and live blur layers while panning.
+   Keep the same composition, but use compositor-friendly equivalents. */
+@media (any-pointer: coarse) {
+  html,
+  body,
+  #__next,
+  .public-site {
+    background-attachment: scroll;
+  }
+
+  html,
+  #__next,
+  .public-site {
+    background-image: none;
+  }
+
+  #__next,
+  .public-site {
+    background-color: transparent;
+  }
+
+  body,
+  .admin-content,
+  [data-transcript-scroll],
+  .tppp-mobile-playlist,
+  .admin-table-scroll,
+  .admin-content .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .site-header,
+  .global-spotify-player,
+  .home-platform-card,
+  .hero-spectrum-tower,
+  .hero-latest-play,
+  .contact-hero,
+  .tppp-viewer {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .global-spotify-player {
+    background: linear-gradient(135deg, rgba(74, 28, 105, .97), rgba(20, 13, 30, .98));
+  }
+
+  .home-wave span,
+  .topic-orbit,
+  .hero-play-ripple,
+  .hero-play-orbit,
+  .hero-live-dot,
+  .hero-player-orb,
+  .hero-progress::after,
+  .hero-scanline,
+  .hero-spectrum-tower span,
+  .hero-audio-rail::after,
+  .episode-play-wave,
+  .home-learning-bars span,
+  .home-learning-dot,
+  .home-host-onair-dot,
+  .home-newsletter-art,
+  .about-approach-progress {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  .admin-content,
+  [data-transcript-scroll],
+  .tppp-mobile-playlist {
+    scroll-behavior: auto;
   }
 }
 
