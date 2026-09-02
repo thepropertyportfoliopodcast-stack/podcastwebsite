@@ -237,7 +237,8 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
             {mounted && !viewer && index === active && episode.shortVideo && !failedVideos.has(episode.uuid) ? <video key={`${episode.uuid}-${active}`} src={episode.shortVideo} muted autoPlay playsInline preload="metadata" onEnded={advancePhone} onError={() => handlePreviewError(episode.uuid)} className="absolute inset-0 z-[2] h-full w-full object-cover" aria-hidden="true" /> : null}
             {mounted && !viewer && index === active && (!episode.shortVideo || failedVideos.has(episode.uuid)) && episode.youtubeShortUrl ? <YouTubeShortPreview key={`${episode.uuid}-${active}`} url={episode.youtubeShortUrl} title={episode.title} onEnded={advancePhone} /> : null}
             <span className="tppp-phone-overlay">
-              <span className="tppp-phone-copy"><small>{episode.episodeNumber ? `Episode ${episode.episodeNumber}` : "Featured video"}</small><strong>{episode.title}</strong>{episode.description && <span>{episode.description}</span>}<em><FaPlay /> Tap to watch</em></span>
+              <span className="tppp-phone-cta"><FaPlay aria-hidden="true" /> Tap to watch</span>
+              <span className="tppp-phone-copy"><small>{episode.episodeNumber ? `Episode ${episode.episodeNumber}` : "Featured video"}</small><strong>{episode.title}</strong>{episode.description && <span>{episode.description}</span>}</span>
             </span>
           </span>
         </div>
