@@ -8,6 +8,7 @@ import { MdSupportAgent } from "react-icons/md";
 import { MdOutlineAnalytics } from "react-icons/md";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { MdOutlineSubtitles } from "react-icons/md";
+import { MdOutlineSecurity } from "react-icons/md";
 import { usePathname } from "next/navigation";
 import { hasSectionAccess } from "@/config/adminSections";
 
@@ -42,6 +43,19 @@ export default function AdminSidebar({ toggle, collapsed, onNavigate, handleLogo
             >
               <MdOutlineAnalytics className="admin-sidebar-icon" size="1.4rem" />
               <span className="admin-sidebar-label">Analytics</span>
+            </Link>
+          </li>}
+
+          {user?.role === "SUPER_ADMIN" && <li>
+            <Link
+              className={`admin-sidebar-link ${pathname === "/admin/ip-whitelist" ? "is-active" : ""}`}
+              href="/admin/ip-whitelist"
+              onClick={onNavigate}
+              aria-label="Analytics IP whitelist"
+              title={collapsed ? "IP whitelist" : undefined}
+            >
+              <MdOutlineSecurity className="admin-sidebar-icon" size="1.4rem" />
+              <span className="admin-sidebar-label">IP whitelist</span>
             </Link>
           </li>}
 

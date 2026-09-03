@@ -14,6 +14,7 @@ export const firstAccessibleRoute = (user) => user?.role === "SUPER_ADMIN" ? "/a
 export function sectionForPath(pathname = "") {
   if (pathname === "/admin") return "dashboard";
   if (pathname.startsWith("/admin/analytics")) return "analytics";
+  if (pathname.startsWith("/admin/ip-whitelist")) return "super_admin";
   if (pathname.startsWith("/admin/podcast") || pathname.startsWith("/admin/episode") || pathname.startsWith("/admin/hero-phones") || pathname.startsWith("/admin/guide")) return "podcasts";
   if (pathname.startsWith("/admin/transcripts")) return "transcripts";
   if (pathname.startsWith("/admin/host")) return "hosts";

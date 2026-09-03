@@ -154,6 +154,10 @@ async enquiryGet(page, limit) {
   async analyticsLighthousePages() { return Api.get("/admin/analytics/lighthouse/pages"); }
   async analyticsLighthouse(params = {}) { return Api.get("/admin/analytics/lighthouse", { params }); }
   async analyticsHealth() { return Api.get("/admin/analytics/health"); }
+  async analyticsIpExclusionsGet() { return Api.get("/admin/analytics/ip-exclusions"); }
+  async analyticsIpExclusionCreate(data) { return Api.post("/admin/analytics/ip-exclusions", data); }
+  async analyticsIpExclusionUpdate(id, data) { return Api.patch(`/admin/analytics/ip-exclusions/${id}`, data); }
+  async analyticsIpExclusionDelete(id) { return Api.delete(`/admin/analytics/ip-exclusions/${id}`); }
   async AdminUsersGet() { return Api.get("/admin/users"); }
   async AdminUserCreate(data) { return Api.post("/admin/users", data); }
   async AdminUserUpdate(id, data) { return Api.patch(`/admin/users/${id}`, data); }
