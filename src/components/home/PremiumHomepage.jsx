@@ -73,7 +73,7 @@ function NowPlaying({ episode }) {
 }
 function Hero({ latest, episodes = [], heroPhones = [] }) {
   return <>
-  <section className="home-hero relative isolate overflow-hidden pb-[clamp(3rem,7vh,6rem)] pt-[clamp(10rem,15vh,8.75rem)] lg:min-h-[min(820px,100svh)]">
+  <section className="home-hero relative isolate overflow-hidden pb-[clamp(3rem,7vh,6rem)] pt-[clamp(8rem,15vh,8.75rem)] lg:min-h-[min(820px,100svh)]">
     <div className="absolute inset-0 -z-20 bg-[#07070B]"/>
     <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_78%_36%,rgba(168,55,244,.24),transparent_34%),radial-gradient(circle_at_12%_55%,rgba(100,38,145,.22),transparent_35%),linear-gradient(180deg,#0e0917_0%,#07070b_82%)]"/>
     <div className="absolute inset-x-0 bottom-0 -z-10 h-64 opacity-25 [background-image:linear-gradient(90deg,transparent_49%,rgba(195,71,255,.22)_50%,transparent_51%),linear-gradient(rgba(195,71,255,.15)_1px,transparent_1px)] [background-size:54px_54px] [mask-image:linear-gradient(to_top,black,transparent)]"/>
@@ -84,7 +84,7 @@ function Hero({ latest, episodes = [], heroPhones = [] }) {
           <span className="block text-[#C347FF] font-black text-[clamp(2.65rem,4.4vw,4.35rem)] leading-[.96] tracking-[-.045em]">Intelligence</span>
         </h1>
         <p className="mt-6 max-w-xl text-content-justify-all text-base leading-7 text-[#A837F4]">Australian property conversations covering market trends, suburb research, finance and the strategies investors use when deciding what, where and when to buy.</p>
-        <div className="mt-7 grid gap-3 sm:flex">
+        <div className="mt-7 grid gap-3 sm:flex justify-center">
           <Link href={latest ? contentPath("episode",latest) : "/episode"} prefetch={false} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8c2ed3] to-[#C347FF] px-5 font-bold transition hover:-translate-y-0.5 hover:brightness-110">
           <FaPlay size={13}/>Watch latest episode
           </Link>
