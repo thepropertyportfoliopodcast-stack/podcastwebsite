@@ -1,5 +1,6 @@
 import HomePage from "@/components/home/HomePage";
 import { getCachedValue } from "@/utils/serverCache";
+import { developmentEpisodes, developmentHeroPhones, developmentHosts, isDevelopmentExampleMode } from "@/data/developmentContent";
 
 export default function Home({ initialEpisodes = [], latestEpisode = null, initialHeroPhones = [], initialHosts = [] }) {
   return (
@@ -9,6 +10,20 @@ export default function Home({ initialEpisodes = [], latestEpisode = null, initi
 
 export async function getServerSideProps({ res }) {
   const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
+  const exampleEpisodes = isDevelopmentExampleMode ? developmentEpisodes : [];
+  const exampleHeroPhones = isDevelopmentExampleMode ? developmentHeroPhones : [];
+  const exampleHosts = isDevelopmentExampleMode ? developmentHosts : [];
+  if (isDevelopmentExampleMode) {
+    res.setHeader("Cache-Control", "no-store");
+    return {
+      props: {
+        initialEpisodes: exampleEpisodes,
+        latestEpisode: exampleEpisodes[0] || null,
+        initialHeroPhones: exampleHeroPhones,
+        initialHosts: exampleHosts,
+      },
+    };
+  }
   const safely = (request, fallback, label) => request.catch((error) => {
     console.error(`${label} fetch failed:`, error.message);
     return fallback;
@@ -52,22 +67,25 @@ export async function getServerSideProps({ res }) {
         return Array.isArray(payload?.data) ? payload.data : [];
       }, 30000), [], "Homepage hosts"),
     ]);
+    const resolvedEpisodes = episodes.length ? episodes : exampleEpisodes;
+    const resolvedHeroPhones = heroPhones.length ? heroPhones : (episodes.length ? [] : exampleHeroPhones);
+    const resolvedHosts = hosts.length ? hosts : exampleHosts;
     return {
       props: {
-        initialEpisodes: episodes,
-        latestEpisode: latestEpisode || episodes[0] || null,
-        initialHeroPhones: heroPhones,
-        initialHosts: hosts,
+        initialEpisodes: resolvedEpisodes,
+        latestEpisode: latestEpisode || resolvedEpisodes[0] || null,
+        initialHeroPhones: resolvedHeroPhones,
+        initialHosts: resolvedHosts,
       },
     };
   } catch (error) {
     console.error("Home SSR fetch failed:", error.message);
     return {
       props: {
-        initialEpisodes: [],
-        latestEpisode: null,
-        initialHeroPhones: [],
-        initialHosts: [],
+        initialEpisodes: exampleEpisodes,
+        latestEpisode: exampleEpisodes[0] || null,
+        initialHeroPhones: exampleHeroPhones,
+        initialHosts: exampleHosts,
       },
     };
   }

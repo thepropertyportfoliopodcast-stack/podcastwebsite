@@ -10,6 +10,7 @@ import TopicSuggestionForm from "@/components/episodes/TopicSuggestionForm";
 import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
 import { contentPath, episodeKeywords, extractUuid, metaDescription, plainText, SITE_URL } from "@/utils/seo";
 import { fallbackHosts, resolveEpisodeHosts } from "@/data/hosts";
+import { findDevelopmentEpisode, isDevelopmentExampleMode } from "@/data/developmentContent";
 
 function episodeDuration(seconds, minutes) {
   const total = Number(seconds) || (Number(minutes) * 60) || 0;
@@ -160,16 +161,22 @@ export default function EpisodePage({ initialData }) {
 
 export async function getServerSideProps({ params, res }) {
   const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
+  const exampleEpisode = isDevelopmentExampleMode ? findDevelopmentEpisode(extractUuid(params.slug)) || findDevelopmentEpisode(params.slug) : null;
+  if (isDevelopmentExampleMode) {
+    if (!exampleEpisode) return { notFound: true };
+    res.setHeader("Cache-Control", "no-store");
+    return { props: { initialData: exampleEpisode } };
+  }
   try {
     const [response, hostsResult] = await Promise.all([
       fetch(`${apiUrl}/file/get/${encodeURIComponent(extractUuid(params.slug))}`),
       fetch(`${apiUrl}/host/get`).then(async (hostsResponse) => hostsResponse.ok ? (await hostsResponse.json())?.data : []).catch(() => []),
     ]);
-    if (response.status === 404) return { notFound: true };
+    if (response.status === 404) return exampleEpisode ? { props: { initialData: exampleEpisode } } : { notFound: true };
     if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
     const payload = (await response.json())?.data;
     let episode = payload && typeof payload === "object" && !Array.isArray(payload) ? payload : null;
-    if (!episode) return { notFound: true };
+    if (!episode) return exampleEpisode ? { props: { initialData: exampleEpisode } } : { notFound: true };
     episode = { ...episode, hostProfiles: Array.isArray(episode.hostProfiles) ? episode.hostProfiles : (Array.isArray(hostsResult) ? hostsResult : []), guestHostProfiles: Array.isArray(episode.guestHostProfiles) ? episode.guestHostProfiles : [] };
     const canonicalPath = contentPath("episode", episode);
     if (`/episode/${params.slug}` !== canonicalPath) return { redirect: { destination: canonicalPath, permanent: true } };
@@ -177,6 +184,6 @@ export async function getServerSideProps({ params, res }) {
     return { props: { initialData: episode } };
   } catch (error) {
     console.error("Episode SSR fetch failed:", error.message);
-    return { notFound: true };
+    return exampleEpisode ? { props: { initialData: exampleEpisode } } : { notFound: true };
   }
 }

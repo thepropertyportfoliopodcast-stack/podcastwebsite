@@ -1030,6 +1030,10 @@ body :where([class*="bg-[#A837F4]"], [class*="bg-[#9747FF]"], [class*="bg-[#C347
 .tppp-viewer-frame,
 .tppp-viewer-screen { background-color: #050506; }
 .tppp-mobile-info { background: #0b0810; }
+@media (max-width:720px) and (orientation:portrait) {
+  .tppp-mobile-info > span { margin-left:-4px; }
+  .tppp-mobile-info > h2 { margin-left:-4px; }
+}
 .tppp-mobile-playlist button { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); }
 
 .min-h-screen > main,

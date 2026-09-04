@@ -8,6 +8,7 @@ import { getEpisodes } from "@/services/publicApi";
 import PublicEpisodeCard from "@/components/episodes/PublicEpisodeCard";
 import PageLoader from "@/components/ui/PageLoader";
 import { getCachedValue } from "@/utils/serverCache";
+import { developmentEpisodeListing, isDevelopmentExampleMode } from "@/data/developmentContent";
 
 export default function Index({ initialEpisodes = [], initialTopics = [], initialPagination = {} }) {
   const router = useRouter();
@@ -33,17 +34,30 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
   const fetchEpisodes = async (search = "", topic = "", pageNumber = 1) => {
     try {
       setLoading(true);
+      if (isDevelopmentExampleMode) {
+        const localData = developmentEpisodeListing(search, topic, pageNumber, LIMIT);
+        setTopics(localData.topics);
+        setTotalPages(localData.pagination.totalPages);
+        setPage(localData.pagination.page);
+        setData(localData.episodes);
+        return;
+      }
       const response = await getEpisodes(search, topic, pageNumber, LIMIT);
       const resData = response?.data;
       const nextTopics = Array.isArray(resData?.topics) ? resData.topics : [];
       const nextEpisodes = Array.isArray(resData?.episodes) ? resData.episodes : [];
-      setTopics(nextTopics);
-      setTotalPages(Math.max(1, Number(resData?.pagination?.totalPages) || 1));
-      setPage(Number(resData?.pagination?.page) || pageNumber);
-      setData(nextEpisodes);
+      const localData = isDevelopmentExampleMode && !nextEpisodes.length ? developmentEpisodeListing(search, topic, pageNumber, LIMIT) : null;
+      setTopics(localData?.topics || nextTopics);
+      setTotalPages(Math.max(1, Number(localData?.pagination?.totalPages || resData?.pagination?.totalPages) || 1));
+      setPage(Number(localData?.pagination?.page || resData?.pagination?.page) || pageNumber);
+      setData(localData?.episodes || nextEpisodes);
     } catch (error) {
       console.log("error", error);
-      setData([]);
+      const localData = isDevelopmentExampleMode ? developmentEpisodeListing(search, topic, pageNumber, LIMIT) : null;
+      setTopics(localData?.topics || []);
+      setTotalPages(localData?.pagination?.totalPages || 1);
+      setPage(localData?.pagination?.page || pageNumber);
+      setData(localData?.episodes || []);
     } finally {
       setLoading(false);
     }
@@ -67,12 +81,25 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
     if (timerRef.current) clearTimeout(timerRef.current);
     if (sval.trim().length < 2) { setSuggestions([]); setSuggestionsOpen(false); return; }
     timerRef.current = setTimeout(async () => {
+      if (isDevelopmentExampleMode) {
+        const localMatches = developmentEpisodeListing(sval.trim(), "", 1, 6).episodes;
+        setSuggestions(localMatches);
+        setSuggestionsOpen(true);
+        return;
+      }
       try {
         const response = await getEpisodes(sval.trim(), "", 1, 6);
         const matches = response?.data?.episodes;
-        setSuggestions(Array.isArray(matches) ? matches.slice(0, 6) : []);
+        const localMatches = isDevelopmentExampleMode && (!Array.isArray(matches) || !matches.length)
+          ? developmentEpisodeListing(sval.trim(), "", 1, 6).episodes
+          : null;
+        setSuggestions(localMatches || (Array.isArray(matches) ? matches.slice(0, 6) : []));
         setSuggestionsOpen(true);
-      } catch { setSuggestions([]); setSuggestionsOpen(false); }
+      } catch {
+        const localMatches = isDevelopmentExampleMode ? developmentEpisodeListing(sval.trim(), "", 1, 6).episodes : [];
+        setSuggestions(localMatches);
+        setSuggestionsOpen(Boolean(localMatches.length));
+      }
     }, 300);
   };
 
@@ -221,13 +248,21 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
 export async function getServerSideProps({ res, query }) {
   const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000/api";
   const requestedPage = Math.max(1, Number.parseInt(query.page, 10) || 1);
+  if (isDevelopmentExampleMode) {
+    const data = developmentEpisodeListing("", "", requestedPage, 9);
+    res.setHeader("Cache-Control", "no-store");
+    return { props: { initialEpisodes: data.episodes, initialTopics: data.topics, initialPagination: data.pagination } };
+  }
   try {
     const payload = await getCachedValue(`episode-archive:${requestedPage}`, async () => {
       const response = await fetch(`${apiUrl}/file/getAll?search=&topic=&page=${requestedPage}&limit=9`);
       if (!response.ok) throw new Error(`Episode API returned ${response.status}`);
       return response.json();
     }, 300000);
-    const data = payload?.data || {};
+    const apiData = payload?.data || {};
+    const data = isDevelopmentExampleMode && !(Array.isArray(apiData.episodes) && apiData.episodes.length)
+      ? developmentEpisodeListing("", "", requestedPage, 9)
+      : apiData;
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=3600");
     return {
       props: {
@@ -238,11 +273,12 @@ export async function getServerSideProps({ res, query }) {
     };
   } catch (error) {
     console.error("Episode listing SSR fetch failed:", error.message);
+    const data = isDevelopmentExampleMode ? developmentEpisodeListing("", "", requestedPage, 9) : null;
     return {
       props: {
-        initialEpisodes: [],
-        initialTopics: [],
-        initialPagination: { page: 1, totalPages: 1 },
+        initialEpisodes: data?.episodes || [],
+        initialTopics: data?.topics || [],
+        initialPagination: data?.pagination || { page: 1, totalPages: 1 },
       },
     };
   }
