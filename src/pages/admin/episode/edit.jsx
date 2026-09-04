@@ -933,7 +933,7 @@ export default function Edit() {
               name="publicationStatus"
               value={formData.publicationStatus === "DRAFT" ? "PUBLISHED" : "DRAFT"}
               disabled={loading}
-              className="rounded-lg border border-[#9747FF] bg-transparent px-5 py-3 font-semibold !text-white transition hover:bg-[#9747FF]/15 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg border border-[#9747FF] bg-transparent px-5 py-3 font-semibold !text-black transition hover:!text-black  disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading
                 ? "Updating..."

@@ -72,7 +72,7 @@ export default function YouTubeChapterPlayer({ url, timestamps }) {
       <div className="aspect-video md:h-[440px] md:aspect-auto lg:h-[520px] overflow-hidden rounded-2xl border border-white/20 bg-black">
         {!activated ? <YouTubeFacade url={url} title="Play podcast video" onActivate={() => setActivated(true)} /> : <div ref={mountRef} className="h-full w-full" />}
       </div>
-      <aside className="flex h-[300px] flex-col overflow-hidden rounded-2xl border border-[#8d2dcc]/20 bg-white/80 p-4 shadow-[0_18px_45px_rgba(69,36,82,.08)] md:h-[440px] md:p-5 lg:h-[520px]" aria-label="Episode timestamps">
+      <aside className="flex h-[300px] flex-col overflow-hidden rounded-2xl border border-[#8d2dcc]/20 bg-white/80 p-4  md:h-[440px] md:p-5 lg:h-[520px]" aria-label="Episode timestamps">
         <h2 className="flex shrink-0 items-center gap-3 border-b border-[#8d2dcc]/15 pb-4 text-xl font-bold text-[#6f218f]"><FaClock aria-hidden="true" /><span>Timestamps</span></h2>
         <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pt-3 pr-1">
           {chapters.map((chapter, index) => (

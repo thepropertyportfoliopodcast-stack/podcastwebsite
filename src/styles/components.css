@@ -1058,7 +1058,7 @@ main > [class*="bg-black"] {
 .episode-hero [class*="bg-[#0c0"] { background: rgba(255,255,255,.78); }
 .episode-hero a:not([class*="from-[#9747FF]"]) { color: var(--site-text); }
 .episode-detail-page { color: var(--site-text); }
-.episode-detail-page article:not(.episode-card-surface) { background: rgba(255,255,255,.78); color: var(--site-text); box-shadow: 0 18px 45px rgba(69,36,82,.08); }
+.episode-detail-page article:not(.episode-card-surface) { background: rgba(255,255,255,.78); color: var(--site-text);  }
 .episode-detail-page article > h2 { color: #6f218f; }
 .episode-detail-page article p:not([class*="text-[#"]) { color: #302437; }
 .episode-detail-page .episode-card-chip { background: #ead9f4; color: #57166d; }
@@ -1416,20 +1416,14 @@ body :where(a, button).bg-theme {
   -webkit-backdrop-filter: blur(24px);
   
   /* Glowing Specular Border */
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  border: px solid rgba(255, 255, 255, 0.12);
+  border-top: px solid rgba(255, 255, 255, 0.35);
   
   /* Multilayer Ambient Glow */
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7),
+  box-shadow: 0 15px 30px -15px rgba(0, 0, 0, 0.7),
               0 0 0 1px rgba(151, 71, 255, 0.1);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  container-type: inline-size;
-}
-
-/* Website episode artwork is 16:9, matching this frame so object-fit: cover
-   fills it without cropping. Older square RSS artwork stays fully visible. */
-.episode-grid-image > div:first-child {
-  background: #160622;
+  /* container-type: inline-size; */
 }
 
 .episode-grid-image {
@@ -1451,8 +1445,8 @@ body :where(a, button).bg-theme {
   transform: translateY(-8px) scale(1.015);
   /* border-color: rgba(252, 24, 216, 0.45);
   border-top-color: rgba(252, 24, 216, 0.8); */
-  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.85),
-              0 0 35px 0 rgba(151, 71, 255, 0.4),
+    box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.85),
+              0 0 30px 0 rgba(151, 71, 255, 0.4),
               0 0 15px 0 rgba(252, 24, 216, 0.25);
 }
 
@@ -2771,27 +2765,11 @@ body { max-width: 100%; overflow-x: clip; }
   }
 }
 
-/* Final isolation for the Related Episodes outer canvas. Card styles are not
-   changed; this only removes wrapper chrome and clips shadow bleed below it. */
-.public-site .episode-detail-page section.episode-related-section,
-.public-site .episode-detail-page .episode-related-grid {
-  border: 0 !important;
-  outline: 0 !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  box-shadow: none !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-}
+/* Related Episodes */
 
 .public-site .episode-detail-page section.episode-related-section {
   overflow: hidden;
   overflow: clip;
-}
-
-.public-site .episode-detail-page .episode-related-section .episode-grid-card {
-  content-visibility: visible;
-  contain-intrinsic-size: none;
 }
 
 .public-site .episode-detail-page section.episode-related-section::before,

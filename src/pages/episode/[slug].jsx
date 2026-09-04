@@ -135,11 +135,11 @@ export default function EpisodePage({ initialData }) {
           </section>}
 
           {data.youtubeUrl && <YouTubeChapterPlayer url={data.youtubeUrl} timestamps={data.timestamps} />}
-          {!data.youtubeUrl && data.link && <section className="overflow-hidden rounded-2xl border border-white/20 bg-black"><video src={data.link} poster={data.thumbnail} controls playsInline preload="metadata" className="mx-auto max-h-[75vh] w-full" /></section>}
+          {!data.youtubeUrl && data.link && <section className="overflow-hidden rounded-2xl border border-white/20"><video src={data.link} poster={data.thumbnail} controls playsInline preload="metadata" className="mx-auto max-h-[75vh] w-full" /></section>}
           <SpotifyEmbed url={data.spotifyLink} title={data.title} onPlaybackUpdate={setSpotifyPlayback} />
 
           <section>
-            <article className={`flex flex-col rounded-2xl border border-white/15 bg-[#111] p-6 md:p-8 ${expanded ? "h-[520px]" : "md:h-[370px]"}`}>
+            <article className={`flex flex-col rounded-2xl border border-white/15  p-6 md:p-8 ${expanded ? "h-[520px]" : "md:h-[370px]"}`}>
               <h2 className="flex items-center gap-3 text-2xl font-bold text-[#c99cff] md:text-3xl"><FaMicrophoneAlt aria-hidden="true" /><span>Episode transcript</span></h2>
               <div data-transcript-scroll className={`mt-5 text-base leading-8 text-white/75 md:text-lg ${expanded ? "min-h-0 flex-1 overflow-y-auto pr-3 [scrollbar-color:#9747FF_#1b1b1b] [scrollbar-width:thin]" : "line-clamp-4 md:min-h-0 md:flex-1 md:overflow-hidden md:[display:block]"}`}><SyncedTranscript transcript={transcript} transcriptIsManual={data.transcriptIsManual} timestamps={data.timestamps} wordTimings={data.transcriptWords} transcriptSegments={data.transcriptSegments} transcriptStatus={data.transcriptStatus} speakerNames={transcriptSpeakerNames} playback={spotifyPlayback} positionMs={spotifyPlayback.position} syncOffsetMs={data.transcriptSyncOffsetMs} expanded={expanded}/></div>
               {transcriptLength > 350 && <button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={expanded} className={`w-fit font-bold text-[#c99cff] hover:text-[#7b249d] hover:cursor-pointer ${expanded ? "mt-5" : "mt-auto pt-5"}`}>{expanded ? "Read less" : "Read more"}</button>}
@@ -148,7 +148,7 @@ export default function EpisodePage({ initialData }) {
 
           <section className="episode-related-section">
             <h2 className="mb-7 flex items-center gap-3 text-3xl font-bold text-[#7b249d]"><FaPlayCircle aria-hidden="true" /><span>Related episodes</span></h2>
-            {related.length ? <div className="grid items-stretch gap-8 md:grid-cols-2 xl:grid-cols-3 pb-12">{related.map((episode) => <PublicEpisodeCard key={episode.uuid || episode.slug} episode={episode} />)}</div> : <div className="min-h-[220px] rounded-2xl border border-[#8d2dcc]/20 bg-white/60 p-8 text-[#5f5366]">Related episodes will appear here.</div>}
+            {related.length ? <div className="grid items-stretch gap-1 md:grid-cols-2 xl:grid-cols-3 pb-12">{related.map((episode) => <PublicEpisodeCard key={episode.uuid || episode.slug} episode={episode} />)}</div> : <div className="min-h-[220px] rounded-2xl border border-[#8d2dcc]/20 bg-white/60 p-8 text-[#5f5366]">Related episodes will appear here.</div>}
           </section>
 
           <TopicSuggestionForm episodeTitle={data.title} />
