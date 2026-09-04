@@ -148,7 +148,7 @@ export default function EpisodePage({ initialData }) {
 
           <section className="episode-related-section">
             <h2 className="mb-7 flex items-center gap-3 text-3xl font-bold text-[#7b249d]"><FaPlayCircle aria-hidden="true" /><span>Related episodes</span></h2>
-            {related.length ? <div className="grid items-stretch gap-8 md:grid-cols-2 xl:grid-cols-3">{related.map((episode) => <PublicEpisodeCard key={episode.uuid || episode.slug} episode={episode} />)}</div> : <div className="min-h-[220px] rounded-2xl border border-[#8d2dcc]/20 bg-white/60 p-8 text-[#5f5366]">Related episodes will appear here.</div>}
+            {related.length ? <div className="grid items-stretch gap-8 md:grid-cols-2 xl:grid-cols-3 pb-12">{related.map((episode) => <PublicEpisodeCard key={episode.uuid || episode.slug} episode={episode} />)}</div> : <div className="min-h-[220px] rounded-2xl border border-[#8d2dcc]/20 bg-white/60 p-8 text-[#5f5366]">Related episodes will appear here.</div>}
           </section>
 
           <TopicSuggestionForm episodeTitle={data.title} />

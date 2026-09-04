@@ -54,6 +54,7 @@ export default function Add() {
     relatedEpisodeUuids: [],
     homePageHeroPhone: false,
     heroPhones: [],
+    publicationStatus: "PUBLISHED",
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [homepageThumbnailPreview, setHomepageThumbnailPreview] = useState(null);
@@ -512,6 +513,14 @@ export default function Add() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
+    const requestedPublicationStatus = e.nativeEvent?.submitter?.value === "DRAFT"
+      ? "DRAFT"
+      : "PUBLISHED";
+
+    if (!formData.title.trim()) {
+      toast.error("Add an episode title before saving");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -539,6 +548,7 @@ export default function Add() {
       payload.append("isFeatured", String(formData.isFeatured));
       payload.append("relatedEpisodeUuids", JSON.stringify(formData.relatedEpisodeUuids));
       payload.append("homePageHeroPhone", String(formData.homePageHeroPhone));
+      payload.append("publicationStatus", requestedPublicationStatus);
       payload.append("heroPhones", JSON.stringify((formData.heroPhones || []).map(({ thumbnail, shortVideo, ...phone }) => phone)));
       (formData.heroPhones || []).forEach((phone, index) => {
         if (phone.thumbnail) payload.append(`heroPhoneThumbnail_${index}`, phone.thumbnail);
@@ -546,7 +556,7 @@ export default function Add() {
       });
 
       // Video now handled via chunk upload
-      if (!uploadedFileUrl && !formData.youtubeUrl) {
+      if (requestedPublicationStatus === "PUBLISHED" && !uploadedFileUrl && !formData.youtubeUrl) {
         toast.error("Please add a YouTube URL or upload a video first!");
         setLoading(false);
         return;
@@ -836,14 +846,31 @@ export default function Add() {
         />
 
         {/* Submit */}
-        <div className="pt-2 mt-16">
+        <div className="mt-16 rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-5">
+          <p className="text-sm font-semibold text-white">Publication</p>
+          <p className="mt-1 text-xs leading-5 text-gray-400">
+            Save a private draft to finish later, or publish it to the website and RSS feed now.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <button
+              type="submit"
+              name="publicationStatus"
+              value="DRAFT"
+              disabled={loading}
+              className="rounded-lg border border-[#9747FF] bg-transparent px-5 py-3 font-semibold !text-white transition hover:bg-[#9747FF]/15 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Saving..." : "Save as draft"}
+            </button>
           <button
             type="submit"
+            name="publicationStatus"
+            value="PUBLISHED"
             disabled={loading}
-            className="w-full button-bg font-semibold py-3 rounded-lg transition cursor-pointer"
+              className="button-bg rounded-lg px-5 py-3 font-semibold !text-white transition disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Submitting..." : "Submit"}
+              {loading ? "Publishing..." : "Publish episode"}
           </button>
+          </div>
         </div>
       </form>
     </AdminLayout>

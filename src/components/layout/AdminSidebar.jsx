@@ -152,12 +152,12 @@ export default function AdminSidebar({ toggle, collapsed, onNavigate, handleLogo
             </Link>
           </li> */}
 
-          <li>
+          {/* <li>
             <button type="button" className="admin-sidebar-link w-full cursor-pointer" onClick={handleLogout} aria-label="Logout" title={collapsed ? "Logout" : undefined}>
               <MdOutlineLogout className="admin-sidebar-icon" size={"1.4rem"} />
               <span className="admin-sidebar-label">Logout</span>
             </button>
-          </li>
+          </li> */}
         </ul>
         </div>
       </aside>

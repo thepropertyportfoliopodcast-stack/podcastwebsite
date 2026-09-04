@@ -153,7 +153,7 @@ export default function About() {
                       {/* Icon Container */}
                       <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-all duration-500 ${
                         activeApproach === i 
-                          ? "bg-gradient-to-br from-[#9747FF] to-[#FC18D8] text-white shadow-lg shadow-[#FC18D8]/30" 
+                          ? "bg-gradient-to-br from-[#9747FF] to-[#FC18D8] text-[#ffffff] shadow-lg shadow-[#FC18D8]/30"
                           : "bg-[#f3e9f8] text-[#a882bf]"
                       }`}>
                         {icon}

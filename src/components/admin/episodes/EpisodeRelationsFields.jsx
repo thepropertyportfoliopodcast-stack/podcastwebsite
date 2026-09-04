@@ -1,6 +1,9 @@
 export default function EpisodeRelationsFields({ formData, episodes = [], currentUuid, onChange }) {
   const selected = Array.isArray(formData.relatedEpisodeUuids) ? formData.relatedEpisodeUuids : [];
-  const candidates = episodes.filter((episode) => episode.uuid !== currentUuid);
+  const candidates = episodes.filter((episode) =>
+    episode.uuid !== currentUuid
+    && (episode.publicationStatus !== "DRAFT" || selected.includes(episode.uuid))
+  );
   const toggleRelated = (uuid) => {
     const next = selected.includes(uuid) ? selected.filter((item) => item !== uuid) : [...selected, uuid].slice(0, 4);
     onChange({ ...formData, relatedEpisodeUuids: next });
@@ -17,7 +20,7 @@ export default function EpisodeRelationsFields({ formData, episodes = [], curren
       <div className="max-h-72 space-y-2 overflow-y-auto pr-2">
         {candidates.map((episode) => <label key={episode.uuid} className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-700 bg-[#1c1c1c] p-3">
           <input type="checkbox" checked={selected.includes(episode.uuid)} disabled={!selected.includes(episode.uuid) && selected.length >= 4} onChange={() => toggleRelated(episode.uuid)} className="h-4 w-4 accent-[#9747FF]" />
-          <span className="line-clamp-2 text-sm">{episode.title}</span>
+          <span className="line-clamp-2 text-sm">{episode.title}{episode.publicationStatus === "DRAFT" ? " (draft)" : ""}</span>
         </label>)}
         {!candidates.length && <p className="text-sm text-gray-400">No other episodes are available yet.</p>}
       </div>

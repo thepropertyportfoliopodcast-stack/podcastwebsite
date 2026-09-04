@@ -1355,7 +1355,7 @@ body :where(a, button).bg-theme {
 }
 
 .episode-grid-play svg {
-  color: #8d2dcc;
+  color: #d6cbdd;
 }
 
 .episode-meta-pill {
@@ -1463,7 +1463,7 @@ body :where(a, button).bg-theme {
 
 /* Glowing Play Button */
 .episode-grid-play {
-  background: linear-gradient(135deg, #9747FF 0%, #FC18D8 100%);
+  background: linear-gradient(135deg, #FC18D8 0%, #9747FF 100%);
   box-shadow: 0 8px 24px rgba(252, 24, 216, 0.45),
               0 0 0 4px rgba(255, 255, 255, 0.15);
   color: #ffffff;
@@ -2769,6 +2769,37 @@ body { max-width: 100%; overflow-x: clip; }
   .public-site h1.public-hero-title {
     font-size: clamp(3.25rem, 4vw, 3.75rem);
   }
+}
+
+/* Final isolation for the Related Episodes outer canvas. Card styles are not
+   changed; this only removes wrapper chrome and clips shadow bleed below it. */
+.public-site .episode-detail-page section.episode-related-section,
+.public-site .episode-detail-page .episode-related-grid {
+  border: 0 !important;
+  outline: 0 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.public-site .episode-detail-page section.episode-related-section {
+  overflow: hidden;
+  overflow: clip;
+}
+
+.public-site .episode-detail-page .episode-related-section .episode-grid-card {
+  content-visibility: visible;
+  contain-intrinsic-size: none;
+}
+
+.public-site .episode-detail-page section.episode-related-section::before,
+.public-site .episode-detail-page section.episode-related-section::after,
+.public-site .episode-detail-page .episode-related-grid::before,
+.public-site .episode-detail-page .episode-related-grid::after {
+  display: none !important;
+  content: none !important;
 }
 
 /* Homepage and About page share one balanced, fluid hero-title treatment. */

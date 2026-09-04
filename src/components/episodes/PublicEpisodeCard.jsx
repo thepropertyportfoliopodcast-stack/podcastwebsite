@@ -54,7 +54,7 @@ export default function PublicEpisodeCard({ episode, imagePriority = false }) {
             className="episode-grid-play absolute right-4 top-4 z-10 grid h-12 w-12 place-items-center rounded-full"
             aria-hidden="true"
           >
-            <FaPlay className="ml-0.5 text-xs" />
+            <FaPlay className="ml-0.5 text-sm" />
           </span>
 
           <div className="episode-meta-pill absolute -bottom-6 left-4 right-4 z-10 flex min-h-[54px] items-center justify-between gap-2.5 rounded-2xl px-3.5">

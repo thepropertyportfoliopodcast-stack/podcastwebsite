@@ -147,7 +147,7 @@ export default function Footer() {
               <button
                 type="submit"
                 disabled={loading}
-                className="site-footer-newsletter-button min-h-11 rounded-lg bg-[#A837F4] px-4 text-sm font-bold tracking-wide text-white transition-all duration-200 hover:bg-[#b842ff] hover:shadow-lg hover:shadow-[#A837F4]/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="site-footer-newsletter-button min-h-11 rounded-lg bg-[#A837F4] px-4 text-sm font-bold tracking-wide text-white! important transition-all duration-200 hover:bg-[#b842ff] hover:shadow-lg hover:shadow-[#A837F4]/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "…" : "Subscribe"}
               </button>

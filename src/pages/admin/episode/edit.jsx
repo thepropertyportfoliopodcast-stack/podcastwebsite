@@ -59,6 +59,7 @@ export default function Edit() {
     relatedEpisodeUuids: [],
     homePageHeroPhone: false,
     heroPhones: [],
+    publicationStatus: "PUBLISHED",
   });
   const [thumbnailPreview, setThumbnailPreview] = useState(null); 
   const [homepageThumbnailPreview, setHomepageThumbnailPreview] = useState(null);
@@ -445,6 +446,9 @@ export default function Edit() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
+    const requestedPublicationStatus = e.nativeEvent?.submitter?.value
+      || formData.publicationStatus
+      || "PUBLISHED";
     setLoading(true);
     try {
       const main = new PodcastApi();
@@ -469,6 +473,7 @@ export default function Edit() {
       payload.append("isFeatured", String(formData.isFeatured));
       payload.append("relatedEpisodeUuids", JSON.stringify(formData.relatedEpisodeUuids));
       payload.append("homePageHeroPhone", String(formData.homePageHeroPhone));
+      payload.append("publicationStatus", requestedPublicationStatus);
       payload.append("heroPhones", JSON.stringify((formData.heroPhones || []).map(({ thumbnail, shortVideo, ...phone }) => phone)));
       (formData.heroPhones || []).forEach((phone, index) => {
         if (phone.thumbnail instanceof File) payload.append(`heroPhoneThumbnail_${index}`, phone.thumbnail);
@@ -577,6 +582,7 @@ export default function Edit() {
       relatedEpisodeUuids: Array.isArray(response?.data?.data?.relatedEpisodeUuids) ? response.data.data.relatedEpisodeUuids : [],
       homePageHeroPhone: Boolean(response?.data?.data?.heroPhones?.length),
       heroPhones: (response?.data?.data?.heroPhones || []).map((phone) => ({ ...phone, thumbnail: null, shortVideo: null, shortVideoUrl: phone.shortVideo || null, removeShortVideo: false })),
+      publicationStatus: response?.data?.data?.publicationStatus || "PUBLISHED",
     });
 
     setThumbnailPreview(response?.data?.data?.thumbnail || null);
@@ -898,14 +904,44 @@ export default function Edit() {
 
 
         {/* Submit */}
-        <div className="pt-2 mt-16">
+        <div className="mt-16 rounded-xl border border-gray-800 bg-[#111111] p-4 md:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-white">Publication</p>
+              <p className="mt-1 text-xs leading-5 text-gray-400">
+                {formData.publicationStatus === "DRAFT"
+                  ? "This draft is private. Publish it when all required content is ready."
+                  : "This episode is live on the website and available to public feeds."}
+              </p>
+            </div>
+            <span className={`rounded-full px-3 py-1 text-xs font-bold !text-white ${formData.publicationStatus === "DRAFT" ? "bg-amber-600" : "bg-emerald-600"}`}>
+              {formData.publicationStatus === "DRAFT" ? "Draft" : "Published"}
+            </span>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <button
             type="submit"
+              name="publicationStatus"
+              value={formData.publicationStatus || "PUBLISHED"}
             disabled={loading}
-            className="w-full button-bg font-semibold py-3 rounded-lg transition cursor-pointer"
+              className="button-bg rounded-lg px-5 py-3 font-semibold !text-white transition disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Submitting..." : "Submit"}
+              {loading ? "Saving..." : formData.publicationStatus === "DRAFT" ? "Save draft changes" : "Save changes"}
           </button>
+            <button
+              type="submit"
+              name="publicationStatus"
+              value={formData.publicationStatus === "DRAFT" ? "PUBLISHED" : "DRAFT"}
+              disabled={loading}
+              className="rounded-lg border border-[#9747FF] bg-transparent px-5 py-3 font-semibold !text-white transition hover:bg-[#9747FF]/15 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading
+                ? "Updating..."
+                : formData.publicationStatus === "DRAFT"
+                  ? "Publish episode"
+                  : "Move to draft"}
+            </button>
+          </div>
         </div>
           </form>
         </div>
