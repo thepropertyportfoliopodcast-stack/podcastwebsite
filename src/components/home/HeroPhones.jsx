@@ -207,7 +207,6 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
           <div className="tppp-mobile-info">
             <span>Featured video</span>
             <h2>{viewer.episode.title}</h2>
-            {viewer.episode.description && <p>{viewer.episode.description}</p>}
             <div className="tppp-mobile-divider" />
             <div className="tppp-mobile-playlist" aria-label="More featured videos">
               {items.filter((item) => item.uuid !== viewer.episode.uuid).map((item) => <button type="button" key={item.uuid} onClick={() => selectViewerPhone(item)}><span className="tppp-mobile-thumb"><Image src={imageFor(item)} alt="" fill sizes="92px" className="object-cover" /></span><strong>{item.title}</strong></button>)}
@@ -238,7 +237,7 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
             {mounted && !viewer && index === active && (!episode.shortVideo || failedVideos.has(episode.uuid)) && episode.youtubeShortUrl ? <YouTubeShortPreview key={`${episode.uuid}-${active}`} url={episode.youtubeShortUrl} title={episode.title} onEnded={advancePhone} /> : null}
             <span className="tppp-phone-overlay">
               <span className="tppp-phone-cta"><FaPlay aria-hidden="true" /> Tap to watch</span>
-              <span className="tppp-phone-copy"><small>{episode.episodeNumber ? `Episode ${episode.episodeNumber}` : "Featured video"}</small><strong>{episode.title}</strong>{episode.description && <span>{episode.description}</span>}</span>
+              <span className="tppp-phone-copy"><small>{episode.episodeNumber ? `Episode ${episode.episodeNumber}` : "Featured video"}</small><strong>{episode.title}</strong></span>
             </span>
           </span>
         </div>
