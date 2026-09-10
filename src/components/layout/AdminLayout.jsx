@@ -1,8 +1,8 @@
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbLogout } from "react-icons/tb";
-import { HiOutlineUserCircle } from "react-icons/hi2";
 import AdminSidebar from "./AdminSidebar";
+import AdminAvatarPicker from "@/components/admin/AdminAvatarPicker";
 import PodcastApi from "@/services/podcastApi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
@@ -162,9 +162,7 @@ export default function AdminLayout({ children }) {
             </div>
             <div className="flex gap-2 items-center">
               <div className="hidden md:flex items-center">
-                <div>
-                  <HiOutlineUserCircle className="admin-header-icon" size="2.5rem" />
-                </div>
+                <AdminAvatarPicker user={user} onUpdated={setUser} />
                 <div className="text-start me-4 ps-2">
                   <h2 className="admin-header-name capitalize font-bold">{user?.name || "Admin"}</h2>
                   <p className="admin-header-email text-sm mt-[-3px]">
@@ -180,7 +178,7 @@ export default function AdminLayout({ children }) {
                 ref={menuButtonRef}
                 type="button"
                 onClick={showSidebar}
-                className="admin-mobile-menu block md:hidden flex flex-col gap-[4px] px-2 py-1 rounded-md"
+                className="admin-mobile-menu md:hidden flex flex-col gap-[4px] px-2 py-1 rounded-md"
                 aria-label={toggle ? "Close admin navigation" : "Open admin navigation"}
                 aria-expanded={toggle}
                 aria-controls="admin-navigation"
@@ -198,6 +196,7 @@ export default function AdminLayout({ children }) {
               onNavigate={closeSidebar}
               handleLogout={handleLogout}
               user={user}
+              onUserUpdated={setUser}
             />
             <div className="admin-content content min-w-0 flex-1 md:max-h-[100vh] overflow-y-auto p-4 md:p-6 !pt-[105px] lg:!pt-[112px] w-full">
               <div className="admin-page-frame">

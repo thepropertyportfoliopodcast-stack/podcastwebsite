@@ -1,7 +1,7 @@
 import React from "react";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { MdOutlineLogout } from "react-icons/md";
-import { HiOutlineUserCircle } from "react-icons/hi2";
+import AdminAvatarPicker from "@/components/admin/AdminAvatarPicker";
 import Link from "next/link";
 import { FaRegUser } from "react-icons/fa";
 import { MdSupportAgent } from "react-icons/md";
@@ -12,7 +12,7 @@ import { MdOutlineSecurity } from "react-icons/md";
 import { usePathname } from "next/navigation";
 import { hasSectionAccess } from "@/config/adminSections";
 
-export default function AdminSidebar({ toggle, collapsed, onNavigate, handleLogout, user }) {
+export default function AdminSidebar({ toggle, collapsed, onNavigate, handleLogout, user, onUserUpdated }) {
   const pathname = usePathname();
   return (
     <>
@@ -24,9 +24,7 @@ export default function AdminSidebar({ toggle, collapsed, onNavigate, handleLogo
         <div className="admin-sidebar-menu">
 
         <div className="admin-mobile-profile flex md:hidden items-center">
-          <div>
-            <HiOutlineUserCircle className="admin-header-icon" size="2.5rem" />
-          </div>
+          <AdminAvatarPicker user={user} onUpdated={onUserUpdated} />
           <div className="text-start me-4 ps-2">
             <h2 className="capitalize font-bold text-slate-900">{user?.name || "Admin"}</h2>
             <p className="text-sm text-slate-600">{user?.email || "Dashboard account"}</p>

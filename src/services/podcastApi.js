@@ -9,6 +9,10 @@ class PodcastApi {
     return Api.get("/user/profile", { signal })
   }
 
+  async updateMyAvatar(avatar) {
+    return Api.patch("/admin/profile/avatar", { avatar });
+  }
+
   async Dashboard() {
     return Api.get(`/user/dashboard`);
   }
