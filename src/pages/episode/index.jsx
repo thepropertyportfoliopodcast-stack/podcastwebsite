@@ -156,6 +156,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
               className={"text-center max-w-3xl mx-auto"}
               subtitle={"All Episodes"}
               title={"Browse"}
+              headingLevel="h1"
               content={
                 "Browse our complete library, where each episode holds the conversation, adding value to your portfolio every time you listen."
               }

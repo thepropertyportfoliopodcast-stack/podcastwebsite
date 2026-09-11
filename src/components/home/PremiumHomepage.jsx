@@ -48,7 +48,7 @@ function NowPlaying({ episode }) {
         <div className="flex items-center gap-2 rounded-full border border-[#C347FF]/30 bg-[#C347FF]/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[.14em] text-white sm:text-xs"><MdMic aria-hidden="true" />{episodeNumber(episode)}</div>
       </div>
       <Link href={href} prefetch={false} aria-label={`Play ${episode?.title || "the latest episode"}`} className="hero-player-visual relative block aspect-video overflow-hidden rounded-[20px] border border-white/15 bg-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDBBFF]">
-        <Image src={episode?.homepageThumbnail || episode?.thumbnail || "/heroimg01.jpg"} alt={episode?.title ? `${episode.title} episode artwork` : "The Property Portfolio Podcast hosts recording an episode"} fill priority fetchPriority="high" sizes="(max-width:1023px) calc(100vw - 44px), 720px" quality={90} className="hero-player-image object-cover" />
+        <Image src={episode?.homepageThumbnail || episode?.thumbnail || "/heroimg01.jpg"} alt={episode?.title || "The Property Portfolio Podcast hosts recording an episode"} fill priority fetchPriority="high" sizes="(max-width:1023px) calc(100vw - 44px), 720px" quality={90} className="hero-player-image object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#09050f]/95 via-transparent to-black/15" />
         <div className="hero-scanline" aria-hidden="true" />
         <div className="hero-spectrum-tower" aria-hidden="true">{[34,62,88,49,96,71,42,82].map((height,index)=><span key={index} style={{height:`${height}%`,animationDelay:`${index * 90}ms`}} />)}</div>
@@ -283,8 +283,8 @@ function Hosts({ hosts: suppliedHosts = [] }) {
               <p className="mt-3 min-h-5 text-sm text-[#DDBBFF]" role="status" aria-live="polite">{message}</p>
               <p className="text-xs text-[#8F879B]">By subscribing, you agree to receive podcast updates. You can unsubscribe at any time.</p>
             </div>
-            <div className="home-newsletter-art" aria-hidden="true">
-              <Image src="/newsletter-3d.webp" alt="" fill sizes="(min-width: 1280px) 360px, (min-width: 768px) 30vw, 0px" className="object-contain"/>
+            <div className="home-newsletter-art">
+              <Image src="/newsletter-3d.webp" alt="Newsletter illustration" fill sizes="(min-width: 1280px) 360px, (min-width: 768px) 30vw, 0px" className="object-contain"/>
             </div>
           </div>
         </div>

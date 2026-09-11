@@ -209,7 +209,7 @@ export default function HeroPhones({ phones = [], episodes = [] }) {
             <h2>{viewer.episode.title}</h2>
             <div className="tppp-mobile-divider" />
             <div className="tppp-mobile-playlist" aria-label="More featured videos">
-              {items.filter((item) => item.uuid !== viewer.episode.uuid).map((item) => <button type="button" key={item.uuid} onClick={() => selectViewerPhone(item)}><span className="tppp-mobile-thumb"><Image src={imageFor(item)} alt="" fill sizes="92px" className="object-cover" /></span><strong>{item.title}</strong></button>)}
+              {items.filter((item) => item.uuid !== viewer.episode.uuid).map((item) => <button type="button" key={item.uuid} onClick={() => selectViewerPhone(item)}><span className="tppp-mobile-thumb"><Image src={imageFor(item)} alt={item.title || "Featured podcast episode"} fill sizes="92px" className="object-cover" /></span><strong>{item.title}</strong></button>)}
             </div>
           </div>
         </div>

@@ -42,7 +42,7 @@ export default function AdminAvatarPicker({ user, onUpdated }) {
           <div className="admin-avatar-grid">
             {ADMIN_AVATARS.map(([fileName, source]) => (
               <button type="button" key={fileName} className={`admin-avatar-option ${user?.avatar === fileName ? "is-selected" : ""}`} onClick={() => choose(fileName)} disabled={saving} aria-label={`Choose ${fileName.replace(/\.svg$/, "").replace(/^\d+-/, "")}`} title={fileName.replace(/\.svg$/, "").replace(/^\d+-/, "")}>
-                <Image src={source} alt="" width={42} height={42} />
+                <Image src={source} alt={fileName.replace(/\.svg$/, "").replace(/^\d+-/, "")} width={42} height={42} />
               </button>
             ))}
           </div>

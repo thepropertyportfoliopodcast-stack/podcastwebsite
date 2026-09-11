@@ -53,6 +53,46 @@ export default function AdminUsersPage() {
       <label className="mt-6 flex items-center gap-3"><input type="checkbox" checked={form.isActive} onChange={(event) => update("isActive", event.target.checked)} className="h-4 w-4 accent-[#c347ff]" />Account is active</label>
       <button disabled={saving} className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-gradient-to-r from-[#8c2ed3] to-[#c347ff] px-7 font-bold disabled:opacity-60"><FaPlus />{saving ? "Saving…" : editing ? "Save administrator" : "Create administrator"}</button>
     </form>
-    <section className="grid gap-4 md:grid-cols-2">{loading ? <p className="text-gray-400">Loading administrators…</p> : users.map((user) => <article key={user.id} className="rounded-2xl border border-gray-700 bg-[#121212] p-5"><div className="flex items-start justify-between gap-4"><div className="flex min-w-0 items-center gap-3"><Image className="admin-directory-avatar" src={getAdminAvatarSource(user.avatar)} alt={`${user.name} profile avatar`} width={56} height={56} /><div className="min-w-0"><h2 className="truncate text-lg font-bold">{user.name}</h2><p className="truncate text-sm text-gray-400">{user.email}</p></div></div><span className={`admin-role-badge rounded-full px-3 py-1 text-xs font-bold !text-white ${user.role === "SUPER_ADMIN" ? "bg-purple-900" : "bg-gray-800"}`}>{user.role === "SUPER_ADMIN" ? "Super admin" : "Admin"}</span></div><p className="mt-4 text-xs text-gray-400">{user.role === "SUPER_ADMIN" ? "All dashboard sections" : user.permissions.length ? user.permissions.join(", ") : "No dashboard sections"} · {user.isActive ? "Active" : "Inactive"}</p><div className="mt-5 flex flex-wrap gap-3"><button type="button" onClick={() => edit(user)} className="inline-flex items-center gap-2 rounded-lg border border-gray-600 px-4 py-2 text-sm font-bold"><FaEdit />Edit</button>{user.role === "ADMIN" && <button type="button" disabled={deletingId === user.id} onClick={() => remove(user)} className="inline-flex items-center gap-2 rounded-lg border border-red-500/70 px-4 py-2 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"><FaTrash />{deletingId === user.id ? "Deleting…" : "Delete"}</button>}</div></article>)}</section>
+    <section className="grid gap-4 md:grid-cols-2">
+  {loading ? <p className="text-gray-400">Loading administrators…</p> : users.map((user) => (
+    <article key={user.id} className="flex items-stretch overflow-hidden rounded-2xl border border-gray-700 bg-[#121212]">
+      <div className="relative w-32 flex-shrink-0 bg-[#1c1c1c] sm:w-40">
+        <Image
+          className="admin-directory-avatar object-contain p-2"
+          src={getAdminAvatarSource(user.avatar)}
+          alt={`${user.name} profile avatar`}
+          fill
+          sizes="(min-width: 640px) 160px, 128px"
+        />
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col justify-between gap-4 p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="truncate text-lg font-bold">{user.name}</h2>
+            <p className="truncate text-sm text-gray-400">{user.email}</p>
+          </div>
+          <span className={`admin-role-badge shrink-0 rounded-full px-3 py-1 text-xs font-bold !text-white ${user.role === "SUPER_ADMIN" ? "bg-purple-900" : "bg-gray-800"}`}>
+            {user.role === "SUPER_ADMIN" ? "Super admin" : "Admin"}
+          </span>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <p className="text-xs text-gray-400">
+            {user.role === "SUPER_ADMIN" ? "All dashboard sections" : user.permissions.length ? user.permissions.join(", ") : "No dashboard sections"} · {user.isActive ? "Active" : "Inactive"}
+          </p>
+          <div className="flex flex-wrap justify-end gap-3">
+            <button type="button" onClick={() => edit(user)} className="inline-flex items-center gap-2 rounded-lg border border-gray-600 px-4 py-2 text-sm font-bold">
+              <FaEdit />Edit
+            </button>
+            {user.role === "ADMIN" && (
+              <button type="button" disabled={deletingId === user.id} onClick={() => remove(user)} className="inline-flex items-center gap-2 rounded-lg border border-red-500/70 px-4 py-2 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60">
+                <FaTrash />{deletingId === user.id ? "Deleting…" : "Delete"}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </article>
+  ))}
+</section>
   </div></AdminLayout>;
 }

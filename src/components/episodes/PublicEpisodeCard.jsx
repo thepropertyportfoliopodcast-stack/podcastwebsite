@@ -35,7 +35,7 @@ export default function PublicEpisodeCard({ episode, imagePriority = false }) {
             {artwork && (
               <Image
                 src={artwork}
-                alt={episode?.title ? `${episode.title} website thumbnail` : "Podcast episode thumbnail"}
+                alt={episode?.title || "Podcast episode thumbnail"}
                 fill
                 sizes="(max-width:639px) calc(100vw - 32px), (max-width:1023px) 50vw, 420px"
                 quality={68}
