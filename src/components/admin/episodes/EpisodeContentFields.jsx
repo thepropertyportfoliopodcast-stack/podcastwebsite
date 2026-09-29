@@ -60,11 +60,7 @@ export default function EpisodeContentFields({ formData, onChange, onTranscriptC
         <textarea className={fieldClass} rows="6" name="topicsCovered" value={formData.topicsCovered || ""} onChange={onChange} placeholder={"Australian property market\nFirst-home buyers\nInterest rates"} />
       </label>
 
-      <label className="block space-y-2">
-        <span className="text-sm font-medium">YouTube Shorts links</span>
-        <textarea className={fieldClass} rows="6" name="reelLinks" value={formData.reelLinks || ""} onChange={onChange} placeholder={"https://www.youtube.com/shorts/...\nhttps://www.youtube.com/shorts/..."} />
-        <span className="block text-xs text-gray-400">Add up to four YouTube Shorts, one URL per line.</span>
-      </label>
+
     </section>
   );
 }
