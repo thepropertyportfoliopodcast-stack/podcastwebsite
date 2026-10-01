@@ -6,6 +6,7 @@ import PodcastApi from "@/services/podcastApi";
 import { useRouter } from "next/router";
 import RichTextEditor from "@/components/admin/episodes/RichTextEditor";
 import axios from "axios";
+import { assertReadableFile, episodeRequestError, uploadEpisodeMedia } from "@/utils/episodeUpload.mjs";
 import { Api } from "@/services/apiClient";
 import SeoFields from "@/components/admin/forms/SeoFields";
 import EpisodeContentFields from "@/components/admin/episodes/EpisodeContentFields";
@@ -168,11 +169,17 @@ export default function Add() {
     }
 
     // Extract metadata before upload
+    setUploadingVideo(true);
     const tempVideo = document.createElement("video");
     tempVideo.preload = "metadata";
 
     tempVideo.onloadedmetadata = async () => {
       window.URL.revokeObjectURL(tempVideo.src);
+      if (!Number.isFinite(tempVideo.duration)) {
+        setUploadingVideo(false);
+        toast.error("Unable to read this media file duration. Please choose a supported audio or video file.");
+        return;
+      }
       const durationInSec = Math.floor(tempVideo.duration);
       const durationInMinutes = Math.ceil(durationInSec / 60);
       const sizeInBytes = file.size;
@@ -202,13 +209,18 @@ export default function Add() {
         toast.success("Upload complete!");
       } catch (err) {
         toast.dismiss();
-        toast.error("Upload failed!");
+        toast.error(episodeRequestError(err));
         console.error(err);
       }
 
       setUploadingVideo(false);
     };
 
+    tempVideo.onerror = () => {
+      URL.revokeObjectURL(tempVideo.src);
+      setUploadingVideo(false);
+      toast.error("Cannot read this media file. Reselect a supported audio or video file.");
+    };
     tempVideo.src = URL.createObjectURL(file);
        }
        else if (name === "audio" && files?.[0]) {
@@ -242,7 +254,7 @@ export default function Add() {
           toast.success("Audio uploaded!");
         } catch (err) {
           toast.dismiss();
-          toast.error("Audio upload failed!");
+          toast.error(episodeRequestError(err));
           console.error(err);
         } finally {
           setUploadingAudio(false);
@@ -355,170 +367,37 @@ export default function Add() {
   // Add this helper function outside of the component or at the top of the file
 // This is an async function that handles fetching the URL and uploading one chunk with retries
 
-  const uploadChunkWithRetry = async (
-      chunk, 
-      partNumber, 
-      uploadId, 
-      key, 
-      MAX_RETRIES, 
-      Api, 
-      onProgress
-  ) => {
-      let attempts = 0;
-      while (attempts < MAX_RETRIES) {
-          try {
-              // 1. Get Presigned URL
-              const { data: { url: presignedUrl } } = await Api.post("/upload/part-url", {
-                  uploadId, key, partNumber,
-              });
-
-              // 2. Upload Chunk
-              const uploadRes = await axios.put(presignedUrl, chunk, {
-                  headers: { "Content-Type": "application/octet-stream" },
-                  onUploadProgress: onProgress, // Passes event data to the centralized handler
-              });
-
-              const rawETag = uploadRes.headers["etag"] || uploadRes.headers["ETag"];
-              if (!rawETag) throw new Error("Storage did not expose the ETag response header");
-              const cleanETag = rawETag.replace(/"/g, "");
-
-              return { ETag: cleanETag, PartNumber: partNumber };
-
-          } catch (error) {
-              attempts++;
-              if (attempts < MAX_RETRIES) {
-                  console.warn(`Chunk ${partNumber} failed (Attempt ${attempts}/${MAX_RETRIES}). Retrying...`);
-                  await new Promise(resolve => setTimeout(resolve, 2000));
-              } else {
-                  throw new Error(`Failed to upload chunk ${partNumber} after ${MAX_RETRIES} attempts.`);
-              }
-          }
-      }
-  };
-
-  const uploadLargeFile = async (file, type="video") => {
-      const fileSize = file.size;
-      const MIN_CHUNK_SIZE = 10 * 1024 * 1024;
-      const MAX_CHUNKS = 100;
-      const MAX_RETRIES = 3; 
-      const CONCURRENCY_LIMIT = 5;
-
-      const idealChunkSize = Math.ceil(fileSize / MAX_CHUNKS);
-      const CHUNK_SIZE = idealChunkSize > MIN_CHUNK_SIZE ? idealChunkSize : MIN_CHUNK_SIZE;
-      const totalChunks = Math.ceil(fileSize / CHUNK_SIZE);
-
-      // --- NEW: Global progress trackers ---
-      const uploadedBytesRef = { current: 0 }; // Bytes fully completed and accounted for
-      const activeChunkProgress = new Map();     // Bytes transferred for currently uploading chunks (key=partNumber, value=bytes loaded)
-      const totalFileBytes = file.size;
-      // --- END NEW ---
-
-      if(type === "audio"){
-        setUploadingAudio(true);
-        setAudioUploadProgress(0);
-      }else{
-        setUploadingVideo(true);
-        setUploadProgress(0);
-      }
-
-      try {
-          const initRes = await Api.post(`/upload/init`, { fileName: file.name, mimeType: file.type });
-          const { uploadId, key } = initRes.data;
-          
-          const chunkTasks = [];
-          for (let i = 0; i < totalChunks; i++) {
-              const start = i * CHUNK_SIZE;
-              const end = Math.min(start + CHUNK_SIZE, fileSize);
-              const chunk = file.slice(start, end);
-              const partNumber = i + 1;
-
-              // NEW: Centralized progress handler 
-              const onProgress = (e) => {
-                  // Update the current progress for THIS partNumber
-                  activeChunkProgress.set(partNumber, e.loaded);
-
-                  let totalBytesTransferred = uploadedBytesRef.current;
-                  
-                  // Sum all bytes currently loaded from active parallel uploads
-                  for (const bytes of activeChunkProgress.values()) {
-                      totalBytesTransferred += bytes;
-                  }
-
-                  // Calculate the single, overall percentage
-                  const percent = Math.round((totalBytesTransferred / totalFileBytes) * 100);
-                  if(type === "audio"){
-                    setAudioUploadProgress(percent);
-                  }else{
-                    setUploadProgress(percent);
-                  }
-              };
-
-              chunkTasks.push(() =>
-                  uploadChunkWithRetry(chunk, partNumber, uploadId, key, MAX_RETRIES, Api, onProgress)
-              );
-          }
-
-          const allUploadedParts = [];
-          for (let i = 0; i < chunkTasks.length; i += CONCURRENCY_LIMIT) {
-              const batch = chunkTasks.slice(i, i + CONCURRENCY_LIMIT);
-              const results = await Promise.all(batch.map((uploadPart) => uploadPart()));
-              allUploadedParts.push(...results);
-              
-              // --- NEW: Move active bytes to completed bytes after batch success ---
-              for (const part of results) {
-                  // Determine the actual size of the completed chunk
-                  const chunkIndex = part.PartNumber - 1;
-                  const completedChunkSize = Math.min(CHUNK_SIZE, totalFileBytes - (chunkIndex * CHUNK_SIZE));
-                  
-                  // Add the full chunk size to the completed total
-                  uploadedBytesRef.current += completedChunkSize;
-                  
-                  // Remove the chunk from the active tracker to avoid double counting
-                  activeChunkProgress.delete(part.PartNumber);
-              }
-              // --- END NEW ---
-          }
-          
-          // Final completion logic
-          allUploadedParts.sort((a, b) => a.PartNumber - b.PartNumber);
-          const completeRes = await Api.post(`/upload/complete`, { uploadId, key, parts: allUploadedParts });
-
-          // ... success handling remains the same ...
-          if(type === "audio"){
-            setAudioUploadProgress(100);
-          }else{
-            setUploadProgress(100);
-          }
-          toast.success("Upload completed!");
-          return completeRes.data.fileUrl;
-
-      } catch (error) {
-          // ... failure handling remains the same ...
-          toast.error(error.message.includes("chunk") ? error.message : "Upload failed, please try again.");
-          if(type === "audio"){
-            setAudioUploadProgress(0);
-          }else{
-            setUploadProgress(0);
-          }
-          return null;
-      } finally {
-        if(type === "audio"){
-          setUploadingAudio(false);
-        }else{
-          setUploadingVideo(false);
-        }
-      }
+  const uploadLargeFile = async (file, type = "video") => {
+    const setBusy = type === "audio" ? setUploadingAudio : setUploadingVideo;
+    const setProgress = type === "audio" ? setAudioUploadProgress : setUploadProgress;
+    setBusy(true);
+    setProgress(0);
+    try {
+      return await uploadEpisodeMedia({ file, api: Api, put: axios.put, onProgress: setProgress });
+    } catch (error) {
+      setProgress(0);
+      throw error;
+    } finally {
+      setBusy(false);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return;
+    if (loading || uploadingAudio || uploadingVideo) {
+      toast.error("Wait for the current upload or save to finish.");
+      return;
+    }
     const requestedPublicationStatus = e.nativeEvent?.submitter?.value === "DRAFT"
       ? "DRAFT"
       : "PUBLISHED";
 
     if (!formData.title.trim()) {
       toast.error("Add an episode title before saving");
+      return;
+    }
+    if (!router.isReady || !Number.isSafeInteger(Number(id)) || Number(id) <= 0) {
+      toast.error("Open Add Episode from a podcast before saving.");
       return;
     }
     setLoading(true);
@@ -578,13 +457,14 @@ export default function Add() {
       if (formData.thumbnail) {
         payload.append("thumbnail", formData.thumbnail);
       }
-      if (formData.websiteThumbnail) {
-        payload.append("homepageThumbnail", formData.websiteThumbnail);
-      }
+      payload.append("sharedWebsiteArtwork", "true");
       if (formData.websiteThumbnail) {
         payload.append("websiteThumbnail", formData.websiteThumbnail);
       }
 
+      for (const value of payload.values()) {
+        if (value instanceof File) await assertReadableFile(value);
+      }
       const response = await main.EpisodeAdd(payload);
 
       if (response?.data?.status) {
@@ -621,7 +501,7 @@ export default function Add() {
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error(error?.response?.data?.message || "Something went wrong!");
+      toast.error(episodeRequestError(error));
     } finally {
       setLoading(false);
     }
@@ -728,7 +608,7 @@ export default function Add() {
                   </p>
                 )}
                 <input
-                  type="file"
+                  type="file" disabled={loading || uploadingAudio || uploadingVideo}
                   name="thumbnail"
                   accept="image/*"
                   onChange={handleChange}
@@ -747,7 +627,7 @@ export default function Add() {
                 ) : (
                   <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload the card and homepage hero image</p>
                 )}
-                <input type="file" name="websiteThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
+                <input type="file" disabled={loading || uploadingAudio || uploadingVideo} name="websiteThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
               </div>
             </div>
           </div>
@@ -759,7 +639,7 @@ export default function Add() {
             Video file <span className="text-gray-400">(optional when using YouTube)</span>
           </label>
           <input
-            type="file"
+            type="file" disabled={loading || uploadingAudio || uploadingVideo}
             name="video"
              accept="video/*,audio/*"
             onChange={handleChange}
@@ -784,7 +664,7 @@ export default function Add() {
           </label>
 
           <input
-            type="file"
+            type="file" disabled={loading || uploadingAudio || uploadingVideo}
             name="audio"
             accept="audio/*"
             onChange={handleChange}
@@ -842,7 +722,8 @@ export default function Add() {
               type="submit"
               name="publicationStatus"
               value="DRAFT"
-              disabled={loading}
+              formNoValidate
+              disabled={loading || uploadingAudio || uploadingVideo}
               className="rounded-lg border border-[#9747FF] bg-transparent px-5 py-3 font-semibold !text-black transition hover:bg-[#9747FF]/15 hover:text-[#000000] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Saving..." : "Save as draft"}
@@ -851,7 +732,7 @@ export default function Add() {
             type="submit"
             name="publicationStatus"
             value="PUBLISHED"
-            disabled={loading}
+            disabled={loading || uploadingAudio || uploadingVideo}
               className="button-bg rounded-lg px-5 py-3 font-semibold !text-white transition disabled:cursor-not-allowed disabled:opacity-60"
           >
               {loading ? "Publishing..." : "Publish episode"}
