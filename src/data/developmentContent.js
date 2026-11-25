@@ -138,14 +138,15 @@ export function developmentEpisodeListing(search = "", topic = "", page = 1, lim
   const selectedTopic = String(topic).trim().toLowerCase();
   const matches = developmentEpisodes.filter((episode) => {
     const searchable = [episode.title, episode.description, episode.topic, episode.episodeNumber, `ep ${episode.episodeNumber}`].join(" ").toLowerCase();
-    return (!query || searchable.includes(query)) && (!selectedTopic || episode.topic.toLowerCase() === selectedTopic);
+    const categories = String(episode.topic || "").split(",").map((value) => value.trim().toLowerCase());
+    return (!query || searchable.includes(query)) && (!selectedTopic || categories.includes(selectedTopic));
   });
   const pageSize = Math.max(1, Number(limit) || 9);
   const totalPages = Math.max(1, Math.ceil(matches.length / pageSize));
   const currentPage = Math.min(Math.max(1, Number(page) || 1), totalPages);
   return {
     episodes: matches.slice((currentPage - 1) * pageSize, currentPage * pageSize),
-    topics: [...new Set(developmentEpisodes.map((episode) => episode.topic))].sort(),
+    topics: [...new Set(developmentEpisodes.flatMap((episode) => String(episode.topic || "").split(",").map((value) => value.trim()).filter(Boolean)))].sort(),
     pagination: { page: currentPage, limit: pageSize, total: matches.length, totalPages },
   };
 }

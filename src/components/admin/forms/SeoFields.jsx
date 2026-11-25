@@ -27,13 +27,13 @@ export default function SeoFields({ formData, onChange }) {
         <textarea
           name="seoDescription"
           rows="3"
-          maxLength={160}
+          maxLength={200}
           value={formData.seoDescription || ""}
           onChange={onChange}
-          placeholder="Recommended: 140–160 characters"
+          placeholder="Up to 200 characters"
           className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white resize-none"
         />
-        <p className="text-right text-xs text-gray-400">{(formData.seoDescription || "").length}/160</p>
+        <p className="text-right text-xs text-gray-400">{(formData.seoDescription || "").length}/200</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

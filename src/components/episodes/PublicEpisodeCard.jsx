@@ -22,6 +22,10 @@ export default function PublicEpisodeCard({ episode, imagePriority = false }) {
     (episode?.durationInSec
       ? Math.ceil(Number(episode.durationInSec) / 60)
       : 0);
+  const categories = String(episode?.topic || "Property insights")
+    .split(",")
+    .map((category) => category.trim())
+    .filter(Boolean);
 
   return (
     <Link
@@ -75,9 +79,13 @@ export default function PublicEpisodeCard({ episode, imagePriority = false }) {
         </div>
 
         <div className="episode-card-content flex flex-1 flex-col px-5 pb-6 pt-10">
-          <p className="episode-card-topic mb-2 text-[11px] font-black uppercase tracking-[.16em]">
-            {episode?.topic || "Property insights"}
-          </p>
+          <div className="mb-2 flex flex-wrap gap-1.5" aria-label="Episode categories">
+            {categories.map((category) => (
+              <span key={category.toLowerCase()} className="episode-card-topic rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[.12em]">
+                {category}
+              </span>
+            ))}
+          </div>
           <h3 className="episode-card-title line-clamp-2 min-h-[3rem] text-lg font-bold leading-snug">
             {episode?.title}
           </h3>

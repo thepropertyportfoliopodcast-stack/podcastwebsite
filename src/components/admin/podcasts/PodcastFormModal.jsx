@@ -30,13 +30,13 @@ export default function PodcastFormModal({ isOpen, onClose, fetchPodcasts, selec
               ? selectedPodcast.cast.join(", ")
               : selectedPodcast?.cast || "",
         thumbnail: selectedPodcast?.thumbnail || null,
-        description: selectedPodcast?.description || "",
+        description: (selectedPodcast?.description || "").slice(0, 200),
         email: selectedPodcast?.email || "",
         language: Array.isArray(selectedPodcast?.language)
                   ? selectedPodcast.language.join(", ")
                   : selectedPodcast?.language || "",
         seoTitle: selectedPodcast?.seoTitle || "",
-        seoDescription: selectedPodcast?.seoDescription || "",
+        seoDescription: (selectedPodcast?.seoDescription || "").slice(0, 200),
         primaryKeyword: selectedPodcast?.primaryKeyword || "",
         secondaryKeywords: selectedPodcast?.secondaryKeywords || "",
       });
@@ -299,10 +299,12 @@ export default function PodcastFormModal({ isOpen, onClose, fetchPodcasts, selec
             <textarea
               rows="4"
               name="description"
+              maxLength={200}
               className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
               value={formData.description}
               onChange={handleChange}
             />
+            <p className="text-right text-xs text-gray-400">{formData.description.length}/200</p>
           </div>
         </div>
 

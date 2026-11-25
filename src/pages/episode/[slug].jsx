@@ -100,7 +100,7 @@ export default function EpisodePage({ initialData }) {
                 <span className="inline-flex items-center gap-2"><FaCalendarAlt className="text-[#c99cff]" aria-hidden="true" />{episodeDate(data.createdAt)}</span>
                 <span className="hidden text-[#c99cff] sm:inline" aria-hidden="true">|</span>
                 <span className="inline-flex items-center gap-2"><FaClock className="text-[#c99cff]" aria-hidden="true" />{episodeDuration(data.durationInSec, data.duration)}</span>
-                {data.topic && <><span className="hidden text-[#c99cff] sm:inline" aria-hidden="true">|</span><span className="inline-flex items-center gap-2"><FaTag className="text-[#c99cff]" aria-hidden="true" />{data.topic}</span></>}
+                {data.topic && <><span className="hidden text-[#c99cff] sm:inline" aria-hidden="true">|</span><span className="inline-flex flex-wrap items-center gap-2">{String(data.topic).split(",").map((category) => category.trim()).filter(Boolean).map((category) => <span key={category.toLowerCase()} className="inline-flex items-center gap-1.5 rounded-full border border-[#c99cff]/25 bg-white/[.06] px-3 py-1.5"><FaTag className="text-[#c99cff]" aria-hidden="true" />{category}</span>)}</span></>}
               </div>
 
               {hasPlatformLinks && <div className="mt-7 flex flex-wrap gap-3 rounded-2xl border border-[#c99cff]/20 bg-[#0c0d13]/80 p-3 shadow-[inset_0_0_28px_rgba(151,71,255,.05)]">

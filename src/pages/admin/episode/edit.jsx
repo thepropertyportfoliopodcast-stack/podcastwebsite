@@ -18,12 +18,13 @@ export default function Edit() {
   const router = useRouter();
   const { id } = router.query; 
 //   console.log("id", id);
-  const DESCRIPTION_LIMIT = 150;
+  const DESCRIPTION_LIMIT = 200;
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
   const [data, setData] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
     description: "",
     topic: "",
     thumbnail: null,
@@ -350,6 +351,7 @@ export default function Edit() {
       const main = new PodcastApi();
       const payload = new FormData();
       payload.append("title", formData.title);
+      payload.append("slug", formData.slug);
       payload.append("topic", formData.topic);
       payload.append("description", (formData.description || "").slice(0, DESCRIPTION_LIMIT));
       payload.append("podcastId", id);
@@ -444,6 +446,7 @@ export default function Edit() {
       // Updating the fields as required
       setFormData({
       title: response?.data?.data?.title || "",
+      slug: response?.data?.data?.slug || "",
       topic: response?.data?.data?.topic || "",
       description: (response?.data?.data?.description || "").slice(0, DESCRIPTION_LIMIT),
       thumbnail: response?.data?.data?.thumbnail || null,
@@ -472,7 +475,7 @@ export default function Edit() {
       isApple: !!response?.data?.data?.appleLink,
       appleLink: response?.data?.data?.appleLink || "",
       seoTitle: response?.data?.data?.seoTitle || "",
-      seoDescription: response?.data?.data?.seoDescription || "",
+      seoDescription: (response?.data?.data?.seoDescription || "").slice(0, 200),
       primaryKeyword: response?.data?.data?.primaryKeyword || "",
       secondaryKeywords: response?.data?.data?.secondaryKeywords || "",
       isFeatured: Boolean(response?.data?.data?.isFeatured),
@@ -535,8 +538,13 @@ export default function Edit() {
                 </div>
 
                 <div className="space-y-1">
+                  <label className="block text-sm font-medium">Slug <span className="text-gray-400">(optional)</span></label>
+                  <input type="text" name="slug" maxLength={100} value={formData.slug} onChange={handleChange} placeholder="Leave blank to generate from the title" className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white focus:outline-none focus:ring-2 focus:ring-white" />
+                </div>
+
+                <div className="space-y-1">
                   <label className="block text-sm font-medium">
-                    Category <span className="text-red-500">*</span>
+                    Categories <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -544,7 +552,9 @@ export default function Edit() {
                     className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
                     value={formData.topic}
                     onChange={handleChange}
+                    placeholder="Market Insights, Investing, Finance"
                   />
+                  <p className="text-xs text-gray-400">Add multiple categories separated by commas.</p>
                 </div>
               </div>
 
@@ -608,7 +618,7 @@ export default function Edit() {
                       </p>
                     )}
                     <input
-                      type="file" disabled={loading || uploadingAudio || uploadingVideo}
+                      type="file" disabled={loading}
                       name="thumbnail"
                       accept="image/*"
                       onChange={handleChange}
@@ -626,7 +636,7 @@ export default function Edit() {
                     ) : (
                       <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload the card and homepage hero image</p>
                     )}
-                    <input type="file" disabled={loading || uploadingAudio || uploadingVideo} name="websiteThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
+                    <input type="file" disabled={loading} name="websiteThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
                   </div>
                 </div>
 
@@ -639,7 +649,7 @@ export default function Edit() {
                       Upload video or audio file
                     </p>
                     <input
-                      type="file" disabled={loading || uploadingAudio || uploadingVideo}
+                      type="file" disabled={loading}
                       name="video"
                       accept="video/*,audio/*"
                       onChange={handleChange}
@@ -673,7 +683,7 @@ export default function Edit() {
                       Optional separate audio (if needed)
                     </p>
                     <input
-                      type="file" disabled={loading || uploadingAudio || uploadingVideo}
+                      type="file" disabled={loading}
                       name="audio"
                       accept="audio/*"
                       onChange={handleChange}
@@ -808,7 +818,7 @@ export default function Edit() {
               name="publicationStatus"
               value={formData.publicationStatus || "PUBLISHED"}
               formNoValidate={formData.publicationStatus === "DRAFT"}
-            disabled={loading || uploadingAudio || uploadingVideo}
+            disabled={loading}
               className="button-bg rounded-lg px-5 py-3 font-semibold !text-white transition disabled:cursor-not-allowed disabled:opacity-60"
           >
               {loading ? "Saving..." : formData.publicationStatus === "DRAFT" ? "Save draft changes" : "Save changes"}
@@ -818,7 +828,7 @@ export default function Edit() {
               name="publicationStatus"
               value={formData.publicationStatus === "DRAFT" ? "PUBLISHED" : "DRAFT"}
               formNoValidate={formData.publicationStatus !== "DRAFT"}
-              disabled={loading || uploadingAudio || uploadingVideo}
+              disabled={loading}
               className="rounded-lg border border-[#9747FF] bg-transparent px-5 py-3 font-semibold !text-black transition hover:!text-black  disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading

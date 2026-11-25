@@ -22,6 +22,7 @@ export default function Add() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
     description: "",
     topic: "",
     seoTitle: "",
@@ -407,6 +408,7 @@ export default function Add() {
 
       const payload = new FormData();
       payload.append("title", formData.title);
+      payload.append("slug", formData.slug);
       payload.append("description", formData.description);
       payload.append("topic", formData.topic);
       payload.append("podcastId", id);
@@ -471,6 +473,7 @@ export default function Add() {
         toast.success(response.data.message);
         setFormData({
           title: "",
+          slug: "",
           description: "",
           topic: "",
           seoTitle: "",
@@ -528,22 +531,29 @@ export default function Add() {
           />
         </div>
 
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">Slug <span className="text-gray-400">(optional)</span></label>
+          <input type="text" name="slug" maxLength={100} value={formData.slug} onChange={handleChange} placeholder="Leave blank to generate from the title" className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white focus:outline-none focus:ring-2 focus:ring-white" />
+        </div>
+
         {/* Description */}
         <div className="space-y-1">
           <label className="block text-sm font-medium">Description</label>
           <textarea
             name="description"
             rows="4"
+            maxLength={200}
             className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
             value={formData.description}
             onChange={handleChange}
           />
+          <p className="text-right text-xs text-gray-400">{formData.description.length}/200</p>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           <div className="space-y-1">
             <label className="block text-sm font-medium">
-              Category <span className="text-red-500">*</span>
+              Categories <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -551,7 +561,9 @@ export default function Add() {
               className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white focus:outline-none focus:ring-2 focus:ring-white"
               value={formData.topic}
               onChange={handleChange}
+              placeholder="Market Insights, Investing, Finance"
             />
+            <p className="text-xs text-gray-400">Add multiple categories separated by commas.</p>
           </div>
           <div className="space-y-1">
             <label className="block text-sm font-medium">Episode number</label>
@@ -608,7 +620,7 @@ export default function Add() {
                   </p>
                 )}
                 <input
-                  type="file" disabled={loading || uploadingAudio || uploadingVideo}
+                  type="file" disabled={loading}
                   name="thumbnail"
                   accept="image/*"
                   onChange={handleChange}
@@ -627,7 +639,7 @@ export default function Add() {
                 ) : (
                   <p className="absolute inset-0 grid place-items-center px-4 text-center text-sm">Click to upload the card and homepage hero image</p>
                 )}
-                <input type="file" disabled={loading || uploadingAudio || uploadingVideo} name="websiteThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
+                <input type="file" disabled={loading} name="websiteThumbnail" accept="image/*" onChange={handleChange} className="absolute inset-0 cursor-pointer opacity-0" />
               </div>
             </div>
           </div>
@@ -639,7 +651,7 @@ export default function Add() {
             Video file <span className="text-gray-400">(optional when using YouTube)</span>
           </label>
           <input
-            type="file" disabled={loading || uploadingAudio || uploadingVideo}
+            type="file" disabled={loading}
             name="video"
              accept="video/*,audio/*"
             onChange={handleChange}
@@ -664,7 +676,7 @@ export default function Add() {
           </label>
 
           <input
-            type="file" disabled={loading || uploadingAudio || uploadingVideo}
+            type="file" disabled={loading}
             name="audio"
             accept="audio/*"
             onChange={handleChange}
@@ -723,7 +735,7 @@ export default function Add() {
               name="publicationStatus"
               value="DRAFT"
               formNoValidate
-              disabled={loading || uploadingAudio || uploadingVideo}
+              disabled={loading}
               className="rounded-lg border border-[#9747FF] bg-transparent px-5 py-3 font-semibold !text-black transition hover:bg-[#9747FF]/15 hover:text-[#000000] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Saving..." : "Save as draft"}
@@ -732,7 +744,7 @@ export default function Add() {
             type="submit"
             name="publicationStatus"
             value="PUBLISHED"
-            disabled={loading || uploadingAudio || uploadingVideo}
+            disabled={loading}
               className="button-bg rounded-lg px-5 py-3 font-semibold !text-white transition disabled:cursor-not-allowed disabled:opacity-60"
           >
               {loading ? "Publishing..." : "Publish episode"}

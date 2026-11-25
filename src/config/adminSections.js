@@ -1,5 +1,4 @@
 export const ADMIN_SECTIONS = [
-  { id: "dashboard", label: "Dashboard", href: "/admin" },
   { id: "analytics", label: "Analytics", href: "/admin/analytics" },
   { id: "podcasts", label: "Podcasts", href: "/admin/podcast" },
   { id: "transcripts", label: "Transcripts", href: "/admin/transcripts" },
@@ -12,7 +11,7 @@ export const hasSectionAccess = (user, section) => Boolean(user) && (user.role =
 export const firstAccessibleRoute = (user) => user?.role === "SUPER_ADMIN" ? "/admin" : ADMIN_SECTIONS.find((section) => hasSectionAccess(user, section.id))?.href || "/admin/login";
 
 export function sectionForPath(pathname = "") {
-  if (pathname === "/admin") return "dashboard";
+  if (pathname === "/admin") return "podcasts";
   if (pathname.startsWith("/admin/analytics")) return "analytics";
   if (pathname.startsWith("/admin/ip-whitelist")) return "super_admin";
   if (pathname.startsWith("/admin/podcast") || pathname.startsWith("/admin/episode") || pathname.startsWith("/admin/hero-phones") || pathname.startsWith("/admin/guide")) return "podcasts";

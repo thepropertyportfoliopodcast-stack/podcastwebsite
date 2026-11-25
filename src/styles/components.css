@@ -1541,7 +1541,7 @@ body :where(a, button).bg-theme {
 }
 
 .episode-grid-card .episode-card-topic {
-  width: 100%;
+  width: fit-content;
   min-width: 0;
   max-width: none;
   text-align: left;

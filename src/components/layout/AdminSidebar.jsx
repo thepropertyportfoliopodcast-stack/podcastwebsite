@@ -1,9 +1,8 @@
 import React from "react";
-import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { MdOutlineLogout } from "react-icons/md";
 import AdminAvatarPicker from "@/components/admin/AdminAvatarPicker";
 import Link from "next/link";
-import { FaRegUser } from "react-icons/fa";
+import { FaMicrophoneAlt, FaRegUser } from "react-icons/fa";
 import { MdSupportAgent } from "react-icons/md";
 import { MdOutlineAnalytics } from "react-icons/md";
 import { MdAdminPanelSettings } from "react-icons/md";
@@ -70,18 +69,6 @@ export default function AdminSidebar({ toggle, collapsed, onNavigate, handleLogo
             </Link>
           </li>}
 
-          {hasSectionAccess(user, "dashboard") && <li>
-            <Link
-              className={`admin-sidebar-link ${pathname === "/admin" ? "is-active" : ""}`}
-              href={"/admin"}
-              onClick={onNavigate}
-              aria-label="Dashboard"
-              title={collapsed ? "Dashboard" : undefined}
-            >
-              <MdOutlineSpaceDashboard className="admin-sidebar-icon" size={"1.4rem"} />
-              <span className="admin-sidebar-label">Dashboard</span>
-            </Link>
-          </li>}
           {hasSectionAccess(user, "podcasts") && <li>
             <Link
               className={`admin-sidebar-link ${pathname === "/admin/podcast" ? "is-active" : ""}`}
@@ -90,7 +77,7 @@ export default function AdminSidebar({ toggle, collapsed, onNavigate, handleLogo
               aria-label="Podcasts"
               title={collapsed ? "Podcasts" : undefined}
             >
-              <MdOutlineSpaceDashboard className="admin-sidebar-icon" size={"1.4rem"} />
+              <FaMicrophoneAlt className="admin-sidebar-icon" size={"1.4rem"} />
               <span className="admin-sidebar-label">Podcasts</span>
             </Link>
           </li>}

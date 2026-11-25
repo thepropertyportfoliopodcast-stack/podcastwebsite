@@ -189,10 +189,10 @@ export default function index() {
                       <td className="px-4 py-4 text-sm text-white border-b border-white/10">
                         {item?.subject || "-"}
                       </td>
-                      <td className="px-4 py-4 text-sm text-white border-b border-white/10"><span className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ${item?.kind === "TOPIC_SUGGESTION" ? "bg-fuchsia-500/20 text-fuchsia-200" : "bg-blue-500/20 text-blue-200"}`}>{item?.kind === "TOPIC_SUGGESTION" ? "Topic suggestion" : "Enquiry"}</span></td>
+                      <td className="px-4 py-4 text-sm text-white border-b border-white/10"><span className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold !text-slate-950 ${item?.kind === "TOPIC_SUGGESTION" ? "bg-fuchsia-200" : "bg-blue-200"}`}>{item?.kind === "TOPIC_SUGGESTION" ? "Topic suggestion" : "Enquiry"}</span></td>
 
                       <td className="px-4 py-4 text-sm text-white border-b border-white/10">
-                        <MessageViewer text={item?.message} />
+                        <MessageViewer enquiry={item} />
                       </td>
 
                       <td className="px-4 py-4 text-sm text-white border-b border-white/10 whitespace-nowrap">

@@ -14,6 +14,7 @@ export default function EpisodeFormModal({
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
     description: "",
     seoTitle: "",
     seoDescription: "",
@@ -28,9 +29,10 @@ export default function EpisodeFormModal({
   useEffect(() => {
     setFormData({
       title: selectedEpisode?.title || "",
-      description: selectedEpisode?.description || "",
+      slug: selectedEpisode?.slug || "",
+      description: (selectedEpisode?.description || "").slice(0, 200),
       seoTitle: selectedEpisode?.seoTitle || "",
-      seoDescription: selectedEpisode?.seoDescription || "",
+      seoDescription: (selectedEpisode?.seoDescription || "").slice(0, 200),
       primaryKeyword: selectedEpisode?.primaryKeyword || "",
       secondaryKeywords: selectedEpisode?.secondaryKeywords || "",
       thumbnail: selectedEpisode?.thumbnail || null,
@@ -90,6 +92,7 @@ export default function EpisodeFormModal({
       const main = new PodcastApi();
       const payload = new FormData();
       payload.append("title", formData.title);
+      payload.append("slug", formData.slug);
       payload.append("description", formData.description);
       payload.append("seoTitle", formData.seoTitle);
       payload.append("seoDescription", formData.seoDescription);
@@ -109,6 +112,7 @@ export default function EpisodeFormModal({
         toast.success(response.data.message);
         setFormData({
           title: "",
+          slug: "",
           description: "",
           thumbnail: null,
           video: null,
@@ -135,6 +139,7 @@ export default function EpisodeFormModal({
       const main = new PodcastApi();
       const payload = new FormData();
       payload.append("title", formData.title);
+      payload.append("slug", formData.slug);
       payload.append("description", formData.description);
       payload.append("seoTitle", formData.seoTitle);
       payload.append("seoDescription", formData.seoDescription);
@@ -157,6 +162,7 @@ export default function EpisodeFormModal({
         toast.success(response.data.message);
         setFormData({
           title: "",
+          slug: "",
           description: "",
           thumbnail: null,
           video: null,
@@ -198,16 +204,23 @@ export default function EpisodeFormModal({
           />
         </div>
 
+        <div className="space-y-1">
+          <label className="block text-sm font-medium">Slug <span className="text-gray-400">(optional)</span></label>
+          <input type="text" name="slug" maxLength={100} value={formData.slug} onChange={handleChange} placeholder="Leave blank to generate from the title" className="w-full p-3 rounded-lg border border-gray-700 bg-[#1c1c1c] text-white focus:outline-none focus:ring-2 focus:ring-white" />
+        </div>
+
         {/* Description */}
         <div className="space-y-1">
           <label className="block text-sm font-medium">Description</label>
           <textarea
             name="description"
             rows="4"
+            maxLength={200}
             className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
             value={formData.description}
             onChange={handleChange}
           />
+          <p className="text-right text-xs text-gray-400">{formData.description.length}/200</p>
         </div>
 
         <SeoFields formData={formData} onChange={handleChange} />
