@@ -162,7 +162,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
               }
             />
             {/* Search + Filter */}
-            <div className="episode-archive-tools mb-10 flex w-full flex-col items-stretch justify-center gap-3 md:flex-row md:items-center">
+            <div className="episode-archive-tools mb-10 flex w-full flex-col items-stretch justify-center gap-3 md:grid md:grid-cols-[minmax(0,1fr)_minmax(340px,400px)] md:items-center lg:grid-cols-[minmax(0,1fr)_minmax(400px,440px)] xl:grid-cols-[minmax(0,1fr)_460px]">
               {/* Search Box */}
               <form ref={searchRef} className="relative w-full" onSubmit={(event) => { event.preventDefault(); submitSearch(); }} role="search">
                 <input
@@ -185,7 +185,7 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
               </form>
 
               {/* Dropdown */}
-              <div ref={topicRef} className="relative w-full md:max-w-[230px]">
+              <div ref={topicRef} className="relative w-full min-w-0">
                 <button type="button" onClick={() => setTopicOpen((open) => !open)} aria-haspopup="listbox" aria-expanded={topicOpen} className="flex w-full items-center gap-3 rounded-2xl border border-[#ded2e7] bg-white px-4 py-3.5 text-left text-[#24182c] shadow-sm transition hover:border-[#9747FF] focus:border-[#9747FF] focus:outline-none focus:ring-4 focus:ring-[#9747FF]/10">
                 <div className="absolute left-[10px]">
                   <svg
@@ -204,9 +204,9 @@ export default function Index({ initialEpisodes = [], initialTopics = [], initia
                     />
                   </svg>
                 </div>
-                <span className="min-w-0 flex-1 truncate pl-6">{selectedTopic || "All Topics"}</span><FaChevronDown className={`shrink-0 transition ${topicOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+                <span className="min-w-0 flex-1 break-words pl-6">{selectedTopic || "All Topics"}</span><FaChevronDown className={`shrink-0 transition ${topicOpen ? "rotate-180" : ""}`} aria-hidden="true" />
                 </button>
-                {topicOpen && <div role="listbox" aria-label="Filter episodes by topic" className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-64 overflow-y-auto rounded-2xl border border-[#ded2e7] bg-white p-2 shadow-xl"><button type="button" role="option" aria-selected={!selectedTopic} onClick={() => chooseTopic("")} className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[#24182c] hover:bg-[#f7f0fa]"><span>All Topics</span>{!selectedTopic && <FaCheck className="text-[#7f2aa9]" />}</button>{topics.map((topic) => <button key={topic} type="button" role="option" aria-selected={selectedTopic === topic} onClick={() => chooseTopic(topic)} className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[#24182c] hover:bg-[#f7f0fa]"><span className="truncate">{topic}</span>{selectedTopic === topic && <FaCheck className="text-[#7f2aa9]" />}</button>)}</div>}
+                {topicOpen && <div role="listbox" aria-label="Filter episodes by topic" className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-64 overflow-y-auto rounded-2xl border border-[#ded2e7] bg-white p-2 shadow-xl"><button type="button" role="option" aria-selected={!selectedTopic} onClick={() => chooseTopic("")} className="flex w-full items-start justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-[#24182c] hover:bg-[#f7f0fa]"><span>All Topics</span>{!selectedTopic && <FaCheck className="mt-0.5 shrink-0 text-[#7f2aa9]" />}</button>{topics.map((topic) => <button key={topic} type="button" role="option" aria-selected={selectedTopic === topic} onClick={() => chooseTopic(topic)} className="flex w-full items-start justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-[#24182c] hover:bg-[#f7f0fa]"><span className="min-w-0 whitespace-normal break-words">{topic}</span>{selectedTopic === topic && <FaCheck className="mt-0.5 shrink-0 text-[#7f2aa9]" />}</button>)}</div>}
               </div>
             </div>
 

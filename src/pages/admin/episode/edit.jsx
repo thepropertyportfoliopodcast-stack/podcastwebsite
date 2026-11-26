@@ -13,6 +13,7 @@ import EpisodeContentFields from "@/components/admin/episodes/EpisodeContentFiel
 import HostSelector from "@/components/admin/episodes/HostSelector";
 import EpisodeRelationsFields from "@/components/admin/episodes/EpisodeRelationsFields";
 import EpisodeHeroPhoneFields from "@/components/admin/episodes/EpisodeHeroPhoneFields";
+import CategoryTagInput from "@/components/admin/episodes/CategoryTagInput";
 
 export default function Edit() {
   const router = useRouter();
@@ -546,15 +547,7 @@ export default function Edit() {
                   <label className="block text-sm font-medium">
                     Categories <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    name="topic"
-                    className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
-                    value={formData.topic}
-                    onChange={handleChange}
-                    placeholder="Market Insights, Investing, Finance"
-                  />
-                  <p className="text-xs text-gray-400">Add multiple categories separated by commas.</p>
+                  <CategoryTagInput value={formData.topic} onChange={(topic) => setFormData((current) => ({ ...current, topic }))} />
                 </div>
               </div>
 
