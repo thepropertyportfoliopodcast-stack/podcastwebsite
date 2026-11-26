@@ -556,7 +556,7 @@ export default function Add() {
             <label className="block text-sm font-medium">
               Categories <span className="text-red-500">*</span>
             </label>
-            <CategoryTagInput value={formData.topic} onChange={(topic) => setFormData((current) => ({ ...current, topic }))} />
+            <CategoryTagInput value={formData.topic} existingEpisodes={episodes} onChange={(topic) => setFormData((current) => ({ ...current, topic }))} />
           </div>
           <div className="space-y-1">
             <label className="block text-sm font-medium">Episode number</label>
