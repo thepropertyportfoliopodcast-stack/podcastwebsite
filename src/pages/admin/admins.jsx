@@ -6,12 +6,15 @@ import AdminLayout from "@/components/layout/AdminLayout";
 import PodcastApi from "@/services/podcastApi";
 import { ADMIN_SECTIONS } from "@/config/adminSections";
 import { getAdminAvatarSource } from "@/data/adminAvatars";
+import { useRole } from "@/context/RoleContext";
 
 const empty = { name: "", email: "", password: "", role: "ADMIN", permissions: ADMIN_SECTIONS.map((section) => section.id), isActive: true };
 
 export default function AdminUsersPage() {
   const api = useMemo(() => new PodcastApi(), []);
+  const { user: currentUser } = useRole();
   const [users, setUsers] = useState([]); const [form, setForm] = useState(empty); const [editing, setEditing] = useState(null); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [deletingId, setDeletingId] = useState(null);
+  const isProtectedOwner = currentUser?.email?.trim().toLowerCase() === "utsav@proowrx.com";
   const load = useCallback(async () => { setLoading(true); try { const response = await api.AdminUsersGet(); setUsers(response?.data?.data?.users || []); } catch (error) { toast.error(error?.response?.data?.message || "Unable to load administrators"); } finally { setLoading(false); } }, [api]);
   useEffect(() => { load(); }, [load]);
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
@@ -28,7 +31,8 @@ export default function AdminUsersPage() {
     finally { setSaving(false); }
   };
   const remove = async (user) => {
-    if (user.role !== "ADMIN" || !window.confirm(`Delete ${user.name}'s administrator account? This cannot be undone.`)) return;
+    if (user.id === currentUser?.id || user.email?.trim().toLowerCase() === "utsav@proowrx.com") return;
+    if ((user.role !== "ADMIN" && !isProtectedOwner) || !window.confirm(`Delete ${user.name}'s ${user.role === "SUPER_ADMIN" ? "super admin" : "admin"} account? This also removes the profile from enquiry email recipients and cannot be undone.`)) return;
     setDeletingId(user.id);
     try {
       await api.AdminUserDelete(user.id);
@@ -40,7 +44,7 @@ export default function AdminUsersPage() {
   };
 
   return <AdminLayout><div className="mx-auto max-w-6xl text-white">
-    <header className="mb-8"><p className="text-sm font-black uppercase tracking-[.18em] text-[#c347ff]">Super admin only</p><h1 className="mt-2 text-3xl font-black">Administrators</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Create admins or super admins. Normal admins see and can call only the dashboard sections selected here; this Admins section is permanently hidden from them. Only normal admin accounts can be deleted.</p></header>
+    <header className="mb-8"><p className="text-sm font-black uppercase tracking-[.18em] text-[#c347ff]">Super admin only</p><h1 className="mt-2 text-3xl font-black">Administrators</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Create admins or super admins. Normal admins see and can call only the dashboard sections selected here; this Admins section is permanently hidden from them. Utsav can delete admin and super admin profiles; other super admins can delete admin profiles.</p></header>
     <form onSubmit={submit} className="mb-10 rounded-2xl border border-gray-700 bg-[#121212] p-5 md:p-7">
       <div className="mb-6 flex items-center justify-between"><h2 className="text-xl font-bold">{editing ? `Edit ${editing.name}` : "Create an administrator"}</h2>{editing && <button type="button" onClick={reset} className="inline-flex items-center gap-2 rounded-lg border border-gray-600 px-3 py-2 text-sm"><FaTimes />Cancel</button>}</div>
       <div className="grid gap-5 md:grid-cols-2">
@@ -80,10 +84,10 @@ export default function AdminUsersPage() {
             {user.role === "SUPER_ADMIN" ? "All dashboard sections" : user.permissions.length ? user.permissions.join(", ") : "No dashboard sections"} · {user.isActive ? "Active" : "Inactive"}
           </p>
           <div className="flex flex-wrap justify-end gap-3">
-            <button type="button" onClick={() => edit(user)} className="inline-flex items-center gap-2 rounded-lg border border-gray-600 px-4 py-2 text-sm font-bold">
+            {(user.email?.trim().toLowerCase() !== "utsav@proowrx.com" || isProtectedOwner) && <button type="button" onClick={() => edit(user)} className="inline-flex items-center gap-2 rounded-lg border border-gray-600 px-4 py-2 text-sm font-bold">
               <FaEdit />Edit
-            </button>
-            {user.role === "ADMIN" && (
+            </button>}
+            {user.id !== currentUser?.id && user.email?.trim().toLowerCase() !== "utsav@proowrx.com" && (user.role === "ADMIN" || isProtectedOwner) && (
               <button type="button" disabled={deletingId === user.id} onClick={() => remove(user)} className="inline-flex items-center gap-2 rounded-lg border border-red-500/70 px-4 py-2 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60">
                 <FaTrash />{deletingId === user.id ? "Deleting…" : "Delete"}
               </button>
