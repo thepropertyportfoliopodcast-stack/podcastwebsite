@@ -7,19 +7,19 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/f
 
 const initial = { name: "", email: "", subject: "Suggest a Topic", message: "" };
 const subjects = ["Suggest a Topic", "Ask a Question", "Guest Opportunity", "Give Feedback"];
-const countWords = (value = "") => value.trim().split(/\s+/).filter(Boolean).length;
+const MIN_MESSAGE_CHARACTERS = 80;
 
 export default function ContactForm() {
   const [form, setForm] = useState(initial);
   const [loading, setLoading] = useState(false);
-  const messageWordCount = countWords(form.message);
+  const messageCharacterCount = form.message.trim().length;
   const update = ({ target }) => setForm((current) => ({ ...current, [target.name]: target.value }));
   const submit = async (event) => {
     event.preventDefault();
     if (loading) return;
     if (!form.name.trim()) return toast.error("Please enter your name.");
     if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) return toast.error("Please enter a valid email address.");
-    if (messageWordCount < 30) return toast.error(`Your message must contain at least 30 words. Please add ${30 - messageWordCount} more.`);
+    if (messageCharacterCount < MIN_MESSAGE_CHARACTERS) return toast.error(`Your message must contain at least ${MIN_MESSAGE_CHARACTERS} characters. Please add ${MIN_MESSAGE_CHARACTERS - messageCharacterCount} more.`);
     setLoading(true);
     try {
       const response = await addContact({ ...form, source: "contact_page" });
@@ -54,7 +54,7 @@ export default function ContactForm() {
       <form onSubmit={submit} className={"contact-form"}>
         <div className={"contact-twoColumns"}><label><span>Your name</span><div><FiUser/><input name="name" value={form.name} onChange={update} placeholder="Enter your name" autoComplete="name" required/></div></label><label><span>Email address</span><div><FiMail/><input type="email" name="email" value={form.email} onChange={update} placeholder="you@example.com" autoComplete="email" required/></div></label></div>
         <fieldset><legend>I’d like to</legend><div className={"contact-subjects"}>{subjects.map((subject)=><button type="button" key={subject} onClick={()=>setForm((current)=>({...current,subject}))} aria-pressed={form.subject===subject} className={form.subject===subject?"selected":""}>{subject}</button>)}</div></fieldset>
-        <label className={"contact-message"}><span>Your message</span><textarea name="message" value={form.message} onChange={update} maxLength={1500} rows={6} placeholder="Share the question, idea or opportunity you would like our hosts to unpack…" aria-describedby="contact-message-requirement" required/><small id="contact-message-requirement">{messageWordCount}/30 words minimum · {form.message.length}/1500 characters</small></label>
+        <label className={"contact-message"}><span>Your message</span><textarea name="message" value={form.message} onChange={update} minLength={MIN_MESSAGE_CHARACTERS} maxLength={1500} rows={6} placeholder="Share the question, idea or opportunity you would like our hosts to unpack…" aria-describedby="contact-message-requirement" required/><small id="contact-message-requirement">{messageCharacterCount}/{MIN_MESSAGE_CHARACTERS} characters minimum · {form.message.length}/1500 characters</small></label>
         <button className={"contact-submit"} disabled={loading}>{loading ? "Sending securely…" : "Send my message"}<FiArrowUpRight/></button>
         <p className={"contact-privacy"}>Your details are used only to respond to your enquiry. Read our <Link href="/privacy">privacy policy</Link>.</p>
       </form>
