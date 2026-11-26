@@ -7,7 +7,7 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/f
 
 const initial = { name: "", email: "", subject: "Suggest a Topic", message: "" };
 const subjects = ["Suggest a Topic", "Ask a Question", "Guest Opportunity", "Give Feedback"];
-const MIN_MESSAGE_CHARACTERS = 80;
+const MIN_MESSAGE_CHARACTERS = 30;
 
 export default function ContactForm() {
   const [form, setForm] = useState(initial);
