@@ -5,6 +5,7 @@ import PodcastApi from "@/services/podcastApi";
 import EmptyState from "@/components/ui/EmptyState";
 import { TableLoader } from "@/components/ui/LoadingSpinner";
 import AdminLayout from "@/components/layout/AdminLayout";
+import toast from "react-hot-toast";
 
 export default function SubscriberList() {
   const [listing, setListing] = useState([]);
@@ -13,6 +14,7 @@ export default function SubscriberList() {
   const [limit] = useState(10);
   const [hasMore, setHasMore] = useState(true);
   const [loadingButton, setLoadingButton] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   const EnquiryList = async (pg, signal) => {
     try {
@@ -70,6 +72,20 @@ export default function SubscriberList() {
     XLSX.writeFile(workbook, "Subcribers.xlsx");
   };
 
+  const deleteSubscriber = async (subscriber) => {
+    if (!subscriber?.id || !window.confirm(`Delete the subscriber ${subscriber.email || "record"}? This cannot be undone.`)) return;
+    try {
+      setDeletingId(subscriber.id);
+      await new PodcastApi().SubscriberDelete(subscriber.id);
+      setListing((current) => current.filter((item) => item.id !== subscriber.id));
+      toast.success("Subscriber deleted");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Unable to delete subscriber");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <AdminLayout>
       {/* Header */}
@@ -102,12 +118,15 @@ export default function SubscriberList() {
                 <th className="border-b border-white/30 text-sm text-white uppercase text-left px-6 py-4">
                   Date
                 </th>
+                <th className="border-b border-white/30 text-sm text-white uppercase text-right px-6 py-4">
+                  Action
+                </th>
               </tr>
             </thead>
 
             <tbody>
               {listing.map((item, index) => (
-                <tr key={index} className="hover:bg-white/5 transition-colors">
+                <tr key={item.id || index} className="hover:bg-white/5 transition-colors">
                   <td className="font-medium text-white text-[15px] text-left px-6 py-4 border-b border-white/10">
                     {index + 1}
                   </td>
@@ -120,6 +139,11 @@ export default function SubscriberList() {
                     {item?.createdAt
                       ? moment(item.createdAt).format("DD MMM YYYY, hh:mm A")
                       : "-"}
+                  </td>
+                  <td className="px-6 py-4 text-right border-b border-white/10">
+                    <button type="button" onClick={() => deleteSubscriber(item)} disabled={deletingId === item.id} aria-label={`Delete subscriber ${item.email || "record"}`} className="rounded-lg border border-red-400/40 bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50">
+                      {deletingId === item.id ? "Deleting…" : "Delete"}
+                    </button>
                   </td>
                 </tr>
               ))}

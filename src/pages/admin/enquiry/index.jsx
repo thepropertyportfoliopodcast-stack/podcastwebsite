@@ -22,6 +22,7 @@ export default function index() {
   const [selectedAdminIds, setSelectedAdminIds] = useState([]);
   const [loadingRecipients, setLoadingRecipients] = useState(true);
   const [savingRecipients, setSavingRecipients] = useState(false);
+  const [recipientSettingsWarning, setRecipientSettingsWarning] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -31,9 +32,24 @@ export default function index() {
         const payload = response?.data?.data;
         setAdminProfiles(Array.isArray(payload?.admins) ? payload.admins : []);
         setSelectedAdminIds(Array.isArray(payload?.selectedAdminIds) ? payload.selectedAdminIds : []);
+        setRecipientSettingsWarning("");
       })
-      .catch((error) => {
-        if (active) toast.error(error?.response?.data?.message || "Unable to load email recipients");
+      .catch(async (error) => {
+        if (!active) return;
+        try {
+          // Super admins can still select profiles if the notification settings endpoint is temporarily unavailable.
+          const fallback = await new PodcastApi().AdminUsersGet();
+          const users = fallback?.data?.data?.users;
+          if (active && Array.isArray(users)) {
+            setAdminProfiles(users.filter((user) => user?.isActive));
+            setSelectedAdminIds([]);
+            setRecipientSettingsWarning("Profiles are loaded, but the saved CC selection could not be retrieved. Choose the recipients and save to replace it.");
+            return;
+          }
+          throw error;
+        } catch (fallbackError) {
+          if (active) toast.error(error?.response?.data?.message || fallbackError?.response?.data?.message || "Unable to load email recipients");
+        }
       })
       .finally(() => { if (active) setLoadingRecipients(false); });
     return () => { active = false; };
@@ -50,6 +66,7 @@ export default function index() {
       setSavingRecipients(true);
       const response = await new PodcastApi().emailNotificationRecipientsSave(selectedAdminIds);
       setSelectedAdminIds(response?.data?.data?.selectedAdminIds || selectedAdminIds);
+      setRecipientSettingsWarning("");
       toast.success("Email notification recipients saved");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Unable to save email recipients");
@@ -171,26 +188,27 @@ export default function index() {
           Export as Excel
         </button>
       </div>
-      <section className="mb-7 rounded-2xl border border-white/15 bg-[#171717] p-5 shadow-lg" aria-labelledby="enquiry-email-recipients-title">
+      <section className="mb-7 rounded-2xl border border-violet-200 bg-white p-5 text-slate-900 shadow-lg" aria-labelledby="enquiry-email-recipients-title">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
           <div>
-            <h2 id="enquiry-email-recipients-title" className="text-lg font-bold text-white">Email notification recipients</h2>
-            <p className="mt-1 max-w-3xl text-sm text-white/70">New enquiries and subscribers are sent to the configured SMTP mailbox. Selected active admins are added in CC.</p>
+            <h2 id="enquiry-email-recipients-title" className="text-lg font-bold text-slate-900">Email notification recipients</h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-700">New enquiries and subscribers are sent to the configured SMTP mailbox. Selected active admins are added in CC.</p>
           </div>
-          <button type="button" onClick={saveAdminRecipients} disabled={loadingRecipients || savingRecipients} className="shrink-0 rounded-lg bg-theme px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
+          <button type="button" onClick={saveAdminRecipients} disabled={loadingRecipients || savingRecipients} className="shrink-0 rounded-lg bg-theme px-4 py-2 font-semibold !text-white disabled:cursor-not-allowed disabled:opacity-50">
             {savingRecipients ? "Saving…" : "Save recipients"}
           </button>
         </div>
-        {loadingRecipients ? <p className="mt-4 text-sm text-white/60">Loading admin profiles…</p> : adminProfiles.length ? (
+        {loadingRecipients ? <p className="mt-4 text-sm text-slate-600">Loading admin profiles…</p> : adminProfiles.length ? (
           <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {adminProfiles.map((admin) => (
-              <label key={admin.id} className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/[.04] p-3 hover:bg-white/[.08]">
+              <label key={admin.id} className="flex cursor-pointer items-start gap-3 rounded-xl border border-violet-100 bg-violet-50/60 p-3 hover:bg-violet-50">
                 <input type="checkbox" checked={selectedAdminIds.includes(admin.id)} onChange={() => toggleAdminRecipient(admin.id)} className="mt-1 h-4 w-4 accent-violet-500" />
-                <span className="min-w-0"><span className="block font-semibold text-white">{admin.name} {admin.role === "SUPER_ADMIN" ? <span className="text-xs text-violet-300">(Super admin)</span> : null}</span><span className="block break-all text-sm text-white/65">{admin.email}</span></span>
+                <span className="min-w-0"><span className="block font-semibold text-slate-900">{admin.name} {admin.role === "SUPER_ADMIN" ? <span className="text-xs text-violet-800">(Super admin)</span> : null}</span><span className="block break-all text-sm text-slate-700">{admin.email}</span></span>
               </label>
             ))}
           </div>
-        ) : <p className="mt-4 text-sm text-white/60">No active admin profiles are available.</p>}
+        ) : <p className="mt-4 text-sm text-slate-600">No active admin profiles are available.</p>}
+        {recipientSettingsWarning && <p role="status" className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">{recipientSettingsWarning}</p>}
       </section>
       <div className="admin-table-scroll overflow-auto">
         {loading ? (

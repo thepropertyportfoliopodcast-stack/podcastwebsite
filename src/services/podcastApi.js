@@ -175,6 +175,9 @@ async enquiryGet(page, limit) {
    async GetSubscriber(page, limit){
     return Api.get(`/subscriber/get?page=${page}&limit=${limit}`);
   }
+  async SubscriberDelete(id) {
+    return Api.delete(`/subscriber/delete/${id}`);
+  }
   async AddContact(data){
     return  Api.post("/contact/add",data)
   }
