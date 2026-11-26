@@ -18,6 +18,45 @@ export default function index() {
   const [loadingButton, setLoadingButton] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [syncingId, setSyncingId] = useState(null);
+  const [adminProfiles, setAdminProfiles] = useState([]);
+  const [selectedAdminIds, setSelectedAdminIds] = useState([]);
+  const [loadingRecipients, setLoadingRecipients] = useState(true);
+  const [savingRecipients, setSavingRecipients] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    new PodcastApi().emailNotificationRecipientsGet()
+      .then((response) => {
+        if (!active) return;
+        const payload = response?.data?.data;
+        setAdminProfiles(Array.isArray(payload?.admins) ? payload.admins : []);
+        setSelectedAdminIds(Array.isArray(payload?.selectedAdminIds) ? payload.selectedAdminIds : []);
+      })
+      .catch((error) => {
+        if (active) toast.error(error?.response?.data?.message || "Unable to load email recipients");
+      })
+      .finally(() => { if (active) setLoadingRecipients(false); });
+    return () => { active = false; };
+  }, []);
+
+  const toggleAdminRecipient = (adminId) => {
+    setSelectedAdminIds((current) => current.includes(adminId)
+      ? current.filter((id) => id !== adminId)
+      : [...current, adminId]);
+  };
+
+  const saveAdminRecipients = async () => {
+    try {
+      setSavingRecipients(true);
+      const response = await new PodcastApi().emailNotificationRecipientsSave(selectedAdminIds);
+      setSelectedAdminIds(response?.data?.data?.selectedAdminIds || selectedAdminIds);
+      toast.success("Email notification recipients saved");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Unable to save email recipients");
+    } finally {
+      setSavingRecipients(false);
+    }
+  };
 
   const EnquiryList = async (pg, signal) => {
     try {
@@ -132,6 +171,27 @@ export default function index() {
           Export as Excel
         </button>
       </div>
+      <section className="mb-7 rounded-2xl border border-white/15 bg-[#171717] p-5 shadow-lg" aria-labelledby="enquiry-email-recipients-title">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+          <div>
+            <h2 id="enquiry-email-recipients-title" className="text-lg font-bold text-white">Email notification recipients</h2>
+            <p className="mt-1 max-w-3xl text-sm text-white/70">New enquiries and subscribers are sent to the configured SMTP mailbox. Selected active admins are added in CC.</p>
+          </div>
+          <button type="button" onClick={saveAdminRecipients} disabled={loadingRecipients || savingRecipients} className="shrink-0 rounded-lg bg-theme px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">
+            {savingRecipients ? "Saving…" : "Save recipients"}
+          </button>
+        </div>
+        {loadingRecipients ? <p className="mt-4 text-sm text-white/60">Loading admin profiles…</p> : adminProfiles.length ? (
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            {adminProfiles.map((admin) => (
+              <label key={admin.id} className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/[.04] p-3 hover:bg-white/[.08]">
+                <input type="checkbox" checked={selectedAdminIds.includes(admin.id)} onChange={() => toggleAdminRecipient(admin.id)} className="mt-1 h-4 w-4 accent-violet-500" />
+                <span className="min-w-0"><span className="block font-semibold text-white">{admin.name} {admin.role === "SUPER_ADMIN" ? <span className="text-xs text-violet-300">(Super admin)</span> : null}</span><span className="block break-all text-sm text-white/65">{admin.email}</span></span>
+              </label>
+            ))}
+          </div>
+        ) : <p className="mt-4 text-sm text-white/60">No active admin profiles are available.</p>}
+      </section>
       <div className="admin-table-scroll overflow-auto">
         {loading ? (
           <TableLoader length={10} />

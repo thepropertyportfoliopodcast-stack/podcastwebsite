@@ -150,6 +150,12 @@ async enquiryGet(page, limit) {
   async enquirySheetSync(id) {
     return Api.post(`/contact/sync/${id}`);
   }
+  async emailNotificationRecipientsGet() {
+    return Api.get("/admin/email-notifications/recipients");
+  }
+  async emailNotificationRecipientsSave(adminIds) {
+    return Api.put("/admin/email-notifications/recipients", { adminIds });
+  }
   async analyticsGet(params = {}) {
     return Api.get("/admin/analytics", { params });
   }
