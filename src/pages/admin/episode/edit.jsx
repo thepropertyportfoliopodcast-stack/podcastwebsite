@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AdminLayout from "@/components/layout/AdminLayout";
 import toast from "react-hot-toast";
 import PodcastApi from "@/services/podcastApi";
@@ -49,6 +49,7 @@ export default function Edit() {
     durationInSec: 0,
     episodeNumber: "",
     publishedDate: "",
+    scheduledAt: "",
     size: 0,
     isSpotify: false,
     spotifyLink: "",
@@ -70,6 +71,8 @@ export default function Edit() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const videoUploadController = useRef(null);
+  const audioUploadController = useRef(null);
 
   // Audio States
   const [uploadingAudio, setUploadingAudio] = useState(false);
@@ -197,7 +200,7 @@ export default function Edit() {
         const file = files[0];
 
         if (!file.type.startsWith("audio/")) {
-          toast.error("Only audio files allowed");
+          toast.error("Choose an audio file for the audio field.");
           return;
         }
 
@@ -224,7 +227,11 @@ export default function Edit() {
           toast.success("Audio uploaded!");
         } catch (err) {
           toast.dismiss();
-          toast.error(episodeRequestError(err));
+          if (err?.name === "AbortError" || err?.code === "ERR_CANCELED") {
+            setUploadedAudioUrl(null);
+            setFormData((prev) => ({ ...prev, audio: null, audioUrl: "", audioSize: 0 }));
+            toast.success("Audio upload cancelled.");
+          } else toast.error(episodeRequestError(err));
           console.error(err);
         } finally {
           setUploadingAudio(false);
@@ -233,13 +240,12 @@ export default function Edit() {
       else if (name === "video" && files?.[0]) {
     const file = files[0];
 
-    if (!file.type.startsWith("video/") && !file.type.startsWith("audio/")) {
-      toast.error("Only video/audio allowed");
+    if (!file.type.startsWith("video/")) {
+      toast.error("Choose a video file for the video field.");
       return;
     }
 
     // Extract metadata before upload
-    setUploadingVideo(true);
     const tempVideo = document.createElement("video");
     tempVideo.preload = "metadata";
 
@@ -247,7 +253,7 @@ export default function Edit() {
       window.URL.revokeObjectURL(tempVideo.src);
       if (!Number.isFinite(tempVideo.duration)) {
         setUploadingVideo(false);
-        toast.error("Unable to read this media file duration. Please choose a supported audio or video file.");
+        toast.error("Unable to read this video file duration. Choose a supported video file.");
         return;
       }
       const durationInSec = Math.floor(tempVideo.duration);
@@ -279,7 +285,11 @@ export default function Edit() {
         toast.success("Upload complete!");
       } catch (err) {
         toast.dismiss();
-        toast.error(episodeRequestError(err));
+        if (err?.name === "AbortError" || err?.code === "ERR_CANCELED") {
+          setUploadedFileUrl(null);
+          setFormData((prev) => ({ ...prev, video: null, videoUrl: "" }));
+          toast.success("Video upload cancelled.");
+        } else toast.error(episodeRequestError(err));
         console.error(err);
       }
 
@@ -329,12 +339,17 @@ export default function Edit() {
     setBusy(true);
     setProgress(0);
     try {
-      return await uploadEpisodeMedia({ file, api: Api, put: axios.put, onProgress: setProgress });
+      const controller = new AbortController();
+      if (type === "audio") audioUploadController.current = controller;
+      else videoUploadController.current = controller;
+      return await uploadEpisodeMedia({ file, kind: type, api: Api, put: axios.put, onProgress: setProgress, signal: controller.signal });
     } catch (error) {
       setProgress(0);
       throw error;
     } finally {
       setBusy(false);
+      if (type === "audio") audioUploadController.current = null;
+      else videoUploadController.current = null;
     }
   };
 
@@ -347,6 +362,10 @@ export default function Edit() {
     const requestedPublicationStatus = e.nativeEvent?.submitter?.value
       || formData.publicationStatus
       || "PUBLISHED";
+    if (requestedPublicationStatus === "SCHEDULED" && (!formData.scheduledAt || new Date(formData.scheduledAt).getTime() <= Date.now())) {
+      toast.error("Choose a future date and time to schedule this episode.");
+      return;
+    }
     setLoading(true);
     try {
       const main = new PodcastApi();
@@ -373,6 +392,7 @@ export default function Edit() {
       payload.append("relatedEpisodeUuids", JSON.stringify(formData.relatedEpisodeUuids));
       payload.append("homePageHeroPhone", String(formData.homePageHeroPhone));
       payload.append("publicationStatus", requestedPublicationStatus);
+      payload.append("scheduledAt", formData.scheduledAt ? new Date(formData.scheduledAt).toISOString() : "");
       payload.append("heroPhones", JSON.stringify((formData.heroPhones || []).map(({ thumbnail, shortVideo, ...phone }) => phone)));
       (formData.heroPhones || []).forEach((phone, index) => {
         if (phone.thumbnail instanceof File) payload.append(`heroPhoneThumbnail_${index}`, phone.thumbnail);
@@ -470,6 +490,7 @@ export default function Edit() {
       durationInSec: response?.data?.data?.durationInSec || 0,
       episodeNumber: response?.data?.data?.episodeNumber || "",
       publishedDate: response?.data?.data?.createdAt ? new Date(response.data.data.createdAt).toISOString().slice(0, 10) : "",
+      scheduledAt: response?.data?.data?.scheduledAt ? new Date(new Date(response.data.data.scheduledAt).getTime() - new Date(response.data.data.scheduledAt).getTimezoneOffset() * 60_000).toISOString().slice(0, 16) : "",
       size: response?.data?.data?.size || 0,
       isSpotify: !!response?.data?.data?.spotifyLink,
       spotifyLink: response?.data?.data?.spotifyLink || "",
@@ -554,6 +575,7 @@ export default function Edit() {
               <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                 <div className="space-y-1"><label className="block text-sm font-medium">Episode number</label><input type="number" min="1" step="1" name="episodeNumber" value={formData.episodeNumber} onChange={handleChange} placeholder="24" className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white" /></div>
                 <div className="space-y-1"><label className="block text-sm font-medium">Publication date</label><input type="date" name="publishedDate" value={formData.publishedDate} onChange={handleChange} className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700" /></div>
+                <div className="space-y-1"><label className="block text-sm font-medium">Schedule publication</label><input type="datetime-local" name="scheduledAt" value={formData.scheduledAt} min={new Date(Date.now() + 60_000 - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 16)} onChange={handleChange} className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700" /><p className="text-xs text-gray-400">Uses your local time. The episode becomes public automatically at this time.</p></div>
                 <div className="space-y-1"><label className="block text-sm font-medium">Duration (minutes)</label><input type="number" min="0" step="1" value={formData.duration || ""} onChange={(event) => setFormData((current) => ({ ...current, duration: Number(event.target.value), durationInSec: Number(event.target.value) * 60 }))} className="w-full p-3 rounded-lg bg-[#1c1c1c] text-white border border-gray-700" /></div>
               </div>
 
@@ -639,22 +661,23 @@ export default function Edit() {
                       Episode File <span className="text-red-500">*</span>
                     </label>
                     <p className="text-xs text-gray-400">
-                      Upload video or audio file
+                      Upload a video file here. Upload audio in the separate audio field.
                     </p>
                     <input
                       type="file" disabled={loading}
                       name="video"
-                      accept="video/*,audio/*"
+                      accept="video/*"
                       onChange={handleChange}
                       className="w-full h-fit text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
                     />
                     {uploadingVideo && (
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs text-gray-400">
                           <span>Uploading...</span>
                           <span>{uploadProgress}%</span>
                         </div>
-                        <progress className="w-full" value={uploadProgress} max="100"></progress>
+                        <div className="h-2 overflow-hidden rounded-full bg-gray-700"><div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-[width] duration-300 ease-out" style={{ width: `${uploadProgress}%` }} /></div>
+                        <button type="button" onClick={() => videoUploadController.current?.abort()} className="rounded-lg border border-red-400 px-3 py-1.5 text-xs font-semibold text-red-300 hover:bg-red-950/40">Cancel video upload</button>
                       </div>
                     )}
                     {uploadedFileUrl && (
@@ -684,12 +707,13 @@ export default function Edit() {
                     />
 
                     {uploadingAudio && (
-                      <div className="space-y-1">
+                    <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs text-gray-400">
                           <span>Uploading...</span>
                           <span>{audioUploadProgress}%</span>
                         </div>
-                        <progress className="w-full" value={audioUploadProgress} max="100"></progress>
+                        <div className="h-2 overflow-hidden rounded-full bg-gray-700"><div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-[width] duration-300 ease-out" style={{ width: `${audioUploadProgress}%` }} /></div>
+                        <button type="button" onClick={() => audioUploadController.current?.abort()} className="rounded-lg border border-red-400 px-3 py-1.5 text-xs font-semibold text-red-300 hover:bg-red-950/40">Cancel audio upload</button>
                       </div>
                     )}
 
@@ -798,11 +822,13 @@ export default function Edit() {
               <p className="mt-1 text-xs leading-5 text-gray-400">
                 {formData.publicationStatus === "DRAFT"
                   ? "This draft is private. Publish it when all required content is ready."
-                  : "This episode is live on the website and available to public feeds."}
+                  : formData.publicationStatus === "SCHEDULED"
+                    ? `This episode is private until ${formData.scheduledAt ? new Date(formData.scheduledAt).toLocaleString() : "its scheduled time"}.`
+                    : "This episode is live on the website and available to public feeds."}
               </p>
             </div>
-            <span className={`rounded-full px-3 py-1 text-xs font-bold !text-white ${formData.publicationStatus === "DRAFT" ? "bg-amber-600" : "bg-emerald-600"}`}>
-              {formData.publicationStatus === "DRAFT" ? "Draft" : "Published"}
+            <span className={`rounded-full px-3 py-1 text-xs font-bold !text-white ${formData.publicationStatus === "DRAFT" ? "bg-amber-600" : formData.publicationStatus === "SCHEDULED" ? "bg-violet-700" : "bg-emerald-600"}`}>
+              {formData.publicationStatus === "DRAFT" ? "Draft" : formData.publicationStatus === "SCHEDULED" ? "Scheduled" : "Published"}
             </span>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -819,7 +845,7 @@ export default function Edit() {
             <button
               type="submit"
               name="publicationStatus"
-              value={formData.publicationStatus === "DRAFT" ? "PUBLISHED" : "DRAFT"}
+              value={formData.publicationStatus === "DRAFT" || formData.publicationStatus === "SCHEDULED" ? "PUBLISHED" : "DRAFT"}
               formNoValidate={formData.publicationStatus !== "DRAFT"}
               disabled={loading}
               className="rounded-lg border border-[#9747FF] bg-transparent px-5 py-3 font-semibold !text-black transition hover:!text-black  disabled:cursor-not-allowed disabled:opacity-60"
@@ -828,8 +854,11 @@ export default function Edit() {
                 ? "Updating..."
                 : formData.publicationStatus === "DRAFT"
                   ? "Publish episode"
-                  : "Move to draft"}
+                  : formData.publicationStatus === "SCHEDULED"
+                    ? "Publish now"
+                    : "Move to draft"}
             </button>
+            <button type="submit" name="publicationStatus" value="SCHEDULED" disabled={loading} className="rounded-lg border border-violet-400 bg-violet-950/30 px-5 py-3 font-semibold text-violet-200 transition hover:bg-violet-900/40 disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Saving..." : "Schedule episode"}</button>
           </div>
         </div>
           </form>

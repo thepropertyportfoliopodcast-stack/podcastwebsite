@@ -105,8 +105,8 @@ export default function AdminEpisodeCard({
 
 {/* Content */}
   <div className="flex w-full min-w-0 flex-1 flex-col items-center font-outfit text-white md:items-start">
-    <span className={`mb-3 inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[.08em] !text-white ${episode?.publicationStatus === "DRAFT" ? "bg-amber-600" : "bg-emerald-600"}`}>
-      {episode?.publicationStatus === "DRAFT" ? "Draft" : "Published"}
+    <span className={`mb-3 inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[.08em] !text-white ${episode?.publicationStatus === "DRAFT" ? "bg-amber-600" : episode?.publicationStatus === "SCHEDULED" ? "bg-violet-700" : "bg-emerald-600"}`}>
+      {episode?.publicationStatus === "DRAFT" ? "Draft" : episode?.publicationStatus === "SCHEDULED" ? `Scheduled${episode?.scheduledAt ? ` · ${new Date(episode.scheduledAt).toLocaleString()}` : ""}` : "Published"}
     </span>
     <h3 className="mb-2 break-words text-center text-xl font-bold leading-snug text-white sm:text-2xl md:text-left xl:text-[30px]">
       {episode?.title}

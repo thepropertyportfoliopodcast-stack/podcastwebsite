@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AdminLayout from "@/components/layout/AdminLayout";
 import toast from "react-hot-toast";
 import PodcastApi from "@/services/podcastApi";
@@ -52,6 +52,7 @@ export default function Add() {
     durationInSec: 0,
     episodeNumber: "",
     publishedDate: "",
+    scheduledAt: "",
     size: 0,
     isFeatured: false,
     relatedEpisodeUuids: [],
@@ -65,6 +66,8 @@ export default function Add() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const videoUploadController = useRef(null);
+  const audioUploadController = useRef(null);
 
   // Audio States
   const [uploadingAudio, setUploadingAudio] = useState(false);
@@ -165,13 +168,12 @@ export default function Add() {
     } else if (name === "video" && files?.[0]) {
     const file = files[0];
 
-    if (!file.type.startsWith("video/") && !file.type.startsWith("audio/")) {
-      toast.error("Only video/audio allowed");
+    if (!file.type.startsWith("video/")) {
+      toast.error("Choose a video file for the video field.");
       return;
     }
 
     // Extract metadata before upload
-    setUploadingVideo(true);
     const tempVideo = document.createElement("video");
     tempVideo.preload = "metadata";
 
@@ -179,7 +181,7 @@ export default function Add() {
       window.URL.revokeObjectURL(tempVideo.src);
       if (!Number.isFinite(tempVideo.duration)) {
         setUploadingVideo(false);
-        toast.error("Unable to read this media file duration. Please choose a supported audio or video file.");
+          toast.error("Unable to read this video file duration. Choose a supported video file.");
         return;
       }
       const durationInSec = Math.floor(tempVideo.duration);
@@ -211,7 +213,11 @@ export default function Add() {
         toast.success("Upload complete!");
       } catch (err) {
         toast.dismiss();
-        toast.error(episodeRequestError(err));
+        if (err?.name === "AbortError" || err?.code === "ERR_CANCELED") {
+          setUploadedFileUrl(null);
+          setFormData((prev) => ({ ...prev, video: null, videoUrl: "" }));
+          toast.success("Video upload cancelled.");
+        } else toast.error(episodeRequestError(err));
         console.error(err);
       }
 
@@ -229,7 +235,7 @@ export default function Add() {
         const file = files[0];
 
         if (!file.type.startsWith("audio/")) {
-          toast.error("Only audio files allowed");
+          toast.error("Choose an audio file for the audio field.");
           return;
         }
 
@@ -256,7 +262,11 @@ export default function Add() {
           toast.success("Audio uploaded!");
         } catch (err) {
           toast.dismiss();
-          toast.error(episodeRequestError(err));
+          if (err?.name === "AbortError" || err?.code === "ERR_CANCELED") {
+            setUploadedAudioUrl(null);
+            setFormData((prev) => ({ ...prev, audio: null, audioUrl: "", audioSize: 0 }));
+            toast.success("Audio upload cancelled.");
+          } else toast.error(episodeRequestError(err));
           console.error(err);
         } finally {
           setUploadingAudio(false);
@@ -375,12 +385,17 @@ export default function Add() {
     setBusy(true);
     setProgress(0);
     try {
-      return await uploadEpisodeMedia({ file, api: Api, put: axios.put, onProgress: setProgress });
+      const controller = new AbortController();
+      if (type === "audio") audioUploadController.current = controller;
+      else videoUploadController.current = controller;
+      return await uploadEpisodeMedia({ file, kind: type, api: Api, put: axios.put, onProgress: setProgress, signal: controller.signal });
     } catch (error) {
       setProgress(0);
       throw error;
     } finally {
       setBusy(false);
+      if (type === "audio") audioUploadController.current = null;
+      else videoUploadController.current = null;
     }
   };
 
@@ -390,9 +405,13 @@ export default function Add() {
       toast.error("Wait for the current upload or save to finish.");
       return;
     }
-    const requestedPublicationStatus = e.nativeEvent?.submitter?.value === "DRAFT"
-      ? "DRAFT"
+    const requestedPublicationStatus = ["DRAFT", "SCHEDULED"].includes(e.nativeEvent?.submitter?.value)
+      ? e.nativeEvent.submitter.value
       : "PUBLISHED";
+    if (requestedPublicationStatus === "SCHEDULED" && (!formData.scheduledAt || new Date(formData.scheduledAt).getTime() <= Date.now())) {
+      toast.error("Choose a future date and time to schedule this episode.");
+      return;
+    }
 
     if (!formData.title.trim()) {
       toast.error("Add an episode title before saving");
@@ -431,6 +450,7 @@ export default function Add() {
       payload.append("relatedEpisodeUuids", JSON.stringify(formData.relatedEpisodeUuids));
       payload.append("homePageHeroPhone", String(formData.homePageHeroPhone));
       payload.append("publicationStatus", requestedPublicationStatus);
+      payload.append("scheduledAt", formData.scheduledAt ? new Date(formData.scheduledAt).toISOString() : "");
       payload.append("heroPhones", JSON.stringify((formData.heroPhones || []).map(({ thumbnail, shortVideo, ...phone }) => phone)));
       (formData.heroPhones || []).forEach((phone, index) => {
         if (phone.thumbnail) payload.append(`heroPhoneThumbnail_${index}`, phone.thumbnail);
@@ -566,6 +586,7 @@ export default function Add() {
             <label className="block text-sm font-medium">Publication date</label>
             <input type="date" name="publishedDate" value={formData.publishedDate} onChange={handleChange} className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white" />
           </div>
+          <div className="space-y-1"><label className="block text-sm font-medium">Schedule publication</label><input type="datetime-local" name="scheduledAt" value={formData.scheduledAt} min={new Date(Date.now() + 60_000 - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 16)} onChange={handleChange} className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white" /><p className="text-xs text-gray-400">Uses your local time. The episode becomes public automatically at this time.</p></div>
           <div className="space-y-1">
             <label className="block text-sm font-medium">Duration (minutes)</label>
             <input type="number" min="0" step="1" value={formData.duration || ""} onChange={(event) => setFormData((current) => ({ ...current, duration: Number(event.target.value), durationInSec: Number(event.target.value) * 60 }))} className="w-full rounded-lg border border-gray-700 bg-[#1c1c1c] p-3 text-white" />
@@ -646,15 +667,15 @@ export default function Add() {
           <input
             type="file" disabled={loading}
             name="video"
-             accept="video/*,audio/*"
+            accept="video/*"
             onChange={handleChange}
             className="w-full text-sm text-gray-400 file:bg-white file:text-black file:rounded-lg file:px-4 file:py-2 border border-gray-700 bg-[#1c1c1c]"
           />
           {uploadingVideo && (
-            <div>
-              <label>Uploading Video...</label>
-              <progress value={uploadProgress} max="100"></progress>
-              <span>{uploadProgress}%</span>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-gray-300"><label>Uploading video</label><span>{uploadProgress}%</span></div>
+              <div className="h-2 overflow-hidden rounded-full bg-gray-700"><div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-[width] duration-300 ease-out" style={{ width: `${uploadProgress}%` }} /></div>
+              <button type="button" onClick={() => videoUploadController.current?.abort()} className="rounded-lg border border-red-400 px-3 py-1.5 text-xs font-semibold text-red-300 hover:bg-red-950/40">Cancel video upload</button>
             </div>
           )}
           {uploadedFileUrl && (
@@ -677,10 +698,10 @@ export default function Add() {
           />
 
           {uploadingAudio && (
-            <div>
-              <label>Uploading Audio...</label>
-              <progress value={audioUploadProgress} max="100"></progress>
-              <span>{audioUploadProgress}%</span>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-gray-300"><label>Uploading audio</label><span>{audioUploadProgress}%</span></div>
+              <div className="h-2 overflow-hidden rounded-full bg-gray-700"><div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-[width] duration-300 ease-out" style={{ width: `${audioUploadProgress}%` }} /></div>
+              <button type="button" onClick={() => audioUploadController.current?.abort()} className="rounded-lg border border-red-400 px-3 py-1.5 text-xs font-semibold text-red-300 hover:bg-red-950/40">Cancel audio upload</button>
             </div>
           )}
 
@@ -742,6 +763,7 @@ export default function Add() {
           >
               {loading ? "Publishing..." : "Publish episode"}
           </button>
+          <button type="submit" name="publicationStatus" value="SCHEDULED" disabled={loading} className="rounded-lg border border-violet-400 bg-violet-950/30 px-5 py-3 font-semibold text-violet-200 transition hover:bg-violet-900/40 disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Saving..." : "Schedule episode"}</button>
           </div>
         </div>
       </form>
